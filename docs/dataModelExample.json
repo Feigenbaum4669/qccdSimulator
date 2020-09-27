@@ -1,0 +1,117 @@
+{
+  "trap": {
+    "capacity": 4,
+    "traps": [
+      {
+        "id": 1,
+        "nQubits": 3,
+        "chain": [
+          "q1",
+          "q2",
+          "q3"
+        ],
+        "neighbours": [
+          {
+            "connections": []
+          },
+          {
+            "connections": [
+              {
+                "id": 10,
+                "type": "junction",
+                "weight": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "numberOfQubits": 3,
+        "initialQubits": [
+          "q4",
+          "q5",
+          "q6"
+        ],
+        "neighbours": [
+          {
+            "connections": []
+          },
+          {
+            "connections": [
+              {
+                "id": 12,
+                "type": "junction",
+                "weight": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "junction": {
+    "junctions": [
+      {
+        "id": 10,
+        "capacity": 2,
+        "neighbours": [
+          {
+            "connections": [
+              {
+                "id": 11,
+                "type": "junction",
+                "weight": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "capacity": 2,
+        "neighbours": [
+          {
+            "connections": [
+              {
+                "id": 2,
+                "type": "trap",
+                "weight": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "capacity": 2,
+        "neighbours": [
+          {
+            "connections": [
+              {
+                "id": 13,
+                "type": "junction",
+                "weight": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "capacity": 2,
+        "neighbours": [
+          {
+            "connections": [
+              {
+                "id": 1,
+                "type": "trap",
+                "weight": 2
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
