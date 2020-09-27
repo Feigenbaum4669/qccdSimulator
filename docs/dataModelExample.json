@@ -3,7 +3,7 @@
     "capacity": 4,
     "traps": [
       {
-        "id": 1,
+        "id": 0,
         "nQubits": 3,
         "chain": [
           "q1",
@@ -17,7 +17,7 @@
           {
             "connections": [
               {
-                "id": 10,
+                "id": 2,
                 "type": "junction",
                 "weight": 1
               }
@@ -26,7 +26,7 @@
         ]
       },
       {
-        "id": 2,
+        "id": 1,
         "numberOfQubits": 3,
         "initialQubits": [
           "q4",
@@ -40,7 +40,7 @@
           {
             "connections": [
               {
-                "id": 12,
+                "id": 4,
                 "type": "junction",
                 "weight": 1
               }
@@ -53,13 +53,13 @@
   "junction": {
     "junctions": [
       {
-        "id": 10,
+        "id": 2,
         "capacity": 2,
         "neighbours": [
           {
             "connections": [
               {
-                "id": 11,
+                "id": 3,
                 "type": "junction",
                 "weight": 3
               }
@@ -68,13 +68,13 @@
         ]
       },
       {
-        "id": 11,
+        "id": 3,
         "capacity": 2,
         "neighbours": [
           {
             "connections": [
               {
-                "id": 2,
+                "id": 1,
                 "type": "trap",
                 "weight": 2
               }
@@ -83,13 +83,13 @@
         ]
       },
       {
-        "id": 12,
+        "id": 4,
         "capacity": 2,
         "neighbours": [
           {
             "connections": [
               {
-                "id": 13,
+                "id": 5,
                 "type": "junction",
                 "weight": 3
               }
@@ -98,13 +98,13 @@
         ]
       },
       {
-        "id": 13,
+        "id": 5,
         "capacity": 2,
         "neighbours": [
           {
             "connections": [
               {
-                "id": 1,
+                "id": 0,
                 "type": "trap",
                 "weight": 2
               }
