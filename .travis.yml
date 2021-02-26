@@ -15,4 +15,5 @@ notifications:
 email: false
 codecov: true
 after_success:
+- julia --code-coverage
 - julia -e 'using Pkg; cd(Pkg.dir("qccdSimulator")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
