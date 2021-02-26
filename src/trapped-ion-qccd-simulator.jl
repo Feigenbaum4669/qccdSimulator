@@ -1,5 +1,7 @@
-module trapped-ion-qccd-simulator
+module trapped-ion - qccd - simulator
 
-# Write your package code here.
+test()::Bool = true
 
+
+export test
 end
