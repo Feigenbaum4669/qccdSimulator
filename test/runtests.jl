@@ -1,4 +1,4 @@
-using trapped - ion - qccd - simulator
+using qccdSimulator
 using Test
 
 @test 1 == 1

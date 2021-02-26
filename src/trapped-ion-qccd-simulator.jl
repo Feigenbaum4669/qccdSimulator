@@ -1,4 +1,4 @@
-module trapped-ion - qccd - simulator
+module qccdSimulator
 
 test()::Bool = true
 
