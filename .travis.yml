@@ -5,7 +5,7 @@ os:
 - osx
 - Windows
 julia:
-- 1.5.3
+- 1.5
 - nightly
 matrix:
 allow_failures:
