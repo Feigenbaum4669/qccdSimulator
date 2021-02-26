@@ -1,0 +1,13 @@
+name = "trapped-ion-qccd-simulator"
+uuid = "9ac1aeb4-acc6-4df6-9eeb-8eaa1e4456f1"
+authors = ["Hopery <anabel.ovide@gmail.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
