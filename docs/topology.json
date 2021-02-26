@@ -1,0 +1,125 @@
+{
+    "adjacency": {
+        "1": [
+            "5"
+        ],
+        "2": [
+            "4"
+        ],
+        "3": [
+            "4"
+        ],
+        "4": [
+            "1"
+        ],
+        "5": [
+            "2",
+            "3"
+        ]
+    },
+    "trap": {
+        "capacity": "3",
+        "traps": [
+            {
+                "id": "1",
+                "chain": [
+                    "q1",
+                    "q2",
+                    "q3"
+                ],
+                "end0": {
+                    "qubit": "q1",
+                    "shuttle": ""
+                },
+                "end1": {
+                    "qubit": "q3",
+                    "shuttle": "s1"
+                },
+                "extraAttribute": "value"
+            },
+            {
+                "id": "2",
+                "chain": [
+                    "q4"
+                ],
+                "end0": {
+                    "qubit": "q4",
+                    "shuttle": "s3"
+                },
+                "end1": {
+                    "qubit": "q4",
+                    "shuttle": ""
+                },
+                "extraAttribute": "value"
+            },
+            {
+                "id": "3",
+                "chain": [],
+                "end0": {
+                    "qubit": "",
+                    "shuttle": "s6"
+                },
+                "end1": {
+                    "qubit": "",
+                    "shuttle": ""
+                },
+                "extraAttribute": "value"
+            }
+        ],
+        "extraAttribute": "value"
+    },
+    "junction": {
+        "junctions": [
+            {
+                "id": "4",
+                "type": "T"
+            },
+            {
+                "id": "5",
+                "type": "T"
+            }
+        ],
+        "extraAttribute": "value"
+    },
+    "shuttle": {
+        "shuttles": [
+            {
+                "id": "s1",
+                "from": "1",
+                "to": "5",
+                "extraAttribute": "value"
+            },
+            {
+                "id": "s2",
+                "from": "5",
+                "to": "2",
+                "extraAttribute": "value"
+            },
+            {
+                "id": "s3",
+                "from": "2",
+                "to": "4",
+                "extraAttribute": "value"
+            },
+            {
+                "id": "s4",
+                "from": "4",
+                "to": "1",
+                "extraAttribute": "value"
+            },
+            {
+                "id": "s5",
+                "from": "5",
+                "to": "3",
+                "extraAttribute": "value"
+            },
+            {
+                "id": "s6",
+                "from": "3",
+                "to": "4",
+                "extraAttribute": "value"
+            }
+        ],
+        "extraAttribute": "value"
+    }
+}
