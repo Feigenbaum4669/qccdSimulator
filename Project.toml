@@ -3,6 +3,10 @@ uuid = "9ac1aeb4-acc6-4df6-9eeb-8eaa1e4456f1"
 authors = ["Hopery <anabel.ovide@gmail.com> and Alejandro <alexvilloria26@gmail.com>"]
 version = "0.1.0"
 
+[deps]
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+LightGraphs = "093fc24a-ae57-5d10-9952-331d41423f4d"
+
 [compat]
 julia = "1"
 
