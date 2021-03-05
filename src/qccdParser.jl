@@ -9,9 +9,13 @@ function createTopology(path::String)::SimpleDiGraph{Int64}
     if !isfile(path)
         throw(ArgumentError("Input is not a file"))
     end
+    
     # Parsing JSON
-    topology::Topology  = JSON3.read(read(path, String), Topology)
-
+    topology::Topology  = try 
+        JSON3.read(read(path, String), Topology)
+    catch err
+        throw(ArgumentError(err.msg))
+    end
     # Initialize graphs
     nodesAdjacency::Dict{String,Array{Int64}} = topology.adjacency.nodes
     graphTopology::SimpleDiGraph{Int64} = DiGraph(length(nodesAdjacency))
