@@ -1,32 +1,23 @@
 using LightGraphs
-using GraphPlot
-using Compose
-import JSON
-import Cairo, Fontconfig
+import JSON3
+include("types.jl")
 
 # Input -> Json path
 # Output -> Topology
 # Creates a topology using a graph from JSON
 function createTopology(path::String) :: SimpleDiGraph{Int64}
     # Parsing JSON
-    json = JSON.parsefile(path)
+    topology = JSON3.read(read(path, String),Topology)
 
     # Initialize graphs
-    adjacency = json["adjacency"]
-    topology = DiGraph(length(adjacency))
+    nodesAdjacency = topology.adjacency.nodes
+    topology = DiGraph(length(nodesAdjacency))
 
     # Adding nodes
-    for nodes in keys(adjacency) 
-        for node in adjacency[nodes]
-            add_edge!(topology, parse(Int64, nodes) , parse(Int64, node))
+    for nodes in keys(nodesAdjacency) 
+        for node in nodesAdjacency[nodes]
+            add_edge!(topology, parse(Int64, nodes), node)
         end
     end
     return topology
 end
-
-# Check OK
-graph = createTopology("../docs/topology.json")
-draw(PNG("mygraph.png", 8cm, 8cm), gplot(graph, nodelabel=1:5))
-x=enumerate_paths(dijkstra_shortest_paths(graph, 2), 5)
-println(typeof(graph))
-println(x)
