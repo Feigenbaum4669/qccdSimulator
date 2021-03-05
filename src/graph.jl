@@ -5,7 +5,7 @@ import JSON
 import Cairo, Fontconfig
 
 # Parsing JSON
-j = JSON.parsefile("json.json")
+j = JSON.parsefile("../docs/topology.json")
 
 # Initialize graph
 adjacency = j["adjacency"]
