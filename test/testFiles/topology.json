@@ -1,27 +1,29 @@
 {
     "adjacency": {
-        "1": [
-            "5"
-        ],
-        "2": [
-            "4"
-        ],
-        "3": [
-            "4"
-        ],
-        "4": [
-            "1"
-        ],
-        "5": [
-            "2",
-            "3"
-        ]
+        "nodes": {
+            "1": [
+                5
+            ],
+            "2": [
+                4
+            ],
+            "3": [
+                4
+            ],
+            "4": [
+                1
+            ],
+            "5": [
+                2,
+                3
+            ]
+        }
     },
     "trap": {
-        "capacity": "3",
+        "capacity": 3,
         "traps": [
             {
-                "id": "1",
+                "id": 1,
                 "chain": [
                     "q1",
                     "q2",
@@ -38,7 +40,7 @@
                 "extraAttribute": "value"
             },
             {
-                "id": "2",
+                "id": 2,
                 "chain": [
                     "q4"
                 ],
@@ -53,7 +55,7 @@
                 "extraAttribute": "value"
             },
             {
-                "id": "3",
+                "id": 3,
                 "chain": [],
                 "end0": {
                     "qubit": "",
@@ -71,11 +73,11 @@
     "junction": {
         "junctions": [
             {
-                "id": "4",
+                "id": 4,
                 "type": "T"
             },
             {
-                "id": "5",
+                "id": 5,
                 "type": "T"
             }
         ],
@@ -85,38 +87,38 @@
         "shuttles": [
             {
                 "id": "s1",
-                "from": "1",
-                "to": "5",
+                "from": 1,
+                "to": 5,
                 "extraAttribute": "value"
             },
             {
                 "id": "s2",
-                "from": "5",
-                "to": "2",
+                "from": 5,
+                "to": 2,
                 "extraAttribute": "value"
             },
             {
                 "id": "s3",
-                "from": "2",
-                "to": "4",
+                "from": 2,
+                "to": 4,
                 "extraAttribute": "value"
             },
             {
                 "id": "s4",
-                "from": "4",
-                "to": "1",
+                "from": 4,
+                "to": 1,
                 "extraAttribute": "value"
             },
             {
                 "id": "s5",
-                "from": "5",
-                "to": "3",
+                "from": 5,
+                "to": 3,
                 "extraAttribute": "value"
             },
             {
                 "id": "s6",
-                "from": "3",
-                "to": "4",
+                "from": 3,
+                "to": 4,
                 "extraAttribute": "value"
             }
         ],

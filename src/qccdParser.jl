@@ -10,17 +10,17 @@ function createTopology(path::String)::SimpleDiGraph{Int64}
         throw(ArgumentError(path + " Is not a file"))
     end
     # Parsing JSON
-    topology = JSON3.read(read(path, String), Topology)
+    topology::Topology  = JSON3.read(read(path, String), Topology)
 
     # Initialize graphs
-    nodesAdjacency = topology.adjacency.nodes
-    topology = DiGraph(length(nodesAdjacency))
+    nodesAdjacency::Dict{String,Array{Int64}} = topology.adjacency.nodes
+    graphTopology::SimpleDiGraph{Int64} = DiGraph(length(nodesAdjacency))
 
     # Adding nodes
     for nodes in keys(nodesAdjacency) 
         for node in nodesAdjacency[nodes]
-            add_edge!(topology, parse(Int64, nodes), node)
+            add_edge!(graphTopology, parse(Int64, nodes), node)
         end
     end
-    return topology
+    return graphTopology
 end
