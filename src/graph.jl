@@ -4,21 +4,29 @@ using Compose
 import JSON
 import Cairo, Fontconfig
 
-# Parsing JSON
-j = JSON.parsefile("../docs/topology.json")
+# Input -> Json path
+# Output -> Topology
+# Creates a topology using a graph from JSON
+function createTopology(path::String) :: SimpleDiGraph{Int64}
+    # Parsing JSON
+    json = JSON.parsefile(path)
 
-# Initialize graph
-adjacency = j["adjacency"]
-graph = DiGraph(length(adjacency))
+    # Initialize graphs
+    adjacency = json["adjacency"]
+    topology = DiGraph(length(adjacency))
 
-# Adding nodes
-for nodes in keys(adjacency) 
-    for node in adjacency[nodes]
-        add_edge!(graph, parse(Int64, nodes) , parse(Int64, node))
+    # Adding nodes
+    for nodes in keys(adjacency) 
+        for node in adjacency[nodes]
+            add_edge!(topology, parse(Int64, nodes) , parse(Int64, node))
+        end
     end
+    return topology
 end
 
 # Check OK
+graph = createTopology("../docs/topology.json")
 draw(PNG("mygraph.png", 8cm, 8cm), gplot(graph, nodelabel=1:5))
 x=enumerate_paths(dijkstra_shortest_paths(graph, 2), 5)
+println(typeof(graph))
 println(x)
