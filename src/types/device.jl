@@ -9,6 +9,8 @@ include("json.jl")
 struct JunctionEnd
     queue::Array{String,1}
     status::JunctionEndStatus
+    JunctionEnd() = new([], free)
+    JunctionEnd(queue, status) = new(queue, status)
 end
 
 #=  Struct for junction.
