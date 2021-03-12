@@ -1,4 +1,9 @@
-include("json.jl")
+@enum QubitStatus begin
+    moving
+    resting
+    waitingDecongestion
+    gateApplied
+end
 
 @enum JunctionEndStatus begin 
     free
@@ -39,4 +44,59 @@ struct Junction
         end
         return new(id, type, ends)
     end
+end
+
+#=  
+    Struct for the qubits.
+    id: qubit identifictor 
+    status: current qubit status
+        - moving
+        - resting
+        - waitingDecongestion
+        - gateApplied
+    position: current qubit position
+    destination: qubit destination, it could not have any =#
+struct Qubit
+    id::String
+    status::QubitStatus
+    position::Union{String,Int64}
+    destination::Union{Nothing,Int64}
+end
+
+#=  
+    Struct for the shuttles.
+    id: shuttle identifictor 
+    from & to: direcction of shuttle and endings =#
+struct Shuttle
+    id::String
+    from::Int64
+    to::Int64
+    Shuttle(id, from, to) = from == to ?  
+            error("\"from\" and \"to\" must be different") : new(id, from, to)
+end
+
+#=  
+    Struct for the trap endings.
+    qubit: qubit id in that ending 
+    shuttle: shuttle id the ending is connected =#
+struct TrapEnd
+    qubit::String
+    shuttle::String
+end
+
+#=  
+    Struct for the traps.
+    id: trap identifictor
+    capacity: maximum qubits in the trap 
+    chain: Orderer Qbits in the trap (from end0 to end1)
+    end0 & end1: Trap endings =#
+struct Trap
+    id::Int64
+    capacity::Int64
+    chain::Array{String}
+    end0::TrapEnd
+    end1::TrapEnd
+    Trap(id, capacity, chain, end0, end1) = capacity < length(chain) ? 
+        error("Trap with id \"$id\" exceeds its capacity") : 
+        new(id, capacity, chain, end0, end1)
 end
