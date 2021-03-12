@@ -1,6 +1,6 @@
 using LightGraphs
 import JSON3
-include("types.jl")
+include("./types/typesJson.jl")
 
 # Input -> Json path
 # Output -> Topology
@@ -9,10 +9,9 @@ function createTopology(path::String)::SimpleDiGraph{Int64}
     if !isfile(path)
         throw(ArgumentError("Input is not a file"))
     end
-    
     # Parsing JSON
-    topology::Topology  = try 
-        JSON3.read(read(path, String), Topology)
+    topology::TopologyJSON  = try 
+        JSON3.read(read(path, String), TopologyJSON)
     catch err
         throw(ArgumentError(err.msg))
     end
