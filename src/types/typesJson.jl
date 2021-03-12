@@ -1,0 +1,63 @@
+using StructTypes
+
+struct TrapEndJSON
+    qubit:: String
+    shuttle:: String
+end
+
+struct TrapInfoJSON
+    id:: Int64
+    chain:: Array{String}
+    end0:: TrapEndJSON
+    end1:: TrapEndJSON
+    extraAttribute:: String
+end
+
+struct TrapJSON
+    capacity:: Int64
+    traps:: Array{TrapInfoJSON}
+    extraAttribute:: String
+end
+
+struct JunctionInfoJSON
+    id:: Int64
+    type:: String
+end
+
+struct JunctionJSON
+    junctions :: Array{JunctionInfoJSON}
+    extraAttribute:: String
+end
+
+struct  ShuttleInfoJSON
+    id:: String
+    from:: Int64
+    to:: Int64
+    extraAttribute:: String
+end
+
+struct ShuttleJSON
+    shuttles:: Array{ShuttleInfoJSON}
+    extraAttribute:: String
+end
+
+struct AdjacencyJSON
+    nodes:: Dict{String,Array{Int64}} 
+end
+
+struct TopologyJSON
+    adjacency:: AdjacencyJSON
+    trap:: TrapJSON
+    junction:: JunctionJSON
+    shuttle:: ShuttleJSON
+end
+
+StructTypes.StructType(::Type{TrapEndJSON})= StructTypes.Struct()
+StructTypes.StructType(::Type{TrapInfoJSON})= StructTypes.Struct()
+StructTypes.StructType(::Type{TrapJSON})= StructTypes.Struct()
+StructTypes.StructType(::Type{JunctionInfoJSON})= StructTypes.Struct()
+StructTypes.StructType(::Type{JunctionJSON})= StructTypes.Struct()
+StructTypes.StructType(::Type{ShuttleInfoJSON})= StructTypes.Struct()
+StructTypes.StructType(::Type{ShuttleJSON})= StructTypes.Struct()
+StructTypes.StructType(::Type{AdjacencyJSON})= StructTypes.Struct()
+StructTypes.StructType(::Type{TopologyJSON})= StructTypes.Struct()
