@@ -1,6 +1,6 @@
 using LightGraphs
 import JSON3
-include("./types/typesJson.jl")
+include("./types/json.jl")
 
 # Input -> Json path
 # Output -> Topology
