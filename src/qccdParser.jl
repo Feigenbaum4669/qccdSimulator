@@ -1,27 +1,30 @@
+include("./types/typesJson.jl")
+include("./types/device.jl")
 using LightGraphs
 import JSON3
-include("./types/typesJson.jl")
 
 #=  
     Input -> Json path
     Output -> Topology
-    Creates a topology using a graph from JSON 
-=#
+    Creates a topology using a graph from JSON =#
 function createTopology(path::String)::SimpleDiGraph{Int64}
     topology::TopologyJSON  = try 
         _readJSON(path::String)
     catch err
         throw(err)
     end
-    
+    qubits = _initalizateQubits(topology.trap)
+    shuttles = _initializateShuttles(topology.shuttle)
+    traps = _initializateTraps(topology.trap)
+    println(traps)
     return _createGraph(topology)
 end
 
 #=  
     Input -> Json path
     Output -> TopologyJSON
-    Creates an object topologyJSON from JSON 
-=#
+    Creates an object topologyJSON from JSON. Throws an error
+    if input is not a valid file. =#
 function _readJSON(path::String)::TopologyJSON
     if !isfile(path)
         throw(ArgumentError("Input is not a file"))
@@ -37,8 +40,7 @@ end
 #=  
     Input -> topologyJSON
     Output -> graph
-    Creates a graph using a object topologyJSON
-=#
+    Creates a graph using a object topologyJSON =#
 function _createGraph(topology::TopologyJSON)::SimpleDiGraph{Int64}
     # Initialize graphs
     nodesAdjacency::Dict{String,Array{Int64}} = topology.adjacency.nodes
@@ -53,3 +55,58 @@ function _createGraph(topology::TopologyJSON)::SimpleDiGraph{Int64}
     return graphTopology
 end
 
+#=  
+    Input -> TrapJSON
+    Output -> Dict of qubits
+    Creates a dictionary of qubits using a object TrapJSON, throws an error
+    if qubits are in more than one place at same time. =#
+function _initalizateQubits(trapJSON::TrapJSON)::Dict{String,Qubit}
+    qubits = Dict{String,Qubit}()
+    err = (trapId, qubitPos) -> ArgumentError("Qubit cannot be in two places 
+            at same time when inicializating: " * trapId * ", " * qubitPos * ".")
+
+    for trap in trapJSON.traps
+        for qubit in trap.chain
+            !haskey(qubits, qubit) || throw(err(trap.id, qubits[qubit].position))
+            qubits[qubit] = Qubit(qubit, resting, trap.id, nothing)
+        end
+    end
+    return qubits
+end
+
+#=  
+    Input -> shuttleJSON
+    Output -> Dict of shuttles
+    Creates a dictionary of shuttles using a object shuttleJSON, throws an error
+    if shuttle id is repeated. =#
+function _initializateShuttles(shuttleJSON::ShuttleJSON)::Dict{String,Shuttle}
+    shuttles = Dict{String,Shuttle}()
+    err = id -> ArgumentError("Shuttle id is repeated: " * id * ".")
+
+    map(sh -> haskey(shuttles, sh.id) ? throw(err(sh.id)) :
+              shuttles[sh.id] = Shuttle(sh.id, sh.from, sh.to), 
+              shuttleJSON.shuttles)
+    return shuttles
+end
+
+#=  
+    Input -> trapJSON
+    Output -> Dict of traps
+    Creates a dictionary of traps using a object trapJSON, throws an error
+    if trap id is repeated. =#
+function _initializateTraps(trapJSON::TrapJSON)::Dict{Int64,Trap}
+    traps = Dict{Int64,Trap}()
+    err = id -> ArgumentError("Trap id is repeated: " * id * ".")
+
+    map(tr -> haskey(traps, tr.id) ? throw(err(tr.id)) :
+              traps[tr.id] = Trap(tr.id,trapJSON.capacity,tr.chain, 
+              TrapEnd(tr.end0.qubit, tr.end0.shuttle), 
+              TrapEnd(tr.end1.qubit, tr.end1.shuttle)), 
+              trapJSON.traps)
+    return traps
+end
+
+
+## CHECK TRAP -> SHUTTLE, QUBIT && SHUTTLE -> FROM(TRAP/JUNC), TO(TRAP/JUNC)
+
+createTopology("../test/testFiles/topology.json")   
