@@ -1,4 +1,4 @@
-include("./types/typesJson.jl")
+include("./types/json.jl")
 include("./types/device.jl")
 using LightGraphs
 import JSON3
@@ -87,10 +87,8 @@ function _initalizateQubits(trapJSON::TrapJSON)::Dict{String,Qubit}
             at same time when inicializating: " * trapId * ", " * qubitPos * ".")
 
     for trap in trapJSON.traps
-        for qubit in trap.chain
-            !haskey(qubits, qubit) || throw(err(trap.id, qubits[qubit].position))
-            qubits[qubit] = Qubit(qubit, resting, trap.id, nothing)
-        end
+        map(q -> haskey(qubits, q) ? throw(err(trap.id, qubits[q].position)) :
+                 qubits[q] = Qubit(q, resting, trap.id, nothing), trap.chain)
     end
     return qubits
 end
@@ -126,6 +124,5 @@ function _initializateTraps(trapJSON::TrapJSON)::Dict{Int64,Trap}
               trapJSON.traps)
     return traps
 end
-
 
 ## CHECK TRAP -> SHUTTLE, QUBIT && SHUTTLE -> FROM(TRAP/JUNC), TO(TRAP/JUNC)
