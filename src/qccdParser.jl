@@ -56,19 +56,15 @@ end
 function _createJunctions(shuttles::Array{ShuttleInfoJSON}, junctions::Array{JunctionInfoJSON})::Dict{Int64,Junction}
     res = Dict{Int64,Junction}()
     for j ∈ junctions
-        if haskey(res, j.id)
-            throw(ArgumentError(string("Repeated junction ID:", j.id, ". Make sure the IDs are unique.")))
-        end
+        !haskey(res, j.id) || throw(ArgumentError("Repeated junction ID: "* j.id))
+
         connectedShuttles = Iterators.filter(x -> x.from == j.id || x.to == j.id, shuttles)
         junctionEnds = Dict(s.id => JunctionEnd() for s ∈ connectedShuttles)
         try
             res[j.id] = Junction(j.id, eval(Meta.parse(j.type)), junctionEnds)
         catch e
-            if e isa UndefVarError
-                throw(ArgumentError(string("Junction type ", j.type, " not supported")))
-            else
-                rethrow(e)
-            end
+            e isa UndefVarError ?
+                throw(ArgumentError("Junction type "* j.type *" not supported")) : rethrow(e)
         end
     end
     return res

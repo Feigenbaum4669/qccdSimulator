@@ -39,8 +39,8 @@ struct Junction
     ends::Dict{String,JunctionEnd}
     function Junction(id::Int64, type::JunctionType, ends::Dict{String,JunctionEnd})
         if length(ends) != typesSizes[type]
-            throw(ArgumentError(string("Junction with ID ", id, " of type ",type, " has ",length(ends),
-            " ends. It should have ", typesSizes[type], " ends.")))
+            throw(ArgumentError("Junction with ID "* id* " of type "* type* " has "* length(ends)*
+            " ends. It should have "* typesSizes[type]* " ends."))
         end
         return new(id, type, ends)
     end
