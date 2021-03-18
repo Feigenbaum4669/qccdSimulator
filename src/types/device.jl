@@ -78,9 +78,9 @@ struct Shuttle
     id::String
     from::Int64
     to::Int64
-    Shuttle(id, from, to) = from == to ?  
-            throw(ArgumentError("\"from\" and \"to\" must be different"))
-            : new(id, from, to)
+    Shuttle(id, from, to) = from == to ? 
+            throw(ArgumentError("\"from\" and \"to\" must be different")) : 
+            new(id, from, to)
 end
 
 """  
@@ -108,6 +108,13 @@ struct Trap
     end0::TrapEnd
     end1::TrapEnd
     Trap(id, capacity, chain, end0, end1) = capacity < length(chain) ? 
-        throw(ArgumentError("Trap with id \"$id\" exceeds its capacity"))
-        : new(id, capacity, chain, end0, end1)
+        throw(ArgumentError("Trap with id \"$id\" exceeds its capacity")) :
+        new(id, capacity, chain, end0, end1)
+end
+
+struct Watcher
+    qubits::Dict{String,Qubit}
+    traps::Dict{Int64,Trap}
+    junctions::Dict{Int64,Junction}
+    shuttles::Dict{String,Shuttle}
 end

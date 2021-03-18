@@ -12,6 +12,7 @@ function createTopology(path::String)::SimpleDiGraph{Int64}
     qubits = _initQubits(topology.trap)
     shuttles = _initShuttles(topology.shuttle)
     traps = _initTraps(topology.trap)
+    println(_initWatcher(topology.adjacency.nodes, qubits, traps, junctions, shuttles))
     return _initGraph(topology)
 end
 
@@ -117,4 +118,21 @@ function _initTraps(trapJSON::TrapJSON)::Dict{Int64,Trap}
     return traps
 end
 
+"""
+Checks:
+    - Shuttle from - to corresponds JSON adjacency
+    - TrapsEnds shuttles exists and shuttle is connected to that trap
+    - TrapsEnds qubits is a qubit in the Trap chain and it is in the correct chain position
+"""
+function _initWatcher(adjacency:: Dict{String,Array{Int64}}, qubits::Dict{String,Qubit}, traps::Dict{Int64,Trap}, junctions::Dict{Int64,Junction}, shuttles::Dict{String,Shuttle})::Watcher
+    err = shuttleId -> ArgumentError("From-to doesn't correspond with adjacency in shuttle ID " * shuttleId * ".")
+    # Check with map instead for.
+    for (shuttleId, shuttle) in shuttles
+        haskey(adjacency,string(shuttle.from)) && 
+                shuttle.to in adjacency[string(shuttle.from)] || throw(err(shuttleId))
+    end
+    Watcher(qubits,traps,junctions,shuttles)
+end
+
+createTopology("../test/testFiles/topology.json")
 ## CHECK TRAP -> SHUTTLE, QUBIT && SHUTTLE -> FROM(TRAP/JUNC), TO(TRAP/JUNC)
