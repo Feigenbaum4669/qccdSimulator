@@ -79,8 +79,8 @@ struct Shuttle
     from::Int64
     to::Int64
     Shuttle(id, from, to) = from == to ?  
-            throw(ArgumentError("\"from\" and \"to\" must be different"))
-            : new(id, from, to)
+            throw(ArgumentError("\"from\" and \"to\" must be different")) : 
+            new(id, from, to)
 end
 
 """  
@@ -108,6 +108,6 @@ struct Trap
     end0::TrapEnd
     end1::TrapEnd
     Trap(id, capacity, chain, end0, end1) = capacity < length(chain) ? 
-        throw(ArgumentError("Trap with id \"$id\" exceeds its capacity"))
-        : new(id, capacity, chain, end0, end1)
+        throw(ArgumentError("Trap with id \"$id\" exceeds its capacity")) : 
+        new(id, capacity, chain, end0, end1)
 end
