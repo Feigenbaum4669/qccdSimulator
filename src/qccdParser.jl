@@ -75,12 +75,14 @@ end
     if qubits are in more than one place at same time. =#
 function _initalizateQubits(trapJSON::TrapJSON)::Dict{String,Qubit}
     qubits = Dict{String,Qubit}()
-    err = (trapId, qubitPos) -> ArgumentError("Qubit cannot be in two places 
-            at same time when inicializating: " * trapId * ", " * qubitPos * ".")
+    err = (trapId, qubitPos, qubitId) -> ArgumentError("Repeated Qubit ID "
+                       *qubitId * ". In traps " * trapId * ", " * qubitPos)
 
     for trap in trapJSON.traps
-        map(q -> haskey(qubits, q) ? throw(err(trap.id, qubits[q].position)) :
-                 qubits[q] = Qubit(q, resting, trap.id, nothing), trap.chain)
+        map(q -> haskey(qubits, q) ? 
+                 throw(err(trap.id, qubits[q].position, qubits[q].id)) :
+                 qubits[q] = Qubit(q, resting, trap.id, nothing),
+                 trap.chain)
     end
     return qubits
 end
