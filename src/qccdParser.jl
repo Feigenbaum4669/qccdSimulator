@@ -7,16 +7,12 @@ import JSON3
 Creates a topology using a graph from JSON
 """
 function createTopology(path::String)::SimpleDiGraph{Int64}
-    topology::TopologyJSON  = try 
-        _readJSON(path::String)
-    catch err
-        throw(err)
-    end
-    junctions = _createJunctions(topology.shuttle.shuttles, topology.junction.junctions)
-    qubits = _initalizateQubits(topology.trap)
-    shuttles = _initializateShuttles(topology.shuttle)
-    traps = _initializateTraps(topology.trap)
-    return _createGraph(topology)
+    topology::TopologyJSON  = _readJSON(path::String)
+    junctions = _initJunctions(topology.shuttle.shuttles, topology.junction.junctions)
+    qubits = _initQubits(topology.trap)
+    shuttles = _initShuttles(topology.shuttle)
+    traps = _initTraps(topology.trap)
+    return _initGraph(topology)
 end
 
 """  
@@ -38,7 +34,7 @@ end
 """  
 Creates a graph using a object topologyJSON.
 """
-function _createGraph(topology::TopologyJSON)::SimpleDiGraph{Int64}
+function _initGraph(topology::TopologyJSON)::SimpleDiGraph{Int64}
     nodesAdjacency::Dict{String,Array{Int64}} = topology.adjacency.nodes
     graphTopology::SimpleDiGraph{Int64} = DiGraph(length(nodesAdjacency))
 
@@ -55,7 +51,7 @@ Creates a dictionary of junctions from JSON objects.
 Throws ArgumentError if junction IDs are repeated.
 Throws ArgumentError if unsupported junction type is passed.
 """
-function _createJunctions(shuttles::Array{ShuttleInfoJSON}, junctions::Array{JunctionInfoJSON})::Dict{Int64,Junction}
+function _initJunctions(shuttles::Array{ShuttleInfoJSON}, junctions::Array{JunctionInfoJSON})::Dict{Int64,Junction}
     res = Dict{Int64,Junction}()
     for j ∈ junctions
         !haskey(res, j.id) || throw(ArgumentError("Repeated junction ID: "* j.id))
@@ -76,14 +72,16 @@ end
 Creates a dictionary of qubits using a object TrapJSON.
 Throws ArgumentError if qubit appears in more than one trap.
 """
-function _initalizateQubits(trapJSON::TrapJSON)::Dict{String,Qubit}
+function _initQubits(trapJSON::TrapJSON)::Dict{String,Qubit}
     qubits = Dict{String,Qubit}()
-    err = (trapId, qubitPos) -> ArgumentError("Qubit cannot be in two places 
-            at same time when inicializating: " * trapId * ", " * qubitPos * ".")
+    err = (trapId, qubitPos, qubitId) -> ArgumentError("Repeated Qubit ID "
+                       *qubitId * ". In traps " * trapId * ", " * qubitPos)
 
     for trap in trapJSON.traps
-        map(q -> haskey(qubits, q) ? throw(err(trap.id, qubits[q].position)) :
-                 qubits[q] = Qubit(q, resting, trap.id, nothing), trap.chain)
+        map(q -> haskey(qubits, q) ? 
+                 throw(err(trap.id, qubits[q].position, qubits[q].id)) :
+                 qubits[q] = Qubit(q, resting, trap.id, nothing),
+                 trap.chain)
     end
     return qubits
 end
@@ -92,7 +90,7 @@ end
 Creates a dictionary of shuttles using a object shuttleJSON
 Throws ArgumentError if shuttle ID is repeated.
 """
-function _initializateShuttles(shuttleJSON::ShuttleJSON)::Dict{String,Shuttle}
+function _initShuttles(shuttleJSON::ShuttleJSON)::Dict{String,Shuttle}
     shuttles = Dict{String,Shuttle}()
     err = id -> ArgumentError("Shuttle id is repeated: " * id * ".")
 
@@ -106,7 +104,7 @@ end
 Creates a dictionary of traps using a object trapJSON.
 Throws ArgumentError if trap ID is repeated.
 """
-function _initializateTraps(trapJSON::TrapJSON)::Dict{Int64,Trap}
+function _initTraps(trapJSON::TrapJSON)::Dict{Int64,Trap}
     traps = Dict{Int64,Trap}()
     err = id -> ArgumentError("Trap id is repeated: " * id * ".")
 
