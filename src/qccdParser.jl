@@ -3,10 +3,9 @@ include("./types/device.jl")
 using LightGraphs
 import JSON3
 
-#=  
-    Input -> Json path
-    Output -> Topology
-    Creates a topology using a graph from JSON =#
+"""  
+Creates a topology using a graph from JSON
+"""
 function createTopology(path::String)::SimpleDiGraph{Int64}
     topology::TopologyJSON  = try 
         _readJSON(path::String)
@@ -20,11 +19,10 @@ function createTopology(path::String)::SimpleDiGraph{Int64}
     return _createGraph(topology)
 end
 
-#=  
-    Input -> Json path
-    Output -> TopologyJSON
-    Creates an object topologyJSON from JSON. Throws an error
-    if input is not a valid file. =#
+"""  
+Creates an object topologyJSON from JSON.
+Throws ArgumentError an error if input is not a valid file.
+"""
 function _readJSON(path::String)::TopologyJSON
     if !isfile(path)
         throw(ArgumentError("Input is not a file"))
@@ -37,16 +35,13 @@ function _readJSON(path::String)::TopologyJSON
     end
 end
 
-#=  
-    Input -> topologyJSON
-    Output -> graph
-    Creates a graph using a object topologyJSON =#
+"""  
+Creates a graph using a object topologyJSON.
+"""
 function _createGraph(topology::TopologyJSON)::SimpleDiGraph{Int64}
-    # Initialize graphs
     nodesAdjacency::Dict{String,Array{Int64}} = topology.adjacency.nodes
     graphTopology::SimpleDiGraph{Int64} = DiGraph(length(nodesAdjacency))
 
-    # Adding nodes
     for nodes in keys(nodesAdjacency) 
         for node in nodesAdjacency[nodes]
             add_edge!(graphTopology, parse(Int64, nodes), node)
@@ -55,8 +50,11 @@ function _createGraph(topology::TopologyJSON)::SimpleDiGraph{Int64}
     return graphTopology
 end
 
-#=  
- =#
+"""
+Creates a dictionary of junctions from JSON objects.
+Throws ArgumentError if junction IDs are repeated.
+Throws ArgumentError if unsupported junction type is passed.
+"""
 function _createJunctions(shuttles::Array{ShuttleInfoJSON}, junctions::Array{JunctionInfoJSON})::Dict{Int64,Junction}
     res = Dict{Int64,Junction}()
     for j ∈ junctions
@@ -73,10 +71,11 @@ function _createJunctions(shuttles::Array{ShuttleInfoJSON}, junctions::Array{Jun
     end
     return res
 end
-#=    Input -> TrapJSON
-    Output -> Dict of qubits
-    Creates a dictionary of qubits using a object TrapJSON, throws an error
-    if qubits are in more than one place at same time. =#
+
+"""
+Creates a dictionary of qubits using a object TrapJSON.
+Throws ArgumentError if qubit appears in more than one trap.
+"""
 function _initalizateQubits(trapJSON::TrapJSON)::Dict{String,Qubit}
     qubits = Dict{String,Qubit}()
     err = (trapId, qubitPos) -> ArgumentError("Qubit cannot be in two places 
@@ -89,11 +88,10 @@ function _initalizateQubits(trapJSON::TrapJSON)::Dict{String,Qubit}
     return qubits
 end
 
-#=  
-    Input -> shuttleJSON
-    Output -> Dict of shuttles
-    Creates a dictionary of shuttles using a object shuttleJSON, throws an error
-    if shuttle id is repeated. =#
+"""
+Creates a dictionary of shuttles using a object shuttleJSON
+Throws ArgumentError if shuttle ID is repeated.
+"""
 function _initializateShuttles(shuttleJSON::ShuttleJSON)::Dict{String,Shuttle}
     shuttles = Dict{String,Shuttle}()
     err = id -> ArgumentError("Shuttle id is repeated: " * id * ".")
@@ -104,11 +102,10 @@ function _initializateShuttles(shuttleJSON::ShuttleJSON)::Dict{String,Shuttle}
     return shuttles
 end
 
-#=  
-    Input -> trapJSON
-    Output -> Dict of traps
-    Creates a dictionary of traps using a object trapJSON, throws an error
-    if trap id is repeated. =#
+"""
+Creates a dictionary of traps using a object trapJSON.
+Throws ArgumentError if trap ID is repeated.
+"""
 function _initializateTraps(trapJSON::TrapJSON)::Dict{Int64,Trap}
     traps = Dict{Int64,Trap}()
     err = id -> ArgumentError("Trap id is repeated: " * id * ".")
