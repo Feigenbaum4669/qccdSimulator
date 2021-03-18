@@ -10,13 +10,11 @@ struct TrapInfoJSON
     chain:: Array{String}
     end0:: TrapEndJSON
     end1:: TrapEndJSON
-    extraAttribute:: String
 end
 
 struct TrapJSON
     capacity:: Int64
     traps:: Array{TrapInfoJSON}
-    extraAttribute:: String
 end
 
 struct JunctionInfoJSON
@@ -26,19 +24,16 @@ end
 
 struct JunctionJSON
     junctions :: Array{JunctionInfoJSON}
-    extraAttribute:: String
 end
 
 struct  ShuttleInfoJSON
     id:: String
     from:: Int64
     to:: Int64
-    extraAttribute:: String
 end
 
 struct ShuttleJSON
     shuttles:: Array{ShuttleInfoJSON}
-    extraAttribute:: String
 end
 
 struct AdjacencyJSON

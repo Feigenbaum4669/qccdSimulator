@@ -3,7 +3,7 @@ include("./types/device.jl")
 using LightGraphs
 import JSON3
 
-"""  
+"""
 Creates a topology using a graph from JSON
 """
 function createTopology(path::String)::SimpleDiGraph{Int64}
@@ -16,7 +16,7 @@ function createTopology(path::String)::SimpleDiGraph{Int64}
     return _initGraph(topology)
 end
 
-"""  
+"""
 Creates an object topologyJSON from JSON.
 Throws ArgumentError an error if input is not a valid file.
 """
@@ -32,7 +32,7 @@ function _readJSON(path::String)::TopologyJSON
     end
 end
 
-"""  
+"""
 Creates a graph using a object topologyJSON.
 """
 function _initGraph(topology::TopologyJSON)::SimpleDiGraph{Int64}
@@ -59,6 +59,7 @@ function _initJunctions(shuttles::Array{ShuttleInfoJSON},
         !haskey(res, j.id) || throw(ArgumentError("Repeated junction ID: "* j.id))
 
         connectedShuttles = Iterators.filter(x -> x.from == j.id || x.to == j.id, shuttles)
+        # Add check if connectedShuttles is empty...
         junctionEnds = Dict(s.id => JunctionEnd() for s ∈ connectedShuttles)
         try
             res[j.id] = Junction(j.id, eval(Meta.parse(j.type)), junctionEnds)
