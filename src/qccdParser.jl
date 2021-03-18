@@ -53,7 +53,8 @@ end
 
 #=  
  =#
-function _initJunctions(shuttles::Array{ShuttleInfoJSON}, junctions::Array{JunctionInfoJSON})::Dict{Int64,Junction}
+function _initJunctions(shuttles::Array{ShuttleInfoJSON},
+                        junctions::Array{JunctionInfoJSON})::Dict{Int64,Junction}
     res = Dict{Int64,Junction}()
     for j ∈ junctions
         !haskey(res, j.id) || throw(ArgumentError("Repeated junction ID: "* j.id))
@@ -75,8 +76,8 @@ end
     if qubits are in more than one place at same time. =#
 function _initQubits(trapJSON::TrapJSON)::Dict{String,Qubit}
     qubits = Dict{String,Qubit}()
-    err = (trapId, qubitPos, qubitId) -> ArgumentError("Repeated Qubit ID "
-                       *qubitId * ". In traps " * trapId * ", " * qubitPos)
+    err = (trapId, qubitPos, qubitId) -> ArgumentError("Repeated Qubit ID "*qubitId *
+                                         ". In traps " * trapId * ", " * qubitPos)
 
     for trap in trapJSON.traps
         map(q -> haskey(qubits, q) ? 
