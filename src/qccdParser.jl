@@ -8,11 +8,7 @@ import JSON3
     Output -> Topology
     Creates a topology using a graph from JSON =#
 function createTopology(path::String)::SimpleDiGraph{Int64}
-    topology::TopologyJSON  = try 
-        _readJSON(path::String)
-    catch err
-        throw(err)
-    end
+    topology::TopologyJSON  = _readJSON(path::String)
     junctions = _createJunctions(topology.shuttle.shuttles, topology.junction.junctions)
     qubits = _initalizateQubits(topology.trap)
     shuttles = _initializateShuttles(topology.shuttle)
