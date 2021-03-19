@@ -20,6 +20,16 @@ function _initJunctionsTest()
 end
 
 function _initJunctionsTestRepId()
-    shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];repJunction = true)
+    shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];repJunc = true)
+    junctions = _initJunctions(shuttles, _junctions)
+end
+
+function _initJunctionsTestIsolated()
+    shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];isolatedJunc = true)
+    junctions = _initJunctions(shuttles, _junctions)
+end
+
+function _initJunctionsTestWrongType()
+    shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];wrongJuncType = true)
     junctions = _initJunctions(shuttles, _junctions)
 end

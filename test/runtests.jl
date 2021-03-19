@@ -14,4 +14,6 @@ end
 @testset "Topology object initialization" begin
     @test _initJunctionsTest()
     @test_throws ArgumentError _initJunctionsTestRepId()
+    @test_throws ArgumentError _initJunctionsTestIsolated()
+    @test_throws ArgumentError _initJunctionsTestWrongType()
 end
