@@ -113,6 +113,14 @@ struct Trap
         new(id, capacity, chain, end0, end1)
 end
 
+"""
+Struct to have all status in real time.
+qubits: status if all qubits
+trpas: status for all traps
+junctions: status for all junctions
+shuttles: status for all shuttles
+graph: current graph
+"""
 struct QCCDevStat
     qubits::Dict{String,Qubit}
     traps::Dict{Int64,Trap}
