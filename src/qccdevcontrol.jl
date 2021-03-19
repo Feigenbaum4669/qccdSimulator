@@ -16,7 +16,7 @@ simulated quantum device.
 * `load()`
 * `linear_transport()`, `junction_transport()`,
 * `swap()`
-* `Rz()`, `Rxy()`, `XX()`, `YY()`
+* `Rz()`, `Rxy()`, `XX()`, `ZZ()`
 
 # Todo
 * Visualization interface
