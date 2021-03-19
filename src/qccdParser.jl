@@ -56,7 +56,7 @@ function _initJunctions(shuttles::Array{ShuttleInfoJSON},
             junctions::Array{JunctionInfoJSON})::Dict{Int64,Junction}
     res = Dict{Int64,Junction}()
     for j ∈ junctions
-        !haskey(res, j.id) || throw(ArgumentError("Repeated junction ID: "* j.id))
+        !haskey(res, j.id) || throw(ArgumentError("Repeated junction ID: $(j.id)."))
 
         connectedShuttles = Iterators.filter(x -> x.from == j.id || x.to == j.id, shuttles)
         # Add check if connectedShuttles is empty...
@@ -65,7 +65,7 @@ function _initJunctions(shuttles::Array{ShuttleInfoJSON},
             res[j.id] = Junction(j.id, eval(Meta.parse(j.type)), junctionEnds)
         catch e
             e isa UndefVarError ?
-                throw(ArgumentError("Junction type "* j.type *" not supported")) : rethrow(e)
+                throw(ArgumentError("Junction type $(j.type) not supported")) : rethrow(e)
         end
     end
     return res
@@ -77,8 +77,8 @@ Throws ArgumentError if qubit appears in more than one trap.
 """
 function _initQubits(trapJSON::TrapJSON)::Dict{String,Qubit}
     qubits = Dict{String,Qubit}()
-    err = (trapId, qubitPos, qubitId) -> ArgumentError("Repeated Qubit ID $qubitId
-                                                        In traps $trapId, $qubitPos.")
+    err = (trapId, qubitPos, qubitId) -> ArgumentError("Repeated Ion ID: $qubitId
+                                                        ,in traps $trapId, $qubitPos.")
 
     for trap in trapJSON.traps
         map(q -> haskey(qubits, q) ? 
@@ -95,7 +95,7 @@ Throws ArgumentError if shuttle ID is repeated.
 """
 function _initShuttles(shuttleJSON::ShuttleJSON)::Dict{String,Shuttle}
     shuttles = Dict{String,Shuttle}()
-    err = id -> ArgumentError("Shuttle id is repeated: $id ")
+    err = id -> ArgumentError("Repeated Shuttle ID: $id ")
 
     map(sh -> haskey(shuttles, sh.id) ? throw(err(sh.id)) :
               shuttles[sh.id] = Shuttle(sh.id, sh.from, sh.to), 
@@ -109,7 +109,7 @@ Throws ArgumentError if trap ID is repeated.
 """
 function _initTraps(trapJSON::TrapJSON)::Dict{Int64,Trap}
     traps = Dict{Int64,Trap}()
-    err = id -> ArgumentError("Trap id is repeated: $id.")
+    err = id -> ArgumentError("Repeated Trap ID: $id.")
 
     map(tr -> haskey(traps, tr.id) ? throw(err(tr.id)) :
               traps[tr.id] = Trap(tr.id,trapJSON.capacity,tr.chain, 
