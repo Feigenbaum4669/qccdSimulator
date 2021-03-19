@@ -1,4 +1,4 @@
-# src/qccdevstatus-functions.jl
+# src/qccdevcontrol.jl
 # Created by Dirk Oliver Theis, March 19, 2021
 # MIT license
 # Sub-module QCCDevCtrl
