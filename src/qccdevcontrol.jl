@@ -75,7 +75,7 @@ end
 ####################################################################################################
 
 """
-Function `load(` — ...
+Function `load()` — loads an ion into the device
 
 # Arguments
 * `t::Time_t` — time at which the operation commences.  Must be no earlier than the latest time
