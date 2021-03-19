@@ -10,8 +10,8 @@ Check number of vertices of graph
 Check number of edges 
 =#
 @testset "Graph initialization" begin
-    @test_throws ArgumentError("Input is not a file") createTopology(".")
-    @test_throws ArgumentError createTopology("./testFiles/wrongTopology.json")
-    @test nv(createTopology("./testFiles/topology.json")) == 5
-    @test ne(createTopology("./testFiles/topology.json")) == 6
+    @test_throws ArgumentError("Input is not a file") createDevice(".")
+    @test_throws ArgumentError createDevice("./testFiles/wrongTopology.json")
+    @test nv(createDevice("./testFiles/topology.json")) == 5
+    @test ne(createDevice("./testFiles/topology.json")) == 6
 end

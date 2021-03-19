@@ -1,3 +1,5 @@
+using LightGraphs
+
 @enum QubitStatus begin
     moving
     resting
@@ -112,9 +114,10 @@ struct Trap
         new(id, capacity, chain, end0, end1)
 end
 
-struct Watcher
+struct QCCDevStat
     qubits::Dict{String,Qubit}
     traps::Dict{Int64,Trap}
     junctions::Dict{Int64,Junction}
     shuttles::Dict{String,Shuttle}
+    graph::SimpleDiGraph{Int64}
 end

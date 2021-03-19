@@ -6,14 +6,14 @@ import JSON3
 """
 Creates a topology using a graph from JSON
 """
-function createTopology(path::String)::SimpleDiGraph{Int64}
+function createDevice(path::String)::QCCDevStat
     topology::TopologyJSON  = _readJSON(path::String)
     junctions = _initJunctions(topology.shuttle.shuttles, topology.junction.junctions)
     qubits = _initQubits(topology.trap)
     shuttles = _initShuttles(topology.shuttle)
     traps = _initTraps(topology.trap)
-    println(_initWatcher(topology.adjacency.nodes, qubits, traps, junctions, shuttles))
-    return _initGraph(topology)
+    graph = _initGraph(topology)
+    return  _initQCCDevStat(topology.adjacency.nodes, qubits, traps, junctions, shuttles,graph)
 end
 
 """
@@ -120,20 +120,43 @@ function _initTraps(trapJSON::TrapJSON)::Dict{Int64,Trap}
 end
 
 """
-Checks:
+Create the QCCDevStat using dicts.
+Throws error when:
     - Shuttle from - to corresponds JSON adjacency
     - TrapsEnds shuttles exists and shuttle is connected to that trap
     - TrapsEnds qubits is a qubit in the Trap chain and it is in the correct chain position
 """
-function _initWatcher(adjacency:: Dict{String,Array{Int64}}, qubits::Dict{String,Qubit}, traps::Dict{Int64,Trap}, junctions::Dict{Int64,Junction}, shuttles::Dict{String,Shuttle})::Watcher
-    err = shuttleId -> ArgumentError("From-to doesn't correspond with adjacency in shuttle ID " * shuttleId * ".")
-    # Check with map instead for.
-    for (shuttleId, shuttle) in shuttles
-        haskey(adjacency,string(shuttle.from)) && 
-                shuttle.to in adjacency[string(shuttle.from)] || throw(err(shuttleId))
-    end
-    Watcher(qubits,traps,junctions,shuttles)
+function _initQCCDevStat(adjacency:: Dict{String,Array{Int64}}, qubits::Dict{String,Qubit}, 
+                      traps::Dict{Int64,Trap}, junctions::Dict{Int64,Junction},
+                      shuttles::Dict{String,Shuttle}, graph::SimpleDiGraph{Int64})::QCCDevStat
+
+    _checkShuttles(adjacency,shuttles)
+    _checkTraps(traps,shuttles)
+    QCCDevStat(qubits,traps,junctions,shuttles, graph)
 end
 
-createTopology("../test/testFiles/topology.json")
-## CHECK TRAP -> SHUTTLE, QUBIT && SHUTTLE -> FROM(TRAP/JUNC), TO(TRAP/JUNC)
+"""
+Throws an error if trapsEnds shuttles exists and shuttle is connected to that trap
+"""
+function _checkTraps(traps::Dict{Int64,Trap}, shuttles::Dict{String,Shuttle})
+
+    err = trapId-> ArgumentError("Shuttle connected to trap ID " * trapId *
+                                     " does not exist or is wrong connected.")
+
+    check = (trEnd,trId) -> isempty(trEnd.shuttle) || (haskey(shuttles, trEnd.shuttle) && 
+                            trId in [shuttles[trEnd.shuttle].from, shuttles[trEnd.shuttle].to])
+
+    map(tr-> check(tr.end0,tr.id) && check(tr.end1,tr. id) || throw(err(string(tr.id)))
+        ,values(traps))
+end
+
+"""
+Throws an error if shuttle from - to corresponds JSON adjacency.
+"""
+function _checkShuttles(adjacency:: Dict{String,Array{Int64}}, shuttles::Dict{String,Shuttle})
+
+    errSh = shuttleId -> ArgumentError("From-to doesn't correspond with adjacency in shuttle ID "
+                                        * shuttleId * ".")
+    map(sh ->  haskey(adjacency,string(sh.from)) && sh.to in adjacency[string(sh.from)] ||
+                                                            throw(errSh(sh.id)), values(shuttles))
+end
