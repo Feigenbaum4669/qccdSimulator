@@ -77,8 +77,8 @@ Throws ArgumentError if qubit appears in more than one trap.
 """
 function _initQubits(trapJSON::TrapJSON)::Dict{String,Qubit}
     qubits = Dict{String,Qubit}()
-    err = (trapId, qubitPos, qubitId) -> ArgumentError("Repeated Qubit ID "*qubitId *
-                                         ". In traps " * trapId * ", " * qubitPos)
+    err = (trapId, qubitPos, qubitId) -> ArgumentError("Repeated Qubit ID $qubitId
+                                                        In traps $trapId, $qubitPos.")
 
     for trap in trapJSON.traps
         map(q -> haskey(qubits, q) ? 
@@ -95,7 +95,7 @@ Throws ArgumentError if shuttle ID is repeated.
 """
 function _initShuttles(shuttleJSON::ShuttleJSON)::Dict{String,Shuttle}
     shuttles = Dict{String,Shuttle}()
-    err = id -> ArgumentError("Shuttle id is repeated: " * id * ".")
+    err = id -> ArgumentError("Shuttle id is repeated: $id ")
 
     map(sh -> haskey(shuttles, sh.id) ? throw(err(sh.id)) :
               shuttles[sh.id] = Shuttle(sh.id, sh.from, sh.to), 
@@ -109,7 +109,7 @@ Throws ArgumentError if trap ID is repeated.
 """
 function _initTraps(trapJSON::TrapJSON)::Dict{Int64,Trap}
     traps = Dict{Int64,Trap}()
-    err = id -> ArgumentError("Trap id is repeated: " * id * ".")
+    err = id -> ArgumentError("Trap id is repeated: $id.")
 
     map(tr -> haskey(traps, tr.id) ? throw(err(tr.id)) :
               traps[tr.id] = Trap(tr.id,trapJSON.capacity,tr.chain, 
@@ -140,13 +140,13 @@ Throws an error if trapsEnds shuttles exists and shuttle is connected to that tr
 """
 function _checkTraps(traps::Dict{Int64,Trap}, shuttles::Dict{String,Shuttle})
 
-    err = trapId-> ArgumentError("Shuttle connected to trap ID " * trapId *
-                                     " does not exist or is wrong connected.")
+    err = trapId-> ArgumentError("Shuttle connected to trap ID $trapId does
+                                 not exist or is wrong connected.")
 
     check = (trEnd,trId) -> isempty(trEnd.shuttle) || (haskey(shuttles, trEnd.shuttle) && 
                             trId in [shuttles[trEnd.shuttle].from, shuttles[trEnd.shuttle].to])
 
-    map(tr-> check(tr.end0,tr.id) && check(tr.end1,tr. id) || throw(err(string(tr.id)))
+    map(tr-> check(tr.end0,tr.id) && check(tr.end1,tr. id) || throw(err(tr.id))
         ,values(traps))
 end
 
@@ -155,8 +155,8 @@ Throws an error if shuttle from - to corresponds JSON adjacency.
 """
 function _checkShuttles(adjacency:: Dict{String,Array{Int64}}, shuttles::Dict{String,Shuttle})
 
-    errSh = shuttleId -> ArgumentError("From-to doesn't correspond with adjacency in shuttle ID "
-                                        * shuttleId * ".")
+    errSh = shuttleId -> ArgumentError("From-to doesn't correspond with adjacency in shuttle 
+                                        ID $shuttleId.")
     map(sh ->  haskey(adjacency,string(sh.from)) && sh.to in adjacency[string(sh.from)] ||
                                                             throw(errSh(sh.id)), values(shuttles))
 end

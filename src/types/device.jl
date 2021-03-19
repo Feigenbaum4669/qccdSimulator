@@ -45,8 +45,8 @@ struct Junction
     ends::Dict{String,JunctionEnd}
     function Junction(id::Int64, type::JunctionType, ends::Dict{String,JunctionEnd})
         if length(ends) != typesSizes[type]
-            throw(ArgumentError("Junction with ID "* id* " of type "* type* " has "
-            * length(ends)* " ends. It should have "* typesSizes[type]* " ends."))
+            throw(ArgumentError("Junction with ID $id of type $type has" 
+            * string(length(ends))* " ends. It should have "* string(typesSizes[type])* " ends."))
         end
         return new(id, type, ends)
     end
@@ -81,7 +81,7 @@ struct Shuttle
     from::Int64
     to::Int64
     Shuttle(id, from, to) = from == to ? 
-            throw(ArgumentError("\"from\" and \"to\" must be different")) : 
+            throw(ArgumentError("In shuttle ID $id \"from\" and \"to\" must be different")) : 
             new(id, from, to)
 end
 
