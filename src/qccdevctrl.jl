@@ -3,8 +3,29 @@
 # MIT license
 # Sub-module QCCDevCtrl
 
-module QCCDevCtrl
+
+
+"""
+This sub-module provides the type `QCCDevCtrl` and functions for controlling the operation of the
+simulated quantum device.
+
+# Exported
+* Type `QCCDevCtrl` w/ constructor
+
+# Not Exported Interface
+* `load()`
+* `linear_transport()`, `junction_transport()`,
+* `swap()`
+* `Rz()`, `Rxy()`, `XX()`, `YY()`
+
+# Todo
+* Visualization interface
+"""
+module QCCDevControl
 import .QCCDevDescription # type
+
+export QCCDevCtrl
+
 
 """
 Type for time inside the qdev, in [change if necessary] $10^{-10}$
