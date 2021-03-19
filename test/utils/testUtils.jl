@@ -1,5 +1,5 @@
-include("../src/types/json.jl")
-include("../src/types/device.jl")
+include("../../src/types/json.jl")
+include("../../src/types/device.jl")
 
 """
 Generates n shuttles connected to shuttles.

@@ -1,5 +1,5 @@
-include("testUtils.jl")
-include("../src/qccdParser.jl")
+include("../utils/testUtils.jl")
+include("../../src/qccdParser.jl")
 
 function _initJunctionsTest()
     typeSizes = Dict(T => 3, Y => 3, X => 4)
