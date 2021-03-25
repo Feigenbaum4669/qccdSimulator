@@ -33,10 +33,3 @@ function _initJunctionsTestWrongType()
     shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];wrongJuncType = true)
     junctions = _initJunctions(shuttles, _junctions)
 end
-
-function _initShuttlesTest()
-    
-
-
-
-end

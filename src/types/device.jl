@@ -74,7 +74,7 @@ end
 Struct for the shuttles.
 id: shuttle identifictor 
 from & to: direcction of shuttle and endings
-Throws ArgumentError if 'from' adn 'to' are the same
+Throws ArgumentError if 'from' and 'to' are the same
 """
 struct Shuttle
     id::String
