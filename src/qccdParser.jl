@@ -59,7 +59,7 @@ function _initJunctions(shuttles::Array{ShuttleInfoJSON},
         !haskey(res, j.id) || throw(ArgumentError("Repeated junction ID: $(j.id)."))
 
         connectedShuttles = filter(x -> x.from == j.id || x.to == j.id, shuttles)
-        # Add check if connectedShuttles is empty...
+        isempty(connectedShuttles) && throw(ArgumentError("Junction with ID $(j.id) isolated."))
         junctionEnds = Dict(s.id => JunctionEnd() for s ∈ connectedShuttles)
         try
             res[j.id] = Junction(j.id, eval(Meta.parse(j.type)), junctionEnds)
