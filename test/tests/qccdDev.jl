@@ -23,3 +23,10 @@ function _initJunctionsTestRepId()
     shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];repJunction = true)
     junctions = _initJunctions(shuttles, _junctions)
 end
+
+function _initShuttlesTest()
+    
+
+
+
+end

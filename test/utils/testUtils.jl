@@ -28,4 +28,9 @@ function giveShuttlesJunctions(nShuttles:: Int64, juncTypes:: Array{String};
     return shuttles, junctions
 end
 
-#print(giveShuttlesJunctions(2, ["X","Y"];wrongJunctType=true))
+function giveShuttles(nShuttles:: Int64;  repShuttle=false)::Dict{String,Shuttle}
+    shuttles = ShuttleInfoJSON[]
+    for i in 1:nShuttles
+        
+    end
+end
