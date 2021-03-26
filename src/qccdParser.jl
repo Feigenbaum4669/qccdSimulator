@@ -18,7 +18,7 @@ end
 
 """
 Creates an object topologyJSON from JSON.
-Throws ArgumentError an error if input is not a valid file.
+Throws ArgumentError if input is not a valid file.
 """
 function _readJSON(path::String)::TopologyJSON
     if !isfile(path)

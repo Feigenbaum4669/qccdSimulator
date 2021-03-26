@@ -1,15 +1,8 @@
 using StructTypes
-
-struct TrapEndJSON
-    qubit:: String
-    shuttle:: String
-end
-
 struct TrapInfoJSON
     id:: Int64
-    chain:: Array{String}
-    end0:: TrapEndJSON
-    end1:: TrapEndJSON
+    end0:: String
+    end1:: String
 end
 
 struct TrapJSON
@@ -47,7 +40,6 @@ struct TopologyJSON
     shuttle:: ShuttleJSON
 end
 
-StructTypes.StructType(::Type{TrapEndJSON})= StructTypes.Struct()
 StructTypes.StructType(::Type{TrapInfoJSON})= StructTypes.Struct()
 StructTypes.StructType(::Type{TrapJSON})= StructTypes.Struct()
 StructTypes.StructType(::Type{JunctionInfoJSON})= StructTypes.Struct()
