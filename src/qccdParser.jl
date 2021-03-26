@@ -9,11 +9,10 @@ Creates a topology using a graph from JSON
 function createDevice(path::String)::QCCDevStat
     topology::TopologyJSON  = _readJSON(path::String)
     junctions = _initJunctions(topology.shuttle.shuttles, topology.junction.junctions)
-    qubits = _initQubits(topology.trap)
     shuttles = _initShuttles(topology.shuttle)
     traps = _initTraps(topology.trap)
     graph = _initGraph(topology)
-    return  _initQCCDevStat(topology.adjacency.nodes, qubits, traps, junctions, shuttles,graph)
+    return  _initQCCDevStat(topology.adjacency.nodes, traps, junctions, shuttles,graph)
 end
 
 """
@@ -112,9 +111,9 @@ function _initTraps(trapJSON::TrapJSON)::Dict{Int64,Trap}
     err = id -> ArgumentError("Repeated Trap ID: $id.")
 
     map(tr -> haskey(traps, tr.id) ? throw(err(tr.id)) :
-              traps[tr.id] = Trap(tr.id,trapJSON.capacity,tr.chain, 
-              TrapEnd(tr.end0.qubit, tr.end0.shuttle), 
-              TrapEnd(tr.end1.qubit, tr.end1.shuttle)), 
+              traps[tr.id] = Trap(tr.id,trapJSON.capacity, 
+              TrapEnd(nothing, tr.end0), 
+              TrapEnd(nothing, tr.end1)), 
               trapJSON.traps)
     return traps
 end
@@ -126,13 +125,13 @@ Throws error when:
     - TrapsEnds shuttles exists and shuttle is connected to that trap
     - TrapsEnds qubits is a qubit in the Trap chain and it is in the correct chain position
 """
-function _initQCCDevStat(adjacency:: Dict{String,Array{Int64}}, qubits::Dict{String,Qubit}, 
-                      traps::Dict{Int64,Trap}, junctions::Dict{Int64,Junction},
-                      shuttles::Dict{String,Shuttle}, graph::SimpleDiGraph{Int64})::QCCDevStat
+function _initQCCDevStat(adjacency:: Dict{String,Array{Int64}}, traps::Dict{Int64,Trap},
+                        junctions::Dict{Int64,Junction}, shuttles::Dict{String,Shuttle},
+                        graph::SimpleDiGraph{Int64})::QCCDevStat
 
     _checkShuttles(adjacency,shuttles)
     _checkTraps(traps,shuttles)
-    QCCDevStat(qubits,traps,junctions,shuttles, graph)
+    QCCDevStat(traps,junctions,shuttles, graph)
 end
 
 """
@@ -143,7 +142,7 @@ function _checkTraps(traps::Dict{Int64,Trap}, shuttles::Dict{String,Shuttle})
     err = trapId-> ArgumentError("Shuttle connected to trap ID $trapId does
                                  not exist or is wrong connected.")
 
-    check = (trEnd,trId) -> isempty(trEnd.shuttle) || (haskey(shuttles, trEnd.shuttle) && 
+    check = (trEnd,trId) -> trEnd.shuttle isa Nothing || (haskey(shuttles, trEnd.shuttle) && 
                             trId in [shuttles[trEnd.shuttle].from, shuttles[trEnd.shuttle].to])
 
     map(tr-> check(tr.end0,tr.id) && check(tr.end1,tr. id) || throw(err(tr.id))

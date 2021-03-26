@@ -91,8 +91,9 @@ qubit: qubit id in that ending
 shuttle: shuttle id the ending is connected
 """
 struct TrapEnd
-    qubit::String
-    shuttle::String
+    qubit::Union{String, Nothing}
+    shuttle::Union{String, Nothing}
+    TrapEnd(qubit,shuttle) = shuttle == "" ? new(qubit,nothing) : new(qubit,shuttle)
 end
 
 """  
@@ -109,6 +110,7 @@ struct Trap
     chain::Array{String}
     end0::TrapEnd
     end1::TrapEnd
+    Trap(id, capacity, end0, end1) = new(id, capacity, [], end0, end1)
     Trap(id, capacity, chain, end0, end1) = capacity < length(chain) ? 
         throw(ArgumentError("Trap with id \"$id\" exceeds its capacity")) :
         new(id, capacity, chain, end0, end1)
@@ -123,7 +125,6 @@ shuttles: status for all shuttles
 graph: current graph
 """
 struct QCCDevStat
-    qubits::Dict{String,Qubit}
     traps::Dict{Int64,Trap}
     junctions::Dict{Int64,Junction}
     shuttles::Dict{String,Shuttle}
