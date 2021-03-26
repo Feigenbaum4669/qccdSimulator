@@ -22,8 +22,8 @@ Creates a dictionary of junctions from JSON objects.
 Throws ArgumentError if junction IDs are repeated.
 Throws ArgumentError if unsupported junction type is passed.
 """
-function initJunctions(shuttles::Array{ShuttleInfoJSON},
-            junctions::Array{JunctionInfoJSON})::Dict{Int64,Junction}
+function initJunctions(shuttles::Array{ShuttleInfoDesc},
+            junctions::Array{JunctionInfoDesc})::Dict{Int64,Junction}
     res = Dict{Int64,Junction}()
     for j ∈ junctions
         !haskey(res, j.id) || throw(ArgumentError("Repeated junction ID: $(j.id)."))
@@ -42,32 +42,32 @@ function initJunctions(shuttles::Array{ShuttleInfoJSON},
 end
 
 """
-Creates a dictionary of shuttles using a object shuttleJSON
+Creates a dictionary of shuttles using a object shuttleDesc
 Throws ArgumentError if shuttle ID is repeated.
 """
-function initShuttles(shuttleJSON::ShuttleJSON)::Dict{String,Shuttle}
+function initShuttles(shuttleDesc::ShuttleDesc)::Dict{String,Shuttle}
     shuttles = Dict{String,Shuttle}()
     err = id -> ArgumentError("Repeated Shuttle ID: $id ")
 
     map(sh -> haskey(shuttles, sh.id) ? throw(err(sh.id)) :
               shuttles[sh.id] = Shuttle(sh.id, sh.from, sh.to), 
-              shuttleJSON.shuttles)
+              shuttleDesc.shuttles)
     return shuttles
 end
 
 """
-Creates a dictionary of traps using a object trapJSON.
+Creates a dictionary of traps using a object trapDesc.
 Throws ArgumentError if trap ID is repeated.
 """
-function initTraps(trapJSON::TrapJSON)::Dict{Int64,Trap}
+function initTraps(trapDesc::TrapDesc)::Dict{Int64,Trap}
     traps = Dict{Int64,Trap}()
     err = id -> ArgumentError("Repeated Trap ID: $id.")
 
     map(tr -> haskey(traps, tr.id) ? throw(err(tr.id)) :
-              traps[tr.id] = Trap(tr.id,trapJSON.capacity,tr.chain, 
+              traps[tr.id] = Trap(tr.id,trapDesc.capacity,tr.chain, 
               TrapEnd(tr.end0.qubit, tr.end0.shuttle), 
               TrapEnd(tr.end1.qubit, tr.end1.shuttle)), 
-              trapJSON.traps)
+              trapDesc.traps)
     return traps
 end
 

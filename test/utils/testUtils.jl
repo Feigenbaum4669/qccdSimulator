@@ -1,5 +1,5 @@
-include("../../src/types/json.jl")
-include("../../src/types/device.jl")
+include("../../src/types/QCCDevDescription.jl")
+include("../../src/types/QCCDevControl.jl")
 
 """
 Generates n junctions connected to shuttles.
@@ -9,16 +9,16 @@ isolatedJunc: The first junction is not connected to any shuttle.
 """
 function giveShuttlesJunctions(nShuttles:: Int64, juncTypes:: Array{String};
             repJunc=false, wrongJuncType=false, isolatedJunc=false)::
-            Tuple{Array{ShuttleInfoJSON,1},Array{JunctionInfoJSON,1}}
+            Tuple{Array{ShuttleInfoDesc,1},Array{JunctionInfoDesc,1}}
 
-    shuttles = ShuttleInfoJSON[]
-    junctions = JunctionInfoJSON[]
+    shuttles = ShuttleInfoDesc[]
+    junctions = JunctionInfoDesc[]
     sId = 0
     skipShuttle = wrongJuncType
     isolatedJunc = isolatedJunc
     for i in 1:nShuttles
-        repJunc ? push!(junctions, JunctionInfoJSON(0, juncTypes[i])) : 
-        push!(junctions, JunctionInfoJSON(i, juncTypes[i]))
+        repJunc ? push!(junctions, JunctionInfoDesc(0, juncTypes[i])) : 
+        push!(junctions, JunctionInfoDesc(i, juncTypes[i]))
         if isolatedJunc
             isolatedJunc = false
             continue
@@ -28,7 +28,7 @@ function giveShuttlesJunctions(nShuttles:: Int64, juncTypes:: Array{String};
                 skipShuttle = false
                 continue
             end
-            push!(shuttles, ShuttleInfoJSON(string(sId),i,-1))
+            push!(shuttles, ShuttleInfoDesc(string(sId),i,-1))
             sId += 1
         end
     end
@@ -36,7 +36,7 @@ function giveShuttlesJunctions(nShuttles:: Int64, juncTypes:: Array{String};
 end
 
 function giveShuttles(nShuttles:: Int64;  repShuttle=false)::Dict{String,Shuttle}
-    shuttles = ShuttleInfoJSON[]
+    shuttles = ShuttleInfoDesc[]
     for i in 1:nShuttles
         
     end

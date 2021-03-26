@@ -4,15 +4,15 @@ using qccdSimulator
 using Test
 using LightGraphs
 
-@testset "Graph initialization" begin
-    @test_throws ArgumentError("Input is not a file") createDevice(".")
-    @test_throws ArgumentError createDevice("./testFiles/wrongTopology.json")
-    @test nv(createDevice("./testFiles/topology.json").graph) == 5
-    @test ne(createDevice("./testFiles/topology.json").graph) == 6
+@testset "Read JSON" begin
+    @test_throws ArgumentError("Input is not a file") readJSON(".")
+    @test_throws ArgumentError readJSON("./testFiles/wrongTopology.json")
 end
 
-@testset "Topology object initialization" begin
-    @test _initJunctionsTest()
+@testset "QCCDevCtrl object initialization" begin
+    @test nv(QCCDevCtrl("./testFiles/topology.json").graph) == 5
+    @test ne(QCCDevCtrl("./testFiles/topology.json").graph) == 6
+    @test initJunctionsTest()
     @test_throws ArgumentError _initJunctionsTestRepId()
     @test_throws ArgumentError _initJunctionsTestIsolated()
     @test_throws ArgumentError _initJunctionsTestWrongType()
