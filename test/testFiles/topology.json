@@ -24,45 +24,18 @@
         "traps": [
             {
                 "id": 1,
-                "chain": [
-                    "q1",
-                    "q2",
-                    "q3"
-                ],
-                "end0": {
-                    "qubit": "q1",
-                    "shuttle": ""
-                },
-                "end1": {
-                    "qubit": "q3",
-                    "shuttle": "s1"
-                }
+                "end0": "",
+                "end1": "s1"
             },
             {
                 "id": 2,
-                "chain": [
-                    "q4"
-                ],
-                "end0": {
-                    "qubit": "q4",
-                    "shuttle": "s3"
-                },
-                "end1": {
-                    "qubit": "q4",
-                    "shuttle": ""
-                }
+                "end0": "s3",
+                "end1": ""
             },
             {
                 "id": 3,
-                "chain": [],
-                "end0": {
-                    "qubit": "",
-                    "shuttle": "s6"
-                },
-                "end1": {
-                    "qubit": "",
-                    "shuttle": ""
-                }
+                "end0": "s6",
+                "end1": ""
             }
         ]
     },

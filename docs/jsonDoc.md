@@ -15,19 +15,11 @@ The second object, "_trap_", contains all the information related to the traps o
 Trap's id:
 id: "1"
 
-The ion chain inside the trap at the beginning, they should be specified in the correct order:
-chain: ["q1","q2","q3"] 
+The following attribute exists to represent to which shuttle an end of a junction is connected to. Assuming a trap has two ends, we have:
+"end0": ""
+"end1": "s1"
 
-The following attributes exist to represent in which end of the trap the ions are, and which shuttle they are connected to. Assuming a trap has two ends, we have:
-"end0": {
-    "qubit": "q1",
-    "shuttle": ""
-},
-"end1": {
-    "qubit": "q3",
-    "shuttle": "s1"
-}
-This would mean that "q1" is next to an end of the trap in which the shuttle is incoming, so new ions would come from this side and be added to the ion chain next to "q1". On the other hand, "q3" has the outgoing shuttle "s1" next to it so, if necessary, it could leave the ion trap without the need of being swapped with another qubit. See how the qubits in the previous data structure match with the first and last qubits in the "chain" attribute.
+This would mean that end0 is not connected to any junction, while end1 is connected to shuttle with id "s1".
 ```
 
 The next object is "_junction_", which has the attribute ```junction.junctions: [] ``` containing an array of objects, each one containing information for each individual junction. Said information is the following, showed by an example:
