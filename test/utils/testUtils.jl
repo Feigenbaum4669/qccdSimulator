@@ -42,6 +42,9 @@ function giveShuttles(nShuttles:: Int64;  repShuttle=false)::Dict{String,Shuttle
     end
 end
 
+"""
+Creates a struct QCCDevDescription based in the file topology.json
+"""
 function giveQccDes()::QCCDevDescription
     adjacency:: AdjacencyDesc = AdjacencyDesc(
                     Dict(("4" => [1],"1" => [5],"5" => [2, 3],"2" => [4],"3" => [4]))
