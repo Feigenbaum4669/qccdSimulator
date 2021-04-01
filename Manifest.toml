@@ -42,6 +42,12 @@ version = "0.1.2"
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
+[[JSON3]]
+deps = ["Dates", "Mmap", "Parsers", "StructTypes", "UUIDs"]
+git-tree-sha1 = "980b210df4b9bc6a45f7accd5cbb263ee6fb2768"
+uuid = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
+version = "1.8.0"
+
 [[LibGit2]]
 deps = ["Printf"]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
@@ -79,6 +85,12 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 git-tree-sha1 = "4fa2ba51070ec13fcc7517db714445b4ab986bdf"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 version = "1.4.0"
+
+[[Parsers]]
+deps = ["Dates"]
+git-tree-sha1 = "c8abc88faa3f7a3950832ac5d6e690881590d6dc"
+uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
+version = "1.1.0"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]

@@ -1,5 +1,10 @@
 module qccdSimulator
-include("./types/QCCDevDescription.jl")
+export readJSON
+
+include("./types/description.jl")
+
+using .QCCDevDes_Types
+using JSON3
 
 """
 Creates an object topologyJSON from JSON.
@@ -11,11 +16,13 @@ function readJSON(path::String)::QCCDevDescription
     end
     # Parsing JSON
     return topology::QCCDevDescription  = try 
-        JSON3.read(read(path, String), TopologyJSON)
+        JSON3.read(read(path, String), QCCDevDescription)
     catch err
         throw(ArgumentError(err.msg))
     end
 end
 
-export readJSON
+include("./types/control.jl")
+include("./qccdevcontrol.jl")
+
 end

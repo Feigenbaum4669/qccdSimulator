@@ -1,5 +1,6 @@
 module QCCDevDes_Types
-export QCCDevDescription, TrapDesc, ShuttleDesc, ShuttleInfoDesc, JunctionDesc, JunctionInfoDesc
+export QCCDevDescription, TrapDesc, TrapEndDesc, TrapInfoDesc, ShuttleDesc, ShuttleInfoDesc
+export JunctionDesc, JunctionInfoDesc, AdjacencyDesc
 
 using StructTypes
 

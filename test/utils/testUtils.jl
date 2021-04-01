@@ -1,5 +1,5 @@
-include("../../src/types/QCCDevDescription.jl")
-include("../../src/types/QCCDevControl.jl")
+using qccdSimulator.QCCDevControl_Types
+using qccdSimulator.QCCDevDes_Types
 
 """
 Generates n junctions connected to shuttles.
@@ -23,7 +23,7 @@ function giveShuttlesJunctions(nShuttles:: Int64, juncTypes:: Array{String};
             isolatedJunc = false
             continue
         end
-        for j in 1:typesSizes[eval(Meta.parse(juncTypes[i]))]
+        for j in 1:typesSizes[Symbol(juncTypes[i])]
             if skipShuttle
                 skipShuttle = false
                 continue
@@ -40,4 +40,35 @@ function giveShuttles(nShuttles:: Int64;  repShuttle=false)::Dict{String,Shuttle
     for i in 1:nShuttles
         
     end
+end
+
+function giveQccDes()::QCCDevDescription
+    adjacency:: AdjacencyDesc = AdjacencyDesc(
+                    Dict(("4" => [1],"1" => [5],"5" => [2, 3],"2" => [4],"3" => [4]))
+    )
+    trap:: TrapDesc = TrapDesc(
+        3,
+        [ 
+            TrapInfoDesc( 1, ["q1", "q2", "q3"], TrapEndDesc( "q1", ""), TrapEndDesc("q3", "s1")),
+            TrapInfoDesc( 2, ["q4"], TrapEndDesc("q4","s3"), TrapEndDesc("q4","")),
+            TrapInfoDesc( 3, [], TrapEndDesc("","s6"), TrapEndDesc("",""))
+        ]
+    )
+    junction:: JunctionDesc = JunctionDesc(
+        [
+            JunctionInfoDesc( 4, "T"),
+            JunctionInfoDesc( 5, "T")
+        ]
+    )
+    shuttle:: ShuttleDesc = ShuttleDesc(
+        [
+            ShuttleInfoDesc( "s1", 1, 5),
+            ShuttleInfoDesc( "s2", 5, 2),
+            ShuttleInfoDesc( "s3", 2, 4),
+            ShuttleInfoDesc( "s4", 4, 1),
+            ShuttleInfoDesc( "s5", 5, 3),
+            ShuttleInfoDesc( "s6", 3, 4)
+        ]
+    )
+    return  QCCDevDescription(adjacency,trap,junction,shuttle)
 end
