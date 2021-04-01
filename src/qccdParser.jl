@@ -123,7 +123,6 @@ Create the QCCDevStat using dicts.
 Throws error when:
     - Shuttle from - to corresponds JSON adjacency
     - TrapsEnds shuttles exists and shuttle is connected to that trap
-    - TrapsEnds qubits is a qubit in the Trap chain and it is in the correct chain position
 """
 function _initQCCDevStat(adjacency:: Dict{String,Array{Int64}}, traps::Dict{Int64,Trap},
                         junctions::Dict{Int64,Junction}, shuttles::Dict{String,Shuttle},
