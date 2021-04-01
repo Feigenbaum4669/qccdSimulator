@@ -70,7 +70,6 @@ end
 Throws error when:
     - Shuttle from - to corresponds JSON adjacency
     - TrapsEnds shuttles exists and shuttle is connected to that trap
-    - TrapsEnds qubits is a qubit in the Trap chain and it is in the correct chain position
 """
 function checkInitErrors(adjacency:: Dict{String,Array{Int64}},traps::Dict{Int64,Trap},
                                                         shuttles::Dict{String,Shuttle})
@@ -87,7 +86,7 @@ function _checkTraps(traps::Dict{Int64,Trap}, shuttles::Dict{String,Shuttle})
     err = trapId-> ArgumentError("Shuttle connected to trap ID $trapId does
                                  not exist or is wrong connected.")
 
-    check = (trEnd,trId) -> isempty(trEnd.shuttle) || (haskey(shuttles, trEnd.shuttle) && 
+    check = (trEnd,trId) -> trEnd.shuttle isa Nothing || (haskey(shuttles, trEnd.shuttle) && 
                             trId in [shuttles[trEnd.shuttle].from, shuttles[trEnd.shuttle].to])
 
     map(tr-> check(tr.end0,tr.id) && check(tr.end1,tr. id) || throw(err(tr.id))
