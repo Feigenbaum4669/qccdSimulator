@@ -36,9 +36,9 @@ Finally, the last object "_shuttle_" contains the attribute ```shuttle.shuttles:
 Shuttle id:
 "id": "s1",
 
-Id of the node it goes out from:
-"from": "1",
+One of the ends of the shuttle:
+"end0": "1",
 
-Id of the node it goes to:
-"to": "5",
+The other end:
+"end1": "5",
 ```
