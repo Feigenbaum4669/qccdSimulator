@@ -5,11 +5,10 @@ using qccdSimulator.QCCDevControl
 function readJSONOK(path::String)
     qccd1 = readJSON(path)
     qccd2 = giveQccDes()
-    checkEqualQCCD(qccd1,qccd2)
-    return true
+    return checkEqualQCCD(qccd1,qccd2)
 end
 
-function checkEqualQCCD(qccd1::QCCDevDescription, qccd2::QCCDevDescription)
+function checkEqualQCCD(qccd1::QCCDevDescription, qccd2::QCCDevDescription):: Bool
     @assert qccd1.adjacency.nodes == qccd2.adjacency.nodes
     traps1 = qccd1.trap.traps
     traps2 = qccd2.trap.traps
@@ -35,6 +34,7 @@ function checkEqualQCCD(qccd1::QCCDevDescription, qccd2::QCCDevDescription)
         @assert sh1.from == sh2.from
         @assert sh1.to == sh2.to
     end
+    return true
 end
 
 function _initJunctionsTest()

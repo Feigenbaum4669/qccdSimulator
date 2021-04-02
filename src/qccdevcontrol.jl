@@ -71,7 +71,7 @@ Constructor; initializes an "empty" QCCD as described, with no ions loaded (yet)
 * Currently none
 
 """
-function QCCDevCtrl(qdd::QCCDevDescription ; simulate::Bool)
+function QCCDevCtrl(qdd::QCCDevDescription ; simulate::Bool)::QCCDevCtrl
     dev   = qdd
     t_now = 0
     # Initializes devices componentes
@@ -84,7 +84,7 @@ function QCCDevCtrl(qdd::QCCDevDescription ; simulate::Bool)
     _checkInitErrors(qdd.adjacency.nodes, traps, shuttles)
 
     # Initalizate QCCDevCtrl
-    QCCDevCtrl(qdd,t_now,traps,junctions,shuttles, graph)
+    return QCCDevCtrl(qdd,t_now,traps,junctions,shuttles, graph)
 
     # Simulate
 end

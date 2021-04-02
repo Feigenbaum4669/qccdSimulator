@@ -9,7 +9,7 @@ using .QCCDevDes_Types
 using JSON3
 
 """
-Creates an object topologyJSON from JSON.
+Creates an object QCCDevDescription from JSON.
 Throws ArgumentError an error if input is not a valid file.
 """
 function readJSON(path::String)::QCCDevDescription
