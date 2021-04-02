@@ -94,8 +94,8 @@ shuttle: shuttle id the ending is connected
 struct TrapEnd
     qubit::Union{String, Nothing}
     shuttle::Union{String, Nothing}
-    TrapEnd(shuttle) = new(shuttle,nothing)
-    TrapEnd(shuttle,qubit) = shuttle == "" ? new(qubit,nothing) : new(qubit,shuttle)
+    TrapEnd(shuttle) = shuttle == "" ? new(nothing, nothing) : new(nothing,shuttle)
+    TrapEnd(qubit,shuttle) = shuttle == "" ? new(qubit,nothing) : new(qubit,shuttle)
 end
 
 """  
