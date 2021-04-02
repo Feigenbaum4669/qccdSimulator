@@ -3,7 +3,14 @@
 # MIT license
 # Sub-module QCCDevCtrl
 
+module QCCDevControl
 
+export QCCDevCtrl
+
+using ..QCCDevDes_Types
+using ..QCCDevControl_Types
+
+include("initFunctions.jl")
 
 """
 This sub-module provides the type `QCCDevCtrl` and functions for controlling the operation of the
@@ -21,14 +28,11 @@ simulated quantum device.
 # Todo
 * Visualization interface
 """
-module QCCDevControl
-import .QCCDevDescription # type
 
-export QCCDevCtrl
 
 
 """
-Type for time inside the qdev, in [change if necessary] $10^{-10}$
+Type for time inside the qdev, in [change if necessary]   10^{-10}
 seconds, i.e., ns/10.  All times are ≥0; negative value of expressions
 of this type are errors (and may carry local error information).
 """
@@ -38,6 +42,12 @@ struct QCCDevCtrl
     dev         ::QCCDevDescription
 
     t_now       ::Time_t
+# Descomment when load() function is done
+#    qubits      ::Dict{String,Qubit}
+    traps       ::Dict{Int64,Trap}
+    junctions   ::Dict{Int64,Junction}
+    shuttles    ::Dict{String,Shuttle}
+    graph       ::SimpleDiGraph{Int64}
 
     # Rest of struct contains description of current status of qdev
     # and its ions, such as the list of operations that are ongoing
@@ -61,15 +71,22 @@ Constructor; initializes an "empty" QCCD as described, with no ions loaded (yet)
 * Currently none
 
 """
-function QCCDevCtrl(qdd::QCCDevDescription ; simulate::Bool)
+function QCCDevCtrl(qdd::QCCDevDescription ; simulate::Bool)::QCCDevCtrl
     dev   = qdd
     t_now = 0
+    # Initializes devices componentes
+    junctions = _initJunctions(qdd.shuttle.shuttles, qdd.junction.junctions)
+    shuttles = _initShuttles(qdd.shuttle)
+    traps = _initTraps(qdd.trap)
+    graph = initGraph(qdd)
 
-    ...;
-    ...;
+    # Check errors
+    _checkInitErrors(qdd.adjacency.nodes, traps, shuttles)
 
-    QCCDevCtrl(qdd,t,
-               .........)
+    # Initalizate QCCDevCtrl
+    return QCCDevCtrl(qdd,t_now,traps,junctions,shuttles, graph)
+
+    # Simulate
 end
 
 ####################################################################################################
@@ -116,7 +133,7 @@ function linear_transport(qdc           :: QCCDevCtrl,
                           t             :: Time_t,
                           ion_idx       :: Int,
                           edge_idx      :: Int       ) ::Time_t
-    ...
+    
 end
 
 ####################################################################################################
@@ -136,7 +153,7 @@ function junction_transport(qdc           :: QCCDevCtrl,
                             t             :: Time_t,
                             ion_idx       :: Int,
                             edge_idx      :: Int       ) ::Time_t
-    ...
+    
 end
 
 
@@ -157,7 +174,7 @@ function swap(qdc           :: QCCDevCtrl,
               t             :: Time_t,
               ion1_idx      :: Int,
               ion2_idx      :: Int       ) ::Time_t
-    ...
+    
 end
 
 ####################################################################################################
@@ -179,7 +196,7 @@ function split(qdc           :: QCCDevCtrl,
                t             :: Time_t,
                ion_idx       :: Int,
                edge_idx      :: Int) ::Time_t
-    ...
+    
 end
 
 ####################################################################################################
@@ -199,7 +216,7 @@ function merge(qdc           :: QCCDevCtrl,
                t             :: Time_t,
                ion_idx       :: Int,
                edge_idx      :: Int) ::Time_t
-    ...
+    
 end
 
 ####################################################################################################
@@ -219,7 +236,7 @@ function Rz(qdc           :: QCCDevCtrl,
             t             :: Time_t,
             ion_idx       :: Int,
             θ             :: Real      ) ::Time_t
-    ...
+    
 end
 
 ####################################################################################################
@@ -231,7 +248,7 @@ Function `Rxy` — single qubit XY-plane rotation
 * `t::Time_t`   — time at which the operation commences.  Must be no earlier than
   the latest time given to previous function calls.
 * `ion_idx`     — (1-based) index of the ion.
-* `ϕ`           — rotation axis is $\cos(\phi)\cdot\sigma_x + \sin(\phi)\cdot\sigma_y$
+* `ϕ`           — rotation axis is cos(phi)cdot sigma_x + sin(phi)cdot sigma_y
 * `θ`           — rotation angle
 
 The function returns the time at which the operation will be completed.
@@ -239,10 +256,10 @@ The function returns the time at which the operation will be completed.
 function Rxy(qdc           :: QCCDevCtrl,
              t             :: Time_t,
              ion_idx       :: Int,
-             ϕ             :: Real
+             ϕ             :: Real,
              θ             :: Real      ) ::Time_t
     # Attention: Not all values of ϕ may work for the device
-    ...
+    
 end
 
 ####################################################################################################
@@ -264,7 +281,7 @@ function XX(qdc           :: QCCDevCtrl,
             ion2_idx      :: Int,
             θ             :: Real      ) ::Time_t
     # Attention: May not work on all devices
-    ...
+    
 end
 
 ####################################################################################################
@@ -286,7 +303,7 @@ function ZZ(qdc           :: QCCDevCtrl,
             ion2_idx      :: Int,
             θ             :: Real      ) ::Time_t
     # Attention: May not work on all devices
-    ...
+    
 end
 
 end #^ module QCCDevCtrl

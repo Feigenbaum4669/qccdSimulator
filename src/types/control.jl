@@ -1,24 +1,19 @@
-using LightGraphs
+module QCCDevControl_Types
+export Trap, Junction, Shuttle, Qubit, JunctionEnd, TrapEnd, JunctionType, JunctionEndStatus
+export QubitStatus, typesSizes
 
-@enum QubitStatus begin
-    moving
-    resting
-    waitingDecongestion
-    gateApplied
-end
+using LightGraphs
 
 @enum JunctionEndStatus begin 
     free
     blocked
 end
-@enum JunctionType begin 
-    T 
-    Y
-    X 
-end
+
+const QubitStatus = Set([:resting, :moving, :waitingDecongestion, :gateApplied])
+const JunctionType = Set([:T, :Y, :X ])
 
 # Supported junction types with corresponding sizes
-const typesSizes = Dict(T => 3, Y => 3, X => 4)
+const typesSizes = Dict(:T => 3, :Y => 3, :X => 4)
 
 """
 Struct for junction end.
@@ -41,9 +36,10 @@ Throws ArgumentError if junction type doesn't match with number of ends.
 """
 struct Junction
     id::Int64 
-    type::JunctionType
+    type::Symbol
     ends::Dict{String,JunctionEnd}
-    function Junction(id::Int64, type::JunctionType, ends::Dict{String,JunctionEnd})
+    function Junction(id::Int64, type::Symbol, ends::Dict{String,JunctionEnd})
+        type in JunctionType || throw(ArgumentError("Junction type $type not supported"))
         if length(ends) != typesSizes[type]
             throw(ArgumentError("Junction with ID $id of type $type has $(length(ends)) ends.
             It should have $(typesSizes[type]) ends."))
@@ -65,16 +61,21 @@ destination: qubit destination, it could not have any
 """
 struct Qubit
     id::String
-    status::QubitStatus
+    status::Symbol
     position::Union{String,Int64}
     destination::Union{Nothing,Int64}
+    function Qubit(id::String, status::Symbol, position::Union{String,Int64},
+                                            destination::Union{Nothing,Int64})
+        status in QubitStatus || throw(ArgumentError("Qubit status $status not supported"))
+        return new(id, status, position, destination)
+    end
 end
 
 """  
 Struct for the shuttles.
 id: shuttle identifictor 
 from & to: direcction of shuttle and endings
-Throws ArgumentError if 'from' and 'to' are the same
+Throws ArgumentError if 'from' adn 'to' are the same
 """
 struct Shuttle
     id::String
@@ -93,6 +94,7 @@ shuttle: shuttle id the ending is connected
 struct TrapEnd
     qubit::Union{String, Nothing}
     shuttle::Union{String, Nothing}
+    TrapEnd(shuttle) = shuttle == "" ? new(nothing, nothing) : new(nothing,shuttle)
     TrapEnd(qubit,shuttle) = shuttle == "" ? new(qubit,nothing) : new(qubit,shuttle)
 end
 
@@ -116,7 +118,9 @@ struct Trap
         new(id, capacity, chain, end0, end1)
 end
 
+
 """
+--> DEPRECATED
 Struct to have all status in real time.
 qubits: status if all qubits
 trpas: status for all traps
@@ -129,4 +133,6 @@ struct QCCDevStat
     junctions::Dict{Int64,Junction}
     shuttles::Dict{String,Shuttle}
     graph::SimpleDiGraph{Int64}
+end
+
 end

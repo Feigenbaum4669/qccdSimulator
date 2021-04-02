@@ -1,40 +1,11 @@
-include("./types/json.jl")
-include("./types/device.jl")
 using LightGraphs
-import JSON3
-
-"""
-Creates a topology using a graph from JSON
-"""
-function createDevice(path::String)::QCCDevStat
-    topology::TopologyJSON  = _readJSON(path::String)
-    junctions = _initJunctions(topology.shuttle.shuttles, topology.junction.junctions)
-    shuttles = _initShuttles(topology.shuttle)
-    traps = _initTraps(topology.trap)
-    graph = _initGraph(topology)
-    return  _initQCCDevStat(topology.adjacency.nodes, traps, junctions, shuttles,graph)
-end
-
-"""
-Creates an object topologyJSON from JSON.
-Throws ArgumentError if input is not a valid file.
-"""
-function _readJSON(path::String)::TopologyJSON
-    if !isfile(path)
-        throw(ArgumentError("Input is not a file"))
-    end
-    # Parsing JSON
-    topology::TopologyJSON  = try 
-        JSON3.read(read(path, String), TopologyJSON)
-    catch err
-        throw(ArgumentError(err.msg))
-    end
-end
+using .QCCDevDes_Types
+using .QCCDevControl_Types
 
 """
 Creates a graph using a object topologyJSON.
 """
-function _initGraph(topology::TopologyJSON)::SimpleDiGraph{Int64}
+function initGraph(topology::QCCDevDescription)::SimpleDiGraph{Int64}
     nodesAdjacency::Dict{String,Array{Int64}} = topology.adjacency.nodes
     graphTopology::SimpleDiGraph{Int64} = DiGraph(length(nodesAdjacency))
 
@@ -51,8 +22,8 @@ Creates a dictionary of junctions from JSON objects.
 Throws ArgumentError if junction IDs are repeated.
 Throws ArgumentError if unsupported junction type is passed.
 """
-function _initJunctions(shuttles::Array{ShuttleInfoJSON},
-            junctions::Array{JunctionInfoJSON})::Dict{Int64,Junction}
+function _initJunctions(shuttles::Array{ShuttleInfoDesc},
+            junctions::Array{JunctionInfoDesc})::Dict{Int64,Junction}
     res = Dict{Int64,Junction}()
     for j ∈ junctions
         !haskey(res, j.id) || throw(ArgumentError("Repeated junction ID: $(j.id)."))
@@ -60,77 +31,49 @@ function _initJunctions(shuttles::Array{ShuttleInfoJSON},
         connectedShuttles = filter(x -> x.from == j.id || x.to == j.id, shuttles)
         isempty(connectedShuttles) && throw(ArgumentError("Junction with ID $(j.id) isolated."))
         junctionEnds = Dict(s.id => JunctionEnd() for s ∈ connectedShuttles)
-        try
-            res[j.id] = Junction(j.id, eval(Meta.parse(j.type)), junctionEnds)
-        catch e
-            e isa UndefVarError ?
-                throw(ArgumentError("Junction type $(j.type) not supported")) : rethrow(e)
-        end
+        res[j.id] = Junction(j.id, Symbol(j.type), junctionEnds)
     end
     return res
 end
 
 """
-Creates a dictionary of qubits using a object TrapJSON.
-Throws ArgumentError if qubit appears in more than one trap.
-"""
-function _initQubits(trapJSON::TrapJSON)::Dict{String,Qubit}
-    qubits = Dict{String,Qubit}()
-    err = (trapId, qubitPos, qubitId) -> ArgumentError("Repeated Ion ID: $qubitId
-                                                        ,in traps $trapId, $qubitPos.")
-
-    for trap in trapJSON.traps
-        map(q -> haskey(qubits, q) ? 
-                 throw(err(trap.id, qubits[q].position, qubits[q].id)) :
-                 qubits[q] = Qubit(q, resting, trap.id, nothing),
-                 trap.chain)
-    end
-    return qubits
-end
-
-"""
-Creates a dictionary of shuttles using a object shuttleJSON
+Creates a dictionary of shuttles using a object shuttleDesc
 Throws ArgumentError if shuttle ID is repeated.
 """
-function _initShuttles(shuttleJSON::ShuttleJSON)::Dict{String,Shuttle}
+function _initShuttles(shuttleDesc::ShuttleDesc)::Dict{String,Shuttle}
     shuttles = Dict{String,Shuttle}()
     err = id -> ArgumentError("Repeated Shuttle ID: $id ")
 
     map(sh -> haskey(shuttles, sh.id) ? throw(err(sh.id)) :
               shuttles[sh.id] = Shuttle(sh.id, sh.from, sh.to), 
-              shuttleJSON.shuttles)
+              shuttleDesc.shuttles)
     return shuttles
 end
 
 """
-Creates a dictionary of traps using a object trapJSON.
+Creates a dictionary of traps using a object trapDesc.
 Throws ArgumentError if trap ID is repeated.
 """
-function _initTraps(trapJSON::TrapJSON)::Dict{Int64,Trap}
+function _initTraps(trapDesc::TrapDesc)::Dict{Int64,Trap}
     traps = Dict{Int64,Trap}()
     err = id -> ArgumentError("Repeated Trap ID: $id.")
 
     map(tr -> haskey(traps, tr.id) ? throw(err(tr.id)) :
-              traps[tr.id] = Trap(tr.id,trapJSON.capacity, 
-              TrapEnd(nothing, tr.end0), 
-              TrapEnd(nothing, tr.end1)), 
-              trapJSON.traps)
+              traps[tr.id] = Trap(tr.id,trapDesc.capacity, TrapEnd(tr.end0), TrapEnd(tr.end1)),
+              trapDesc.traps)
     return traps
 end
 
 """
-Create the QCCDevStat using dicts.
 Throws error when:
     - Shuttle from - to corresponds JSON adjacency
     - TrapsEnds shuttles exists and shuttle is connected to that trap
 """
-function _initQCCDevStat(adjacency:: Dict{String,Array{Int64}}, traps::Dict{Int64,Trap},
-                        junctions::Dict{Int64,Junction}, shuttles::Dict{String,Shuttle},
-                        graph::SimpleDiGraph{Int64})::QCCDevStat
+function _checkInitErrors(adjacency:: Dict{String,Array{Int64}},traps::Dict{Int64,Trap},
+                                                        shuttles::Dict{String,Shuttle})
 
     _checkShuttles(adjacency,shuttles)
     _checkTraps(traps,shuttles)
-    QCCDevStat(traps,junctions,shuttles, graph)
 end
 
 """
@@ -157,4 +100,39 @@ function _checkShuttles(adjacency:: Dict{String,Array{Int64}}, shuttles::Dict{St
                                         ID $shuttleId.")
     map(sh ->  haskey(adjacency,string(sh.from)) && sh.to in adjacency[string(sh.from)] ||
                                                             throw(errSh(sh.id)), values(shuttles))
+end
+
+########################################################################################################
+
+"""
+--> DEPRECATED
+Creates a topology using a graph from JSON
+"""
+function createDevice(path::String)::QCCDevStat
+    topology::QCCDevDescription  = readJSON(path::String)
+    junctions = _initJunctions(topology.shuttle.shuttles, topology.junction.junctions)
+    qubits = initQubits(topology.trap)
+    shuttles = _initShuttles(topology.shuttle)
+    traps = _initTraps(topology.trap)
+    graph = initGraph(topology)
+    return  initQCCDevStat(topology.adjacency.nodes, qubits, traps, junctions, shuttles,graph)
+end
+
+"""
+--> DEPRECATED
+Creates a dictionary of qubits using a object TrapJSON.
+Throws ArgumentError if qubit appears in more than one trap.
+"""
+function initQubits(trapDesctraps::TrapDesc)::Dict{String,Qubit}
+    qubits = Dict{String,Qubit}()
+    err = (trapId, qubitPos, qubitId) -> ArgumentError("Repeated Ion ID: $qubitId
+                                                        ,in traps $trapId, $qubitPos.")
+
+    for trap in trapDesctraps.traps
+        map(q -> haskey(qubits, q) ? 
+                 throw(err(trap.id, qubits[q].position, qubits[q].id)) :
+                 qubits[q] = Qubit(q, :resting, trap.id, nothing),
+                 trap.chain)
+    end
+    return qubits
 end
