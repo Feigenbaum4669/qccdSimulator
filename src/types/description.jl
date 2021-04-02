@@ -1,19 +1,13 @@
 module QCCDevDes_Types
-export QCCDevDescription, TrapDesc, TrapEndDesc, TrapInfoDesc, ShuttleDesc, ShuttleInfoDesc
+export QCCDevDescription, TrapDesc, TrapInfoDesc, ShuttleDesc, ShuttleInfoDesc
 export JunctionDesc, JunctionInfoDesc, AdjacencyDesc
 
 using StructTypes
 
-struct TrapEndDesc
-    qubit:: String
-    shuttle:: String
-end
-
 struct TrapInfoDesc
     id:: Int64
-    chain:: Array{String}
-    end0:: TrapEndDesc
-    end1:: TrapEndDesc
+    end0:: String
+    end1:: String
 end
 
 struct TrapDesc
@@ -51,7 +45,6 @@ struct QCCDevDescription
     shuttle:: ShuttleDesc
 end
 
-StructTypes.StructType(::Type{TrapEndDesc})= StructTypes.Struct()
 StructTypes.StructType(::Type{TrapInfoDesc})= StructTypes.Struct()
 StructTypes.StructType(::Type{TrapDesc})= StructTypes.Struct()
 StructTypes.StructType(::Type{JunctionInfoDesc})= StructTypes.Struct()

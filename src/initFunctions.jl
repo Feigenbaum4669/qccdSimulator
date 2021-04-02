@@ -59,9 +59,7 @@ function initTraps(trapDesc::TrapDesc)::Dict{Int64,Trap}
     err = id -> ArgumentError("Repeated Trap ID: $id.")
 
     map(tr -> haskey(traps, tr.id) ? throw(err(tr.id)) :
-              traps[tr.id] = Trap(tr.id,trapDesc.capacity,tr.chain, 
-              TrapEnd(tr.end0.qubit, tr.end0.shuttle), 
-              TrapEnd(tr.end1.qubit, tr.end1.shuttle)), 
+              traps[tr.id] = Trap(tr.id,trapDesc.capacity, TrapEnd(tr.end0), TrapEnd(tr.end1)),
               trapDesc.traps)
     return traps
 end

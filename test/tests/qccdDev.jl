@@ -17,11 +17,8 @@ function checkEqualQCCD(qccd1::QCCDevDescription, qccd2::QCCDevDescription)
     @assert qccd1.trap.capacity == qccd2.trap.capacity
     for (trap1,trap2) in zip(traps1,traps2)
         @assert trap1.id == trap2.id
-        @assert trap1.chain == trap2.chain
-        @assert trap1.end0.qubit == trap2.end0.qubit
-        @assert trap1.end0.shuttle == trap2.end0.shuttle
-        @assert trap1.end1.qubit == trap2.end1.qubit
-        @assert trap1.end1.shuttle == trap2.end1.shuttle
+        @assert trap1.end0 == trap2.end0
+        @assert trap1.end1 == trap2.end1
     end
     juns1 = qccd1.junction.junctions
     juns2 = qccd2.junction.junctions

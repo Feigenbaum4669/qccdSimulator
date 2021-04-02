@@ -42,8 +42,8 @@ struct QCCDevCtrl
     dev         ::QCCDevDescription
 
     t_now       ::Time_t
-
-    qubits      ::Dict{String,Qubit}
+# Descomment when load() function is done
+#    qubits      ::Dict{String,Qubit}
     traps       ::Dict{Int64,Trap}
     junctions   ::Dict{Int64,Junction}
     shuttles    ::Dict{String,Shuttle}
@@ -76,7 +76,6 @@ function QCCDevCtrl(qdd::QCCDevDescription ; simulate::Bool)
     t_now = 0
     # Initializes devices componentes
     junctions = initJunctions(qdd.shuttle.shuttles, qdd.junction.junctions)
-    qubits = initQubits(qdd.trap)
     shuttles = initShuttles(qdd.shuttle)
     traps = initTraps(qdd.trap)
     graph = initGraph(qdd)
@@ -85,7 +84,7 @@ function QCCDevCtrl(qdd::QCCDevDescription ; simulate::Bool)
     checkInitErrors(qdd.adjacency.nodes, traps, shuttles)
 
     # Initalizate QCCDevCtrl
-    QCCDevCtrl(qdd,t_now,qubits,traps,junctions,shuttles, graph)
+    QCCDevCtrl(qdd,t_now,traps,junctions,shuttles, graph)
 
     # Simulate
 end

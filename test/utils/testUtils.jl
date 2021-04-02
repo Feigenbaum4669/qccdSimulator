@@ -52,9 +52,9 @@ function giveQccDes()::QCCDevDescription
     trap:: TrapDesc = TrapDesc(
         3,
         [ 
-            TrapInfoDesc( 1, ["q1", "q2", "q3"], TrapEndDesc( "q1", ""), TrapEndDesc("q3", "s1")),
-            TrapInfoDesc( 2, ["q4"], TrapEndDesc("q4","s3"), TrapEndDesc("q4","")),
-            TrapInfoDesc( 3, [], TrapEndDesc("","s6"), TrapEndDesc("",""))
+            TrapInfoDesc( 1, "", "s1"),
+            TrapInfoDesc( 2, "s3", ""),
+            TrapInfoDesc( 3, "s6", "")
         ]
     )
     junction:: JunctionDesc = JunctionDesc(

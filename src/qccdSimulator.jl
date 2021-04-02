@@ -2,6 +2,8 @@ module qccdSimulator
 export readJSON
 
 include("./types/description.jl")
+include("./types/control.jl")
+include("./qccdevcontrol.jl")
 
 using .QCCDevDes_Types
 using JSON3
@@ -21,8 +23,5 @@ function readJSON(path::String)::QCCDevDescription
         throw(ArgumentError(err.msg))
     end
 end
-
-include("./types/control.jl")
-include("./qccdevcontrol.jl")
 
 end
