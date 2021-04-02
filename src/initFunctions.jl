@@ -22,7 +22,7 @@ Creates a dictionary of junctions from JSON objects.
 Throws ArgumentError if junction IDs are repeated.
 Throws ArgumentError if unsupported junction type is passed.
 """
-function initJunctions(shuttles::Array{ShuttleInfoDesc},
+function _initJunctions(shuttles::Array{ShuttleInfoDesc},
             junctions::Array{JunctionInfoDesc})::Dict{Int64,Junction}
     res = Dict{Int64,Junction}()
     for j ∈ junctions
@@ -40,7 +40,7 @@ end
 Creates a dictionary of shuttles using a object shuttleDesc
 Throws ArgumentError if shuttle ID is repeated.
 """
-function initShuttles(shuttleDesc::ShuttleDesc)::Dict{String,Shuttle}
+function _initShuttles(shuttleDesc::ShuttleDesc)::Dict{String,Shuttle}
     shuttles = Dict{String,Shuttle}()
     err = id -> ArgumentError("Repeated Shuttle ID: $id ")
 
@@ -54,7 +54,7 @@ end
 Creates a dictionary of traps using a object trapDesc.
 Throws ArgumentError if trap ID is repeated.
 """
-function initTraps(trapDesc::TrapDesc)::Dict{Int64,Trap}
+function _initTraps(trapDesc::TrapDesc)::Dict{Int64,Trap}
     traps = Dict{Int64,Trap}()
     err = id -> ArgumentError("Repeated Trap ID: $id.")
 
@@ -69,7 +69,7 @@ Throws error when:
     - Shuttle from - to corresponds JSON adjacency
     - TrapsEnds shuttles exists and shuttle is connected to that trap
 """
-function checkInitErrors(adjacency:: Dict{String,Array{Int64}},traps::Dict{Int64,Trap},
+function _checkInitErrors(adjacency:: Dict{String,Array{Int64}},traps::Dict{Int64,Trap},
                                                         shuttles::Dict{String,Shuttle})
 
     _checkShuttles(adjacency,shuttles)
@@ -110,10 +110,10 @@ Creates a topology using a graph from JSON
 """
 function createDevice(path::String)::QCCDevStat
     topology::QCCDevDescription  = readJSON(path::String)
-    junctions = initJunctions(topology.shuttle.shuttles, topology.junction.junctions)
+    junctions = _initJunctions(topology.shuttle.shuttles, topology.junction.junctions)
     qubits = initQubits(topology.trap)
-    shuttles = initShuttles(topology.shuttle)
-    traps = initTraps(topology.trap)
+    shuttles = _initShuttles(topology.shuttle)
+    traps = _initTraps(topology.trap)
     graph = initGraph(topology)
     return  initQCCDevStat(topology.adjacency.nodes, qubits, traps, junctions, shuttles,graph)
 end

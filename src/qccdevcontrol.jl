@@ -75,13 +75,13 @@ function QCCDevCtrl(qdd::QCCDevDescription ; simulate::Bool)
     dev   = qdd
     t_now = 0
     # Initializes devices componentes
-    junctions = initJunctions(qdd.shuttle.shuttles, qdd.junction.junctions)
-    shuttles = initShuttles(qdd.shuttle)
-    traps = initTraps(qdd.trap)
+    junctions = _initJunctions(qdd.shuttle.shuttles, qdd.junction.junctions)
+    shuttles = _initShuttles(qdd.shuttle)
+    traps = _initTraps(qdd.trap)
     graph = initGraph(qdd)
 
     # Check errors
-    checkInitErrors(qdd.adjacency.nodes, traps, shuttles)
+    _checkInitErrors(qdd.adjacency.nodes, traps, shuttles)
 
     # Initalizate QCCDevCtrl
     QCCDevCtrl(qdd,t_now,traps,junctions,shuttles, graph)
