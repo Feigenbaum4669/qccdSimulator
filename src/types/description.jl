@@ -26,8 +26,8 @@ end
 
 struct  ShuttleInfoDesc
     id:: String
-    from:: Int64
-    to:: Int64
+    end0:: Int64
+    end1:: Int64
 end
 
 struct ShuttleDesc

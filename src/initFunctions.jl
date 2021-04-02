@@ -3,18 +3,22 @@ using .QCCDevDes_Types
 using .QCCDevControl_Types
 
 """
-Creates a graph using a object topologyJSON.
+Creates a graph using an object QCCDevDescription.
+Throws ArgumentError if LightGraphs fails to add a node. This will happen
+    if there are redundancies in the adjacency list (i.e. repeated edges),
+    so maybe is not worth having.
 """
-function initGraph(topology::QCCDevDescription)::SimpleDiGraph{Int64}
+function initGraph(topology::QCCDevDescription)::SimpleGraph{Int64}
     nodesAdjacency::Dict{String,Array{Int64}} = topology.adjacency.nodes
-    graphTopology::SimpleDiGraph{Int64} = DiGraph(length(nodesAdjacency))
+    graph::SimpleGraph{Int64} = SimpleGraph(length(nodesAdjacency))
 
     for nodes in keys(nodesAdjacency) 
         for node in nodesAdjacency[nodes]
-            add_edge!(graphTopology, parse(Int64, nodes), node)
+            stat = add_edge!(graph, parse(Int64, nodes), node)
+            stat || throw(ArgumentError("Failed adding edge ($nodes,$node) to graph."))
         end
     end
-    return graphTopology
+    return graph
 end
 
 """
