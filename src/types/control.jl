@@ -4,15 +4,14 @@ export QubitStatus, typesSizes
 
 using LightGraphs
 
-@enum JunctionEndStatus begin 
-    free
-    blocked
-end
-
+# Possible Qubits Status
 const QubitStatus = Set([:resting, :moving, :waitingDecongestion, :gateApplied])
-const JunctionType = Set([:T, :Y, :X ])
+
+# Possible junction status
+const JunctionEndStatus = Set([:free, :blocked])
 
 # Supported junction types with corresponding sizes
+const JunctionType = Set([:T, :Y, :X ])
 const typesSizes = Dict(:T => 3, :Y => 3, :X => 4)
 
 """
@@ -22,9 +21,13 @@ status: Status of the junction end, either free (queue is empty) or blocked othe
 """
 struct JunctionEnd
     queue::Array{String,1}
-    status::JunctionEndStatus
-    JunctionEnd() = new([], free)
-    JunctionEnd(queue, status) = new(queue, status)
+    status::Symbol
+    JunctionEnd() = new([], :free)
+    function JunctionEnd(queue::Array{String,1}, status::Symbol)
+        status in JunctionEndStatus || 
+                throw(ArgumentError("Junction status $status not supported"))
+        new(queue, status)
+    end
 end
 
 """
@@ -35,10 +38,10 @@ ends: Dict with key being the shuttle ID the junction is connected to and value 
 Throws ArgumentError if junction type doesn't match with number of ends.
 """
 struct Junction
-    id::Int64 
+    id::Symbol 
     type::Symbol
-    ends::Dict{String,JunctionEnd}
-    function Junction(id::Int64, type::Symbol, ends::Dict{String,JunctionEnd})
+    ends::Dict{Symbol,JunctionEnd}
+    function Junction(id::Symbol, type::Symbol, ends::Dict{Symbol,JunctionEnd})
         type in JunctionType || throw(ArgumentError("Junction type $type not supported"))
         if length(ends) != typesSizes[type]
             throw(ArgumentError("Junction with ID $id of type $type has $(length(ends)) ends.
@@ -60,12 +63,12 @@ position: current qubit position
 destination: qubit destination, it could not have any
 """
 struct Qubit
-    id::String
+    id::Symbol
     status::Symbol
-    position::Union{String,Int64}
-    destination::Union{Nothing,Int64}
-    function Qubit(id::String, status::Symbol, position::Union{String,Int64},
-                                            destination::Union{Nothing,Int64})
+    position::Symbol
+    destination::Union{Nothing,Symbol}
+    function Qubit(id::Symbol, status::Symbol, position::Symbol,
+                                            destination::Union{Nothing,Symbol})
         status in QubitStatus || throw(ArgumentError("Qubit status $status not supported"))
         return new(id, status, position, destination)
     end
@@ -78,9 +81,9 @@ from & to: direcction of shuttle and endings
 Throws ArgumentError if 'from' adn 'to' are the same
 """
 struct Shuttle
-    id::String
-    from::Int64
-    to::Int64
+    id::Symbol
+    from::Symbol
+    to::Symbol
     Shuttle(id, from, to) = from == to ? 
             throw(ArgumentError("In shuttle ID $id \"from\" and \"to\" must be different")) : 
             new(id, from, to)
@@ -91,11 +94,12 @@ Struct for the trap endings.
 qubit: qubit id in that ending 
 shuttle: shuttle id the ending is connected
 """
+# CHECK CONSTRUCTOR IN TEST !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BC "" -> Nothing
 struct TrapEnd
-    qubit::Union{String, Nothing}
-    shuttle::Union{String, Nothing}
-    TrapEnd(shuttle) = shuttle == "" ? new(nothing, nothing) : new(nothing,shuttle)
-    TrapEnd(qubit,shuttle) = shuttle == "" ? new(qubit,nothing) : new(qubit,shuttle)
+    qubit::Union{Symbol, Nothing}
+    shuttle::Union{Symbol, Nothing}
+    TrapEnd(shuttle) = shuttle == Symbol("") ? new(nothing, nothing) : new(nothing,shuttle)
+    TrapEnd(qubit,shuttle) = shuttle == Symbol("") ? new(qubit,nothing) : new(qubit,shuttle)
 end
 
 """  
@@ -107,32 +111,15 @@ end0 & end1: Trap endings
 Throws ArgumentError if length(chain) > capacity
 """
 struct Trap
-    id::Int64
+    id::Symbol
     capacity::Int64
-    chain::Array{String}
+    chain::Array{Symbol}
     end0::TrapEnd
     end1::TrapEnd
     Trap(id, capacity, end0, end1) = new(id, capacity, [], end0, end1)
     Trap(id, capacity, chain, end0, end1) = capacity < length(chain) ? 
         throw(ArgumentError("Trap with id \"$id\" exceeds its capacity")) :
         new(id, capacity, chain, end0, end1)
-end
-
-
-"""
---> DEPRECATED
-Struct to have all status in real time.
-qubits: status if all qubits
-trpas: status for all traps
-junctions: status for all junctions
-shuttles: status for all shuttles
-graph: current graph
-"""
-struct QCCDevStat
-    traps::Dict{Int64,Trap}
-    junctions::Dict{Int64,Junction}
-    shuttles::Dict{String,Shuttle}
-    graph::SimpleDiGraph{Int64}
 end
 
 end
