@@ -94,7 +94,6 @@ Struct for the trap endings.
 qubit: qubit id in that ending 
 shuttle: shuttle id the ending is connected
 """
-# CHECK CONSTRUCTOR IN TEST !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BC "" -> Nothing
 struct TrapEnd
     qubit::Union{Symbol, Nothing}
     shuttle::Union{Symbol, Nothing}
