@@ -20,13 +20,13 @@ queue: Array of qubits waiting in the junction end (if any)
 status: Status of the junction end, either free (queue is empty) or blocked otherwise
 """
 struct JunctionEnd
-    queue::Array{Symbol,1}
+    qubit::Union{Nothing,Symbol}
     status::Symbol
-    JunctionEnd() = new([], :free)
-    function JunctionEnd(queue::Array{Symbol,1}, status::Symbol)
+    JunctionEnd() = new(nothing, :free)
+    function JunctionEnd(qubit::Symbol, status::Symbol)
         status in JunctionEndStatus || 
                 throw(ArgumentError("Junction status $status not supported"))
-        new(queue, status)
+        new(qubit, status)
     end
 end
 
