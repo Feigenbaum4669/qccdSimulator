@@ -44,9 +44,9 @@ struct QCCDevCtrl
     t_now       ::Time_t
 # Descomment when load() function is done
 #    qubits      ::Dict{String,Qubit}
-    traps       ::Dict{Int64,Trap}
-    junctions   ::Dict{Int64,Junction}
-    shuttles    ::Dict{String,Shuttle}
+    traps       ::Dict{Symbol,Trap}
+    junctions   ::Dict{Symbol,Junction}
+    shuttles    ::Dict{Symbol,Shuttle}
     graph       ::SimpleGraph{Int64}
 
     # Rest of struct contains description of current status of qdev

@@ -27,15 +27,15 @@ Throws ArgumentError if junction IDs are repeated.
 Throws ArgumentError if unsupported junction type is passed.
 """
 function _initJunctions(shuttles::Array{ShuttleInfoDesc},
-            junctions::Array{JunctionInfoDesc})::Dict{Int64,Junction}
-    res = Dict{Int64,Junction}()
+            junctions::Array{JunctionInfoDesc})::Dict{Symbol,Junction}
+    res = Dict{Symbol,Junction}()
     for j ∈ junctions
         !haskey(res, j.id) || throw(ArgumentError("Repeated junction ID: $(j.id)."))
 
         connectedShuttles = filter(x -> x.end0 == j.id || x.end1 == j.id, shuttles)
         isempty(connectedShuttles) && throw(ArgumentError("Junction with ID $(j.id) isolated."))
-        junctionEnds = Dict(s.id => JunctionEnd() for s ∈ connectedShuttles)
-        res[j.id] = Junction(j.id, Symbol(j.type), junctionEnds)
+        junctionEnds = Dict(Symbol(s.id) => JunctionEnd() for s ∈ connectedShuttles)
+        res[Symbol(j.id)] = Junction(Symbol(j.id), Symbol(j.type), junctionEnds)
     end
     return res
 end
@@ -44,12 +44,12 @@ end
 Creates a dictionary of shuttles using a object shuttleDesc
 Throws ArgumentError if shuttle ID is repeated.
 """
-function _initShuttles(shuttleDesc::ShuttleDesc)::Dict{String,Shuttle}
-    shuttles = Dict{String,Shuttle}()
+function _initShuttles(shuttleDesc::ShuttleDesc)::Dict{Symbol,Shuttle}
+    shuttles = Dict{Symbol,Shuttle}()
     err = id -> ArgumentError("Repeated Shuttle ID: $id ")
 
-    map(sh -> haskey(shuttles, sh.id) ? throw(err(sh.id)) :
-              shuttles[sh.id] = Shuttle(sh.id, sh.end0, sh.end1), 
+    map(sh -> haskey(shuttles, Symbol(sh.id)) ? throw(err(sh.id)) :
+              shuttles[Symbol(sh.id)] = Shuttle(Symbol(sh.id), Symbol(sh.end0), Symbol(sh.end1)),
               shuttleDesc.shuttles)
     return shuttles
 end
@@ -58,12 +58,13 @@ end
 Creates a dictionary of traps using a object trapDesc.
 Throws ArgumentError if trap ID is repeated.
 """
-function _initTraps(trapDesc::TrapDesc)::Dict{Int64,Trap}
-    traps = Dict{Int64,Trap}()
+function _initTraps(trapDesc::TrapDesc)::Dict{Symbol,Trap}
+    traps = Dict{Symbol,Trap}()
     err = id -> ArgumentError("Repeated Trap ID: $id.")
 
-    map(tr -> haskey(traps, tr.id) ? throw(err(tr.id)) :
-              traps[tr.id] = Trap(tr.id,trapDesc.capacity, TrapEnd(tr.end0), TrapEnd(tr.end1)),
+    map(tr -> haskey(traps, Symbol(tr.id)) ? throw(err(tr.id)) :
+              traps[Symbol(tr.id)] = Trap(Symbol(tr.id),trapDesc.capacity,
+                                        TrapEnd(Symbol(tr.end0)), TrapEnd(Symbol(tr.end1))),
               trapDesc.traps)
     return traps
 end
@@ -73,8 +74,8 @@ Throws error when:
     - Shuttle ends don't correspond to JSON adjacency
     - Throws an error if trapsEnds shuttles don't exists or don't correspond with Shuttle adjacency
 """
-function _checkInitErrors(adjacency:: Dict{String,Array{Int64}},traps::Dict{Int64,Trap},
-                                                        shuttles::Dict{String,Shuttle})
+function _checkInitErrors(adjacency:: Dict{String, Array{Int64}}, traps::Dict{Symbol,Trap},
+                                                        shuttles::Dict{Symbol,Shuttle})
 
     _checkShuttles(adjacency,shuttles)
     _checkTraps(traps,shuttles)
@@ -83,7 +84,7 @@ end
 """
 Throws an error if trapsEnds shuttles don't exists or don't correspond with Shuttle adjacency
 """
-function _checkTraps(traps::Dict{Int64,Trap}, shuttles::Dict{String,Shuttle})
+function _checkTraps(traps::Dict{Symbol,Trap}, shuttles::Dict{Symbol,Shuttle})
 
     err = trapId-> ArgumentError("Shuttle connected to trap ID $trapId does
                                  not exist or is wrong connected.")
@@ -98,30 +99,16 @@ end
 """
 Throws an error if shuttle ends don't correspond JSON adjacency.
 """
-function _checkShuttles(adjacency:: Dict{String,Array{Int64}}, shuttles::Dict{String,Shuttle})
+function _checkShuttles(adjacency:: Dict{String, Array{Int64}}, shuttles::Dict{Symbol,Shuttle})
 
     errSh = shuttleId -> ArgumentError("Ends don't correspond to adjacency in shuttle 
                                         ID $shuttleId.")
-    check = sh -> (haskey(adjacency,string(sh.end0)) && sh.end1 in adjacency[string(sh.end0)]) ||
-                    (haskey(adjacency,string(sh.end1)) && sh.end0 in adjacency[string(sh.end1)])
+    check = sh -> (haskey(adjacency,string(sh.end0)) && parse(Int,string(sh.end1)) in adjacency[string(sh.end0)]) ||
+                    (haskey(adjacency,string(sh.end1)) && parse(Int,string(sh.end0)) in adjacency[string(sh.end1)])
     map(sh ->  check(sh) || throw(errSh(sh.id)), values(shuttles))
 end
 
 ########################################################################################################
-
-"""
---> DEPRECATED
-Creates a topology using a graph from JSON
-"""
-function createDevice(path::String)::QCCDevStat
-    topology::QCCDevDescription  = readJSON(path::String)
-    junctions = _initJunctions(topology.shuttle.shuttles, topology.junction.junctions)
-    qubits = initQubits(topology.trap)
-    shuttles = _initShuttles(topology.shuttle)
-    traps = _initTraps(topology.trap)
-    graph = initGraph(topology)
-    return  initQCCDevStat(topology.adjacency.nodes, qubits, traps, junctions, shuttles,graph)
-end
 
 """
 --> DEPRECATED
