@@ -37,7 +37,7 @@ function checkEqualQCCD(qccd1::QCCDevDescription, qccd2::QCCDevDescription):: Bo
     return true
 end
 
-function _initJunctionsTest()
+function initJunctionsTest()
     _typeSizes = Dict(:T => 3, :Y => 3, :X => 4)
     shuttles, _junctions = giveShuttlesJunctions(9, ["X", "Y", "T","X", "Y", "T","X", "Y", "T"])
     junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
@@ -56,20 +56,31 @@ function _initJunctionsTest()
     return true
 end
 
-function _initJunctionsTestRepId()
+function initJunctionsTestRepId()
     shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];repJunc = true)
     junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
 end
 
-function _initJunctionsTestIsolated()
+function initJunctionsTestIsolated()
     shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];isolatedJunc = true)
     junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
 end
 
-function _initJunctionsTestWrongType()
+function initJunctionsTestWrongType()
     shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];wrongJuncType = true)
     junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
-end 
+end
+
+function initShuttlesTestRepId()
+    shuttles, _ = giveShuttlesJunctions(2, ["T","T"];repShuttle = true)
+    shDesc = ShuttleDesc(shuttles)
+    qccdSimulator.QCCDevControl._initShuttles(shDesc)
+end
+
+#Test actual creation of Shuttle
+#Test end0=end1 edge case
+
+
 
 function QCCDevCtrlTest()
     qdd::QCCDevDescription = readJSON("./testFiles/topology.json")

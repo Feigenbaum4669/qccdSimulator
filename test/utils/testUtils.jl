@@ -7,16 +7,16 @@ repJunction: Repeats a junction ID.
 wrongJunctType: Gives a wrong junction type to a shuttle.
 isolatedJunc: The first junction is not connected to any shuttle.
 """
-function giveShuttlesJunctions(nShuttles:: Int64, juncTypes:: Array{String};
-            repJunc=false, wrongJuncType=false, isolatedJunc=false)::
-            Tuple{Array{ShuttleInfoDesc,1},Array{JunctionInfoDesc,1}}
+function giveShuttlesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
+            repJunc=false, wrongJuncType=false, isolatedJunc=false, repShuttle=false)::
+            Tuple{Array{ShuttleInfoDesc},Array{JunctionInfoDesc}}
 
     shuttles = ShuttleInfoDesc[]
     junctions = JunctionInfoDesc[]
     sId = 0
     skipShuttle = wrongJuncType
     isolatedJunc = isolatedJunc
-    for i in 1:nShuttles
+    for i in 1:nJunctions
         repJunc ? push!(junctions, JunctionInfoDesc(0, juncTypes[i])) : 
         push!(junctions, JunctionInfoDesc(i, juncTypes[i]))
         if isolatedJunc
@@ -29,6 +29,10 @@ function giveShuttlesJunctions(nShuttles:: Int64, juncTypes:: Array{String};
                 continue
             end
             push!(shuttles, ShuttleInfoDesc(string(sId),i,-1))
+            if repShuttle
+                repShuttle = false
+                continue
+            end
             sId += 1
         end
     end
