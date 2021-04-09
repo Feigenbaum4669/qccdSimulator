@@ -43,13 +43,14 @@ function _initJunctionsTest()
     junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
     for (k,junction) in junctions
         @assert k == junction.id
-        juncType = Symbol(filter(x-> x.id==k,_junctions)[1].type)
+        juncType = filter(x-> Symbol(x.id)==k,_junctions)[1].type
+        juncType = Symbol(juncType)
         @assert junction.type == juncType
         shuttleIds = keys(junction.ends)
         @assert length(shuttleIds) == _typeSizes[juncType]
         for shuttleId in shuttleIds
-            shuttle = filter(x -> x.id == shuttleId, shuttles)[1]
-            @assert shuttle.from == k || shuttle.to == k
+            shuttle = filter(x -> Symbol(x.id) == shuttleId, shuttles)[1]
+            @assert Symbol(string(shuttle.from)) == k || Symbol(shuttle.to) == k
         end
     end
     return true
@@ -74,3 +75,5 @@ function QCCDevCtrlTest()
     qdd::QCCDevDescription = readJSON("./testFiles/topology.json")
     return QCCDevCtrl(qdd; simulate=false)
 end
+
+
