@@ -31,8 +31,8 @@ function checkEqualQCCD(qccd1::QCCDevDescription, qccd2::QCCDevDescription):: Bo
     @assert size(shs1) == size(shs2)
     for (sh1,sh2) in zip(shs1,shs2)
         @assert sh1.id == sh2.id
-        @assert sh1.from == sh2.from
-        @assert sh1.to == sh2.to
+        @assert sh1.end0 == sh2.end0
+        @assert sh1.end1 == sh2.end1
     end
     return true
 end
@@ -49,7 +49,7 @@ function _initJunctionsTest()
         @assert length(shuttleIds) == _typeSizes[juncType]
         for shuttleId in shuttleIds
             shuttle = filter(x -> x.id == shuttleId, shuttles)[1]
-            @assert shuttle.from == k || shuttle.to == k
+            @assert shuttle.end0 == k || shuttle.end1 == k
         end
     end
     return true

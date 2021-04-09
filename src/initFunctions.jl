@@ -32,7 +32,7 @@ function _initJunctions(shuttles::Array{ShuttleInfoDesc},
     for j ∈ junctions
         !haskey(res, j.id) || throw(ArgumentError("Repeated junction ID: $(j.id)."))
 
-        connectedShuttles = filter(x -> x.from == j.id || x.to == j.id, shuttles)
+        connectedShuttles = filter(x -> x.end0 == j.id || x.end1 == j.id, shuttles)
         isempty(connectedShuttles) && throw(ArgumentError("Junction with ID $(j.id) isolated."))
         junctionEnds = Dict(s.id => JunctionEnd() for s ∈ connectedShuttles)
         res[j.id] = Junction(j.id, Symbol(j.type), junctionEnds)
@@ -49,7 +49,7 @@ function _initShuttles(shuttleDesc::ShuttleDesc)::Dict{String,Shuttle}
     err = id -> ArgumentError("Repeated Shuttle ID: $id ")
 
     map(sh -> haskey(shuttles, sh.id) ? throw(err(sh.id)) :
-              shuttles[sh.id] = Shuttle(sh.id, sh.from, sh.to), 
+              shuttles[sh.id] = Shuttle(sh.id, sh.end0, sh.end1), 
               shuttleDesc.shuttles)
     return shuttles
 end
@@ -70,8 +70,8 @@ end
 
 """
 Throws error when:
-    - Shuttle from - to corresponds JSON adjacency
-    - TrapsEnds shuttles exists and shuttle is connected to that trap
+    - Shuttle ends don't correspond to JSON adjacency
+    - Throws an error if trapsEnds shuttles don't exists or don't correspond with Shuttle adjacency
 """
 function _checkInitErrors(adjacency:: Dict{String,Array{Int64}},traps::Dict{Int64,Trap},
                                                         shuttles::Dict{String,Shuttle})
@@ -81,7 +81,7 @@ function _checkInitErrors(adjacency:: Dict{String,Array{Int64}},traps::Dict{Int6
 end
 
 """
-Throws an error if trapsEnds shuttles exists and shuttle is connected to that trap
+Throws an error if trapsEnds shuttles don't exists or don't correspond with Shuttle adjacency
 """
 function _checkTraps(traps::Dict{Int64,Trap}, shuttles::Dict{String,Shuttle})
 
@@ -89,21 +89,22 @@ function _checkTraps(traps::Dict{Int64,Trap}, shuttles::Dict{String,Shuttle})
                                  not exist or is wrong connected.")
 
     check = (trEnd,trId) -> trEnd.shuttle isa Nothing || (haskey(shuttles, trEnd.shuttle) && 
-                            trId in [shuttles[trEnd.shuttle].from, shuttles[trEnd.shuttle].to])
+                            trId in [shuttles[trEnd.shuttle].end0, shuttles[trEnd.shuttle].end1])
 
     map(tr-> check(tr.end0,tr.id) && check(tr.end1,tr. id) || throw(err(tr.id))
         ,values(traps))
 end
 
 """
-Throws an error if shuttle from - to corresponds JSON adjacency.
+Throws an error if shuttle ends don't correspond JSON adjacency.
 """
 function _checkShuttles(adjacency:: Dict{String,Array{Int64}}, shuttles::Dict{String,Shuttle})
 
-    errSh = shuttleId -> ArgumentError("From-to doesn't correspond with adjacency in shuttle 
+    errSh = shuttleId -> ArgumentError("Ends don't correspond to adjacency in shuttle 
                                         ID $shuttleId.")
-    map(sh ->  haskey(adjacency,string(sh.from)) && sh.to in adjacency[string(sh.from)] ||
-                                                            throw(errSh(sh.id)), values(shuttles))
+    check = sh -> (haskey(adjacency,string(sh.end0)) && sh.end1 in adjacency[string(sh.end0)]) ||
+                    (haskey(adjacency,string(sh.end1)) && sh.end0 in adjacency[string(sh.end1)])
+    map(sh ->  check(sh) || throw(errSh(sh.id)), values(shuttles))
 end
 
 ########################################################################################################

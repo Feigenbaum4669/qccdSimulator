@@ -73,17 +73,17 @@ end
 
 """  
 Struct for the shuttles.
-id: shuttle identifictor 
-from & to: direcction of shuttle and endings
-Throws ArgumentError if 'from' adn 'to' are the same
+id: shuttle ID 
+end0 & end1: ID of components they are connected to
+Throws ArgumentError if 'end0' and 'end1' are the same
 """
 struct Shuttle
     id::String
-    from::Int64
-    to::Int64
-    Shuttle(id, from, to) = from == to ? 
-            throw(ArgumentError("In shuttle ID $id \"from\" and \"to\" must be different")) : 
-            new(id, from, to)
+    end0::Int64
+    end1::Int64
+    Shuttle(id, end0, end1) = end0 == end1 ? 
+            throw(ArgumentError("In shuttle ID $id \"end0\" and \"end1\" must be different")) : 
+            new(id, end0, end1)
 end
 
 """  
