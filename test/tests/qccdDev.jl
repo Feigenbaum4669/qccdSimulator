@@ -77,10 +77,21 @@ function initShuttlesTestRepId()
     qccdSimulator.QCCDevControl._initShuttles(shDesc)
 end
 
-#Test actual creation of Shuttle
-#Test end0=end1 edge case
+function initShuttlesTestInvShuttle()
+    qccdSimulator.QCCDevControl._initShuttles(giveShuttles(5;invShuttle=true))
+end
 
-
+function initShuttlesTest()
+    _shuttles = giveShuttles(10)
+    shuttles = qccdSimulator.QCCDevControl._initShuttles(_shuttles)
+    @assert length(_shuttles.shuttles) == length(shuttles)
+    for _shuttle in _shuttles.shuttles
+        shuttle = shuttles[Symbol(_shuttle.id)]
+        @assert _shuttle.end0 == parse(Int,string(shuttle.end0))
+        @assert _shuttle.end1 == parse(Int,string(shuttle.end1))
+    end
+    return true
+end
 
 function QCCDevCtrlTest()
     qdd::QCCDevDescription = readJSON("./testFiles/topology.json")

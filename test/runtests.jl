@@ -17,4 +17,6 @@ end
     @test_throws ArgumentError initJunctionsTestIsolated()
     @test_throws ArgumentError initJunctionsTestWrongType()
     @test_throws ArgumentError initShuttlesTestRepId()
+    @test_throws ArgumentError initShuttlesTestInvShuttle()
+    @test initShuttlesTest()
 end

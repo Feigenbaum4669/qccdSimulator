@@ -39,11 +39,19 @@ function giveShuttlesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
     return shuttles, junctions
 end
 
-function giveShuttles(nShuttles:: Int64;  repShuttle=false)::Dict{String,Shuttle}
+"""
+Creates some shuttle objects.
+"""
+function giveShuttles(nShuttles:: Int64;  invShuttle=false)::ShuttleDesc
     shuttles = ShuttleInfoDesc[]
     for i in 1:nShuttles
-        
+        if invShuttle
+            push!(shuttles,ShuttleInfoDesc("$i",i,i))
+            invShuttle = false
+        end
+        push!(shuttles,ShuttleInfoDesc("$i",i,i+1))
     end
+    return ShuttleDesc(shuttles)
 end
 
 """
