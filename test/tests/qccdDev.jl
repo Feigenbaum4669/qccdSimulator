@@ -144,6 +144,7 @@ end
 
 function initJunctionsTestRepId()
     shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];repJunc = true)
+    @show _junctions
     junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
 end
 

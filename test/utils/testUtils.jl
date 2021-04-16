@@ -18,7 +18,7 @@ function giveShuttlesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
     skipShuttle = wrongJuncType
     isolatedJunc = isolatedJunc
     for i in 1:nJunctions
-        repJunc ? push!(junctions, JunctionInfoDesc(0, juncTypes[i])) : 
+        repJunc && i > 1 ? push!(junctions, JunctionInfoDesc(i-1, juncTypes[i])) : 
         push!(junctions, JunctionInfoDesc(i, juncTypes[i]))
         if isolatedJunc
             isolatedJunc = false
