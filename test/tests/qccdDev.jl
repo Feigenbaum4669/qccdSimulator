@@ -2,10 +2,16 @@ include("../utils/testUtils.jl")
 using qccdSimulator.QCCDevControl_Types
 using qccdSimulator.QCCDevControl
 
-function readJSONOK(path::String)
-    qccd1 = readJSON(path)
+function readJSONOK(path::String)::Bool
+    qccd1 = readJSON(path) 
     qccd2 = giveQccDes()
     return checkEqualQCCD(qccd1,qccd2)
+end
+
+function QCCDevCtrlOKTest()::Bool
+    qccd1 = giveQccCtrl()
+    qccd2 = QCCDevCtrl(giveQccDes();simulate=false)
+    return checkEqualQCCDevCtrl(qccd1,qccd2)
 end
 
 function checkEqualQCCD(qccd1::QCCDevDescription, qccd2::QCCDevDescription):: Bool
@@ -33,6 +39,43 @@ function checkEqualQCCD(qccd1::QCCDevDescription, qccd2::QCCDevDescription):: Bo
         @assert sh1.id == sh2.id
         @assert sh1.from == sh2.from
         @assert sh1.to == sh2.to
+    end
+    return true
+end
+
+function checkEqualQCCDevCtrl(qccdc1::QCCDevCtrl,qccdc2::QCCDevCtrl):: Bool
+    @assert qccdc1.t_now == qccdc2.t_now
+    @assert checkEqualQCCD(qccdc1.dev, qccdc2.dev)
+    @assert nv(qccdc1.graph) == nv(qccdc2.graph)
+    @assert ne(qccdc1.graph) == ne(qccdc2.graph)
+    @assert length(qccdc1.traps) == length(qccdc2.traps)
+    @assert length(qccdc1.junctions) == length(qccdc2.junctions)
+    @assert length(qccdc1.shuttles) == length(qccdc2.shuttles)
+    for (key,value) in qccdc1.traps
+        @assert haskey(qccdc2.traps, key)
+        @assert qccdc2.traps[key].id == value.id
+        @assert qccdc2.traps[key].capacity == value.capacity
+        @assert qccdc2.traps[key].chain == value.chain
+        @assert qccdc2.traps[key].end0.qubit == value.end0.qubit
+        @assert qccdc2.traps[key].end0.shuttle == value.end0.shuttle
+        @assert qccdc2.traps[key].end1.qubit == value.end1.qubit
+        @assert qccdc2.traps[key].end1.shuttle == value.end1.shuttle
+    end
+    for (key,value) in qccdc1.shuttles
+        @assert haskey(qccdc2.shuttles, key)
+        @assert qccdc2.shuttles[key].id == value.id
+        @assert qccdc2.shuttles[key].from == value.from
+        @assert qccdc2.shuttles[key].to == value.to
+    end
+    for (key,value) in qccdc1.junctions
+        @assert haskey(qccdc2.junctions, key)
+        @assert qccdc2.junctions[key].id == value.id
+        @assert qccdc2.junctions[key].type == value.type
+        for (k,v) in qccdc1.junctions[key].ends
+            @assert haskey(qccdc1.junctions[key].ends,k)
+            @assert qccdc1.junctions[key].ends[k].qubit == v.qubit
+            @assert qccdc1.junctions[key].ends[k].status == v.status
+        end
     end
     return true
 end
@@ -72,7 +115,7 @@ function _initJunctionsTestWrongType()
 end 
 
 function QCCDevCtrlTest()
-    qdd::QCCDevDescription = readJSON("./testFiles/topology.json")
+    qdd::QCCDevDescription = giveQccDes()
     return QCCDevCtrl(qdd; simulate=false)
 end
 

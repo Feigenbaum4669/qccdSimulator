@@ -10,6 +10,7 @@ using LightGraphs
 end
 
 @testset "QCCDevCtrl object initialization" begin
+    @test QCCDevCtrlOKTest()
     @test nv(QCCDevCtrlTest().graph) == 5
     @test ne(QCCDevCtrlTest().graph) == 6
     @test _initJunctionsTest()
