@@ -103,6 +103,26 @@ function initTrapRepeatedIdTest()
     return qccdSimulator.QCCDevControl._initTraps(trapDesc)
 end
 
+function checkTrapsTest()
+    qdd::QCCDevCtrl = giveQccCtrl()
+    qccdSimulator.QCCDevControl._checkTraps(qdd.traps,qdd.shuttles)
+    return true
+end
+
+function checkTrapsShuttleNotExistTest()
+    qdd::QCCDevCtrl = giveQccCtrl()
+    traps::Dict{Symbol,Trap} = qccdSimulator.QCCDevControl._initTraps(giveTrapDescNonShuttleId())
+    qccdSimulator.QCCDevControl._checkTraps(traps,qdd.shuttles)
+    return true
+end
+
+function checkTrapsShuttleWrongConnectedTest()
+    qdd::QCCDevCtrl = giveQccCtrl()
+    traps::Dict{Symbol,Trap} = qccdSimulator.QCCDevControl._initTraps(giveTrapDescWrongConnectedShuttle())
+    qccdSimulator.QCCDevControl._checkTraps(traps,qdd.shuttles)
+    return true
+end
+
 function initJunctionsTest()
     _typeSizes = Dict(:T => 3, :Y => 3, :X => 4)
     shuttles, _junctions = giveShuttlesJunctions(9, ["X", "Y", "T","X", "Y", "T","X", "Y", "T"])

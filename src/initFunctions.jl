@@ -86,8 +86,8 @@ Throws an error if trapsEnds shuttles don't exists or don't correspond with Shut
 """
 function _checkTraps(traps::Dict{Symbol,Trap}, shuttles::Dict{Symbol,Shuttle})
 
-    err = trapId-> ArgumentError("Shuttle connected to trap ID $trapId does
-                                 not exist or is wrong connected.")
+    err = trapId-> ArgumentError("Shuttle connected to trap ID $trapId does not exist " *
+                                 "or is wrong connected.")
 
     check = (trEnd,trId) -> trEnd.shuttle isa Nothing || (haskey(shuttles, trEnd.shuttle) && 
                             trId in [shuttles[trEnd.shuttle].end0, shuttles[trEnd.shuttle].end1])

@@ -96,6 +96,35 @@ function giveTrapDescRepeatedId()::TrapDesc
 end
 
 """
+Creates a struct TrapDesc with inexistent shuttle
+"""
+function giveTrapDescNonShuttleId()::TrapDesc
+    return TrapDesc(
+        3,
+        [ 
+            TrapInfoDesc( 1, "", "s1"),
+            TrapInfoDesc( 2, "s100", ""),
+            TrapInfoDesc( 3, "s6", "")
+        ]
+    )
+end
+
+"""
+Creates a struct TrapDesc with wrong connected shuttle
+"""
+function giveTrapDescWrongConnectedShuttle()::TrapDesc
+    return TrapDesc(
+        3,
+        [ 
+            TrapInfoDesc( 1, "s5", "s1"),
+            TrapInfoDesc( 2, "s3", ""),
+            TrapInfoDesc( 3, "s6", "")
+        ]
+    )
+end
+
+
+"""
 Creates a struct QCCDevCtrl based in the file giveQccDes()
 """
 function giveQccCtrl()::QCCDevCtrl
