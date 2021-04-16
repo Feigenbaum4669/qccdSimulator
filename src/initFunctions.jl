@@ -103,8 +103,12 @@ function _checkShuttles(adjacency:: Dict{String, Array{Int64}}, shuttles::Dict{S
 
     errSh = shuttleId -> ArgumentError("Ends don't correspond to adjacency in shuttle 
                                         ID $shuttleId.")
-    check = sh -> (haskey(adjacency,string(sh.end0)) && parse(Int,string(sh.end1)) in adjacency[string(sh.end0)]) ||
-                    (haskey(adjacency,string(sh.end1)) && parse(Int,string(sh.end0)) in adjacency[string(sh.end1)])
+    length(shuttles) == sum(length, values(adjacency)) ||
+        ArgumentError("Number of elements in adjacency list and number of shuttles don't match")
+    check = sh ->
+        (haskey(adjacency,string(sh.end0)) && parse(Int,string(sh.end1)) in adjacency[string(sh.end0)]) ||
+        (haskey(adjacency,string(sh.end1)) && parse(Int,string(sh.end0)) in adjacency[string(sh.end1)])
+
     map(sh ->  check(sh) || throw(errSh(sh.id)), values(shuttles))
 end
 
