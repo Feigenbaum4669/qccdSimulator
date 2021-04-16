@@ -47,7 +47,7 @@ struct QCCDevCtrl
     traps       ::Dict{Symbol,Trap}
     junctions   ::Dict{Symbol,Junction}
     shuttles    ::Dict{Symbol,Shuttle}
-    graph       ::SimpleDiGraph{Int64}
+    graph       ::SimpleGraph{Int64}
 
     # Rest of struct contains description of current status of qdev
     # and its ions, such as the list of operations that are ongoing

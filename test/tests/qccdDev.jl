@@ -37,8 +37,8 @@ function checkEqualQCCD(qccd1::QCCDevDescription, qccd2::QCCDevDescription):: Bo
     @assert size(shs1) == size(shs2)
     for (sh1,sh2) in zip(shs1,shs2)
         @assert sh1.id == sh2.id
-        @assert sh1.from == sh2.from
-        @assert sh1.to == sh2.to
+        @assert sh1.end0 == sh2.end0
+        @assert sh1.end1 == sh2.end1
     end
     return true
 end
@@ -64,8 +64,8 @@ function checkEqualQCCDevCtrl(qccdc1::QCCDevCtrl,qccdc2::QCCDevCtrl):: Bool
     for (key,value) in qccdc1.shuttles
         @assert haskey(qccdc2.shuttles, key)
         @assert qccdc2.shuttles[key].id == value.id
-        @assert qccdc2.shuttles[key].from == value.from
-        @assert qccdc2.shuttles[key].to == value.to
+        @assert qccdc2.shuttles[key].end0 == value.end0
+        @assert qccdc2.shuttles[key].end1 == value.end1
     end
     for (key,value) in qccdc1.junctions
         @assert haskey(qccdc2.junctions, key)
@@ -80,7 +80,7 @@ function checkEqualQCCDevCtrl(qccdc1::QCCDevCtrl,qccdc2::QCCDevCtrl):: Bool
     return true
 end
 
-function _initJunctionsTest()
+function initJunctionsTest()
     _typeSizes = Dict(:T => 3, :Y => 3, :X => 4)
     shuttles, _junctions = giveShuttlesJunctions(9, ["X", "Y", "T","X", "Y", "T","X", "Y", "T"])
     junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
@@ -93,26 +93,37 @@ function _initJunctionsTest()
         @assert length(shuttleIds) == _typeSizes[juncType]
         for shuttleId in shuttleIds
             shuttle = filter(x -> Symbol(x.id) == shuttleId, shuttles)[1]
-            @assert Symbol(string(shuttle.from)) == k || Symbol(shuttle.to) == k
+            @assert Symbol(string(shuttle.end0)) == k || Symbol(shuttle.end1) == k
         end
     end
     return true
 end
 
-function _initJunctionsTestRepId()
+function initJunctionsTestRepId()
     shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];repJunc = true)
     junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
 end
 
-function _initJunctionsTestIsolated()
+function initJunctionsTestIsolated()
     shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];isolatedJunc = true)
     junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
 end
 
-function _initJunctionsTestWrongType()
+function initJunctionsTestWrongType()
     shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];wrongJuncType = true)
     junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
-end 
+end
+
+function initShuttlesTestRepId()
+    shuttles, _ = giveShuttlesJunctions(2, ["T","T"];repShuttle = true)
+    shDesc = ShuttleDesc(shuttles)
+    qccdSimulator.QCCDevControl._initShuttles(shDesc)
+end
+
+#Test actual creation of Shuttle
+#Test end0=end1 edge case
+
+
 
 function QCCDevCtrlTest()
     qdd::QCCDevDescription = giveQccDes()

@@ -7,7 +7,7 @@ The JSON file contains three main objects. The first one, "_adjacency_", represe
 adjacency.1: ["5"]
 adjacency.5: ["2", "3"]
 ```
-means that node with id $1$ has an outgoing edge to node $5$, and node $5$ has two outgoing edges to nodes $2$ and $3$.
+means that node with id $1$ has an edge to node $5$, and node $5$ has two edges to nodes $2$ and $3$. Note that, since the edges are undirected, one could write `x: [y]` or `y: [x]`. It doesn't make any difference, just be sure that you don't write it in both ways at the same time (that would be repeating edges, which will throw an error).
 
 The second object, "_trap_", contains all the information related to the traps on the device. Fisrt of all, the attribute ```trap.capacity: "integer" ``` shows how many ions at the same time there can be in a trap. The attribute ``` trap.traps: []``` contains an array of objects, each one of them with information about an individual trap. Each object contains the following data, illustrated with an example:
 ```
@@ -36,9 +36,9 @@ Finally, the last object "_shuttle_" contains the attribute ```shuttle.shuttles:
 Shuttle id:
 "id": "s1",
 
-Id of the node it goes out from:
-"from": "1",
+One of the ends of the shuttle:
+"end0": "1",
 
-Id of the node it goes to:
-"to": "5",
+The other end:
+"end1": "5",
 ```
