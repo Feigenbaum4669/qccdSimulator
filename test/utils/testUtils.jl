@@ -82,6 +82,20 @@ function giveQccDes()::QCCDevDescription
 end
 
 """
+Creates a struct TrapDesc with repeated Ids
+"""
+function giveTrapDescRepeatedId()::TrapDesc
+    return TrapDesc(
+        3,
+        [ 
+            TrapInfoDesc( 1, "", "s1"),
+            TrapInfoDesc( 2, "s3", ""),
+            TrapInfoDesc( 1, "s6", "")
+        ]
+    )
+end
+
+"""
 Creates a struct QCCDevCtrl based in the file giveQccDes()
 """
 function giveQccCtrl()::QCCDevCtrl

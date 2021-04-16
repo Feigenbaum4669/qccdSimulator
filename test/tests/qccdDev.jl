@@ -80,6 +80,29 @@ function checkEqualQCCDevCtrl(qccdc1::QCCDevCtrl,qccdc2::QCCDevCtrl):: Bool
     return true
 end
 
+function initTrapTest()
+    trapDesc::TrapDesc = giveQccDes().trap
+    traps = qccdSimulator.QCCDevControl._initTraps(trapDesc)
+    for (key, value) in traps
+        @assert key == value.id
+        @assert trapDesc.capacity == value.capacity
+        aux = filter(x-> Symbol(x.id)==key,trapDesc.traps)
+        @assert length(aux) == 1
+        @assert isempty(value.chain)
+        @assert value.end0.qubit == value.end1.qubit == nothing
+        tmp = aux[1].end0 == "" ? nothing : Symbol(aux[1].end0)
+        @assert tmp == value.end0.shuttle
+        tmp = aux[1].end1 == "" ? nothing : Symbol(aux[1].end1)
+        @assert tmp == value.end1.shuttle
+    end
+    return true
+end
+
+function initTrapRepeatedIdTest()
+    trapDesc::TrapDesc = giveTrapDescRepeatedId()
+    return qccdSimulator.QCCDevControl._initTraps(trapDesc)
+end
+
 function initJunctionsTest()
     _typeSizes = Dict(:T => 3, :Y => 3, :X => 4)
     shuttles, _junctions = giveShuttlesJunctions(9, ["X", "Y", "T","X", "Y", "T","X", "Y", "T"])
