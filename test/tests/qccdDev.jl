@@ -62,6 +62,8 @@ function checkEqualQCCDevCtrl(qccdc1::QCCDevCtrl,qccdc2::QCCDevCtrl):: Bool
         @assert qccdc2.traps[key].end0.shuttle == value.end0.shuttle
         @assert qccdc2.traps[key].end1.qubit == value.end1.qubit
         @assert qccdc2.traps[key].end1.shuttle == value.end1.shuttle
+        @assert qccdc2.traps[key].gate == value.gate
+        @assert qccdc2.traps[key].loading_hole == value.loading_hole
     end
     for (key,value) in qccdc1.shuttles
         @assert haskey(qccdc2.shuttles, key)
