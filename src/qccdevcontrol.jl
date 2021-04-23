@@ -46,7 +46,7 @@ struct QCCDevCtrl
 
     t_now          ::Time_t
 # Descomment when load() function is done
-#    qubits      ::Dict{String,Qubit}
+#    qubits      ::Dict{Int,Qubit}
     traps          ::Dict{Symbol,Trap}
     junctions      ::Dict{Symbol,Junction}
     shuttles       ::Dict{Symbol,Shuttle}
