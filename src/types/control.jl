@@ -116,12 +116,9 @@ struct Trap
     end0::TrapEnd
     end1::TrapEnd
     gate::Bool
-    loading_hole::Bool
-    Trap(id, capacity, end0, end1, gate, loading_hole) = 
-                        new(id, capacity, [], end0, end1, gate, loading_hole)
-    Trap(id, capacity, chain, end0, end1, gate, loading_hole) = capacity < length(chain) ? 
-        throw(ArgumentError("Trap with id \"$id\" exceeds its capacity")) :
-        new(id, capacity, chain, end0, end1, gate, loading_hole)
+    loading_hole::Tuple{Bool, Union{Symbol, Nothing}}
+    Trap(id, capacity, end0, end1, gate, holeBool) =
+                        new(id, capacity, [], end0, end1, gate, (holeBool,nothing))
 end
 
 end
