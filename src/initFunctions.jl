@@ -30,7 +30,7 @@ function _initJunctions(shuttles::Array{ShuttleInfoDesc},
             junctions::Array{JunctionInfoDesc})::Dict{Symbol,Junction}
     res = Dict{Symbol,Junction}()
     for j ∈ junctions
-        !haskey(res, j.id) || throw(ArgumentError("Repeated junction ID: $(j.id)."))
+        !haskey(res, Symbol(j.id)) || throw(ArgumentError("Repeated junction ID: $(j.id)."))
 
         connectedShuttles = filter(x -> x.end0 == j.id || x.end1 == j.id, shuttles)
         isempty(connectedShuttles) && throw(ArgumentError("Junction with ID $(j.id) isolated."))

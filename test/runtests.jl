@@ -10,12 +10,14 @@ using LightGraphs
 end
 
 @testset "QCCDevCtrl object initialization" begin
+    @test QCCDevCtrlOKTest()
     @test nv(QCCDevCtrlTest().graph) == 5
     @test ne(QCCDevCtrlTest().graph) == 6
     @test initJunctionsTest()
-    @test_throws ArgumentError initJunctionsTestRepId()
-    @test_throws ArgumentError initJunctionsTestIsolated()
-    @test_throws ArgumentError initJunctionsTestWrongType()
+    @test_throws ArgumentError("Repeated junction ID: 1.") initJunctionsTestRepId()
+    @test_throws ArgumentError("Junction with ID 1 isolated.") initJunctionsTestIsolated()
+    @test_throws ArgumentError("Junction with ID 1 of type T has 2 ends. " * 
+                               "It should have 3 ends.") initJunctionsTestWrongType()
     @test_throws ArgumentError initShuttlesTestRepId()
     @test_throws ArgumentError initShuttlesTestInvShuttle()
     @test initShuttlesTest()
@@ -23,4 +25,11 @@ end
     @test checkShuttlesTestMissingAdj()
     @test checkShuttlesTestMissingShuttle()
     @test checkShuttlesTestModifyConnections()
+    @test initTrapTest()
+    @test_throws ArgumentError("Repeated Trap ID: 1.") initTrapRepeatedIdTest()
+    @test checkTrapsTest()
+    @test_throws ArgumentError("Shuttle connected to trap ID 2 does not exist or is" * 
+                               " wrong connected.") checkTrapsShuttleNotExistTest()
+    @test_throws ArgumentError("Shuttle connected to trap ID 1 does not exist or is" * 
+    " wrong connected.") checkTrapsShuttleWrongConnectedTest()
 end

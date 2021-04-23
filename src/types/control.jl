@@ -44,8 +44,8 @@ struct Junction
     function Junction(id::Symbol, type::Symbol, ends::Dict{Symbol,JunctionEnd})
         type in JunctionType || throw(ArgumentError("Junction type $type not supported"))
         if length(ends) != typesSizes[type]
-            throw(ArgumentError("Junction with ID $id of type $type has $(length(ends)) ends.
-            It should have $(typesSizes[type]) ends."))
+            throw(ArgumentError("Junction with ID $id of type $type has $(length(ends)) ends." *
+            " It should have $(typesSizes[type]) ends."))
         end
         return new(id, type, ends)
     end
