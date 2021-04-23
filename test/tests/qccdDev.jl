@@ -98,4 +98,74 @@ function QCCDevCtrlTest()
     return QCCDevCtrl(qdd; simulate=false)
 end
 
+function checkShuttlesTest()
+    adj, shuttles = giveShuttlesAdjacency()
+    qccdSimulator.QCCDevControl._checkShuttles(adj, shuttles)
+    return true
+end
 
+function checkShuttlesTestMissingAdj()
+    adj, shuttles = giveShuttlesAdjacency()
+    try 
+        qccdSimulator.QCCDevControl._checkShuttles(delete!(adj, collect(keys(adj))[1]), shuttles)
+    catch e
+        @assert e.msg == "Number of elements in adjacency list and number of shuttles don't match"
+    end
+    return true
+end
+
+function checkShuttlesTestMissingShuttle()
+    adj, shuttles = giveShuttlesAdjacency()
+    try 
+        qccdSimulator.QCCDevControl.
+                        _checkShuttles(adj, delete!(shuttles, collect(keys(shuttles))[1]))
+    catch e
+        @assert e.msg == "Number of elements in adjacency list and number of shuttles don't match"
+    end
+    return true
+end
+
+"""Checks all combinations for _checkShuttles check function"""
+function checkShuttlesTestModifyConnections()
+    adj, shuttles = giveShuttlesAdjacency()
+    
+    # Tamper a 'random' key in the dictionary
+    _adj = deepcopy(adj)
+    k = collect(keys(_adj))[1]
+    _adj[k*"_"] = _adj[k] 
+    delete!(_adj, k) # So there isn't a size mismatch
+    try
+        qccdSimulator.QCCDevControl._checkShuttles(_adj, shuttles)
+    catch e
+        @assert startswith(e.msg, "Ends don't correspond to adjacency in shuttle ID")
+    end
+    _adj = nothing
+
+    # Tamper a random value in the dictionary
+    _adj = deepcopy(adj)
+    _adj[rand(keys(_adj))][1] = -1 
+    try
+        qccdSimulator.QCCDevControl._checkShuttles(_adj, shuttles)
+    catch e
+        @assert startswith(e.msg, "Ends don't correspond to adjacency in shuttle ID")
+    end
+    _adj = nothing
+
+    # An end0 is going to be wrong
+    adj, shuttles = giveShuttlesAdjacency(;faultyEnd0=true)
+    try
+        qccdSimulator.QCCDevControl._checkShuttles(adj, shuttles)
+    catch e
+        @assert startswith(e.msg, "Ends don't correspond to adjacency in shuttle ID")
+    end
+
+    # An end1 is going to be wrong
+    adj, shuttles = giveShuttlesAdjacency(;faultyEnd1=true)
+    try
+        qccdSimulator.QCCDevControl._checkShuttles(adj, shuttles)
+    catch e
+        @assert startswith(e.msg, "Ends don't correspond to adjacency in shuttle ID")
+    end
+
+    return true
+end

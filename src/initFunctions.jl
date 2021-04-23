@@ -86,8 +86,8 @@ Throws an error if trapsEnds shuttles don't exists or don't correspond with Shut
 """
 function _checkTraps(traps::Dict{Symbol,Trap}, shuttles::Dict{Symbol,Shuttle})
 
-    err = trapId-> ArgumentError("Shuttle connected to trap ID $trapId does
-                                 not exist or is wrong connected.")
+    err = trapId-> ArgumentError("Shuttle connected to trap ID $trapId does "*
+                                 "not exist or is wrong connected.")
 
     check = (trEnd,trId) -> trEnd.shuttle isa Nothing || (haskey(shuttles, trEnd.shuttle) && 
                             trId in [shuttles[trEnd.shuttle].end0, shuttles[trEnd.shuttle].end1])
@@ -101,10 +101,12 @@ Throws an error if shuttle ends don't correspond JSON adjacency.
 """
 function _checkShuttles(adjacency:: Dict{String, Array{Int64}}, shuttles::Dict{Symbol,Shuttle})
 
-    errSh = shuttleId -> ArgumentError("Ends don't correspond to adjacency in shuttle 
-                                        ID $shuttleId.")
+    errSh = shuttleId -> ArgumentError("Ends don't correspond to adjacency in shuttle "*
+                                        "ID $shuttleId.")
     length(shuttles) == sum(length, values(adjacency)) ||
-        ArgumentError("Number of elements in adjacency list and number of shuttles don't match")
+        throw(ArgumentError(
+            "Number of elements in adjacency list and number of shuttles don't match"))
+            
     check = sh ->
         (haskey(adjacency,string(sh.end0)) && parse(Int,string(sh.end1)) in adjacency[string(sh.end0)]) ||
         (haskey(adjacency,string(sh.end1)) && parse(Int,string(sh.end0)) in adjacency[string(sh.end1)])

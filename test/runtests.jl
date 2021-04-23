@@ -19,4 +19,8 @@ end
     @test_throws ArgumentError initShuttlesTestRepId()
     @test_throws ArgumentError initShuttlesTestInvShuttle()
     @test initShuttlesTest()
+    @test checkShuttlesTest()
+    @test checkShuttlesTestMissingAdj()
+    @test checkShuttlesTestMissingShuttle()
+    @test checkShuttlesTestModifyConnections()
 end

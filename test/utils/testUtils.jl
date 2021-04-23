@@ -1,5 +1,6 @@
 using qccdSimulator.QCCDevControl_Types
 using qccdSimulator.QCCDevDes_Types
+using Random
 
 """
 Generates n junctions connected to shuttles.
@@ -86,4 +87,35 @@ function giveQccDes()::QCCDevDescription
         ]
     )
     return  QCCDevDescription(adjacency,trap,junction,shuttle)
+end
+
+"""
+Gives adjacency list and corresponding set of shuttles.
+faultyEnd0, faultyEnd1: Flags for creating shuttles with wrong connections 
+"""
+function giveShuttlesAdjacency(;faultyEnd0 = false,faultyEnd1 = false)::
+    Tuple{Dict{String,Array{Int64}}, Dict{Symbol,Shuttle}}
+
+    adj = Dict{String,Array{Int64}}()
+    shuttles = Dict{Symbol,Shuttle}()
+    s = 0
+    for i in 1:rand(10:30)
+        end0 = rand(setdiff(1:100, keys(adj)))
+        for j in 1:rand(5:20)
+            end1 = rand(setdiff(1:100, [end0]))
+            string(end0) in keys(adj) ? push!(adj[string(end0)], end1) :
+            adj[string(end0)] = [end1]
+            if faultyEnd0
+                shuttles[Symbol(s)] = Shuttle(Symbol(s), Symbol(-1), Symbol(end1))
+                faultyEnd0 = false
+            end
+            if faultyEnd0
+                shuttles[Symbol(s)] = Shuttle(Symbol(s), Symbol(end0), Symbol(-1))
+                faultyEnd1 = false
+            end
+            shuttles[Symbol(s)] = Shuttle(Symbol(s), Symbol(end0), Symbol(end1))
+            s += 1
+        end
+    end
+    return adj, shuttles
 end
