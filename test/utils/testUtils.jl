@@ -42,7 +42,7 @@ function giveShuttles(nShuttles:: Int64;  repShuttle=false)::Dict{String,Shuttle
     end
 end
 
-"""
+""" 
 Creates a struct QCCDevDescription based in the file topology.json
 """
 function giveQccDes()::QCCDevDescription
@@ -52,9 +52,9 @@ function giveQccDes()::QCCDevDescription
     trap:: TrapDesc = TrapDesc(
         3,
         [ 
-            TrapInfoDesc( 1, "", "s1"),
-            TrapInfoDesc( 2, "s3", ""),
-            TrapInfoDesc( 3, "s6", "")
+            TrapInfoDesc( 1, "", "s1", true, true),
+            TrapInfoDesc( 2, "s3", "", false, true),
+            TrapInfoDesc( 3, "s6", "", true, false)
         ]
     )
     junction:: JunctionDesc = JunctionDesc(

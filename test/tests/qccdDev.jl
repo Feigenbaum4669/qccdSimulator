@@ -18,6 +18,8 @@ function checkEqualQCCD(qccd1::QCCDevDescription, qccd2::QCCDevDescription):: Bo
         @assert trap1.id == trap2.id
         @assert trap1.end0 == trap2.end0
         @assert trap1.end1 == trap2.end1
+        @assert trap1.gate == trap2.gate
+        @assert trap1.loading_zone == trap2.loading_zone
     end
     juns1 = qccd1.junction.junctions
     juns2 = qccd2.junction.junctions
