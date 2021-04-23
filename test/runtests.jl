@@ -9,7 +9,7 @@ using LightGraphs
     @test_throws ArgumentError readJSON("./testFiles/wrongTopology.json")
 end
 
-@testset "QCCDevCtrl object initialization" begin
+@testset "QCCDevCtrl initialization" begin
     @test QCCDevCtrlOKTest()
     @test nv(QCCDevCtrlTest().graph) == 5
     @test ne(QCCDevCtrlTest().graph) == 6
