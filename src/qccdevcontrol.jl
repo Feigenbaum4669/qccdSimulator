@@ -84,8 +84,8 @@ Currently none.  Possible:
 """
 function QCCDevCtrl(qdd             ::QCCDevDescription
                     ;
-                    simulate=:No        ::Symbol,
-                    qnoise_estimate=false ::Bool             ) ::QCCDevCtrl
+                    simulate ::Symbol = :No,
+                    qnoise_estimate::Bool = false        ) ::QCCDevCtrl
 
     @assert simulate        ∈ [:No, :PureStates, :MixedStates]
     @assert qnoise_estimate ∈ [true,false] # 😃
