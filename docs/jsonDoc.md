@@ -44,7 +44,7 @@ The other end:
 ```
 
 # Operation duration JSON file
-In this file, one should especify how long does it take (in milliseconds) to perform each low-level device operation. The format is the following:
+In this file, one should specify how long it takes (in milliseconds) to perform each low-level device operation. The format is the following:
 ```
 {
     "operation1": time1,
@@ -61,4 +61,4 @@ The device operations are the following:
 * ```Rz```: Single qubit Z-rotation.
 * ```Rxy```: Single qubit XY-plane rotation.
 * ```XX```: Two qubit XX-rotation.
-* ```ZZ```: Two qubit XX-rotation.
+* ```ZZ```: Two qubit ZZ-rotation.
