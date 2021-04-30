@@ -1,7 +1,7 @@
 # Introduction
 This file contains documentation on how the JSON representation of the TI-QCCD device topolgy works.
 
-# Json file
+# Topology JSON file
 The JSON file contains three main objects. The first one, "_adjacency_", represents how the nodes of the graph representing the device topology are connected. For example, 
 ```
 adjacency.1: ["5"]
@@ -42,3 +42,23 @@ One of the ends of the shuttle:
 The other end:
 "end1": "5",
 ```
+
+# Operation duration JSON file
+In this file, one should especify how long does it take (in milliseconds) to perform each low-level device operation. The format is the following:
+```
+{
+    "operation1": time1,
+    "operation2": time2
+}
+```
+The device operations are the following:
+* ```load```: Loads an ion into the device
+* ```linear_transport```: Moves ions between traps/junctions through a shuttle.
+* ```junction_transport```: Moves ions around a junction.
+* ```swap```: Physically swaps the positions of two ions.
+* ```split```: Splits an ion from an ion chain.
+* ```merge```: Merges an ion in an ion chain.
+* ```Rz```: Single qubit Z-rotation.
+* ```Rxy```: Single qubit XY-plane rotation.
+* ```XX```: Two qubit XX-rotation.
+* ```ZZ```: Two qubit XX-rotation.
