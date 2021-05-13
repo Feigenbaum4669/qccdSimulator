@@ -101,6 +101,7 @@ function initGateZoneTest()
         @assert key == value.id
         aux = filter(x-> Symbol(x.id)==key, gateZoneDesc.gateZones)
         @assert length(aux) == 1
+        aux = aux[1]
         @assert aux.capacity == value.capacity
         @assert isempty(value.chain)
         tmp = aux.end0 == "" ? nothing : Symbol(aux.end0)
