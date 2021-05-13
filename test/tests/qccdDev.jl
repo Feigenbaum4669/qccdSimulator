@@ -15,18 +15,27 @@ function QCCDevCtrlOKTest()::Bool
 end
 
 function checkEqualQCCD(qccd1::QCCDevDescription, qccd2::QCCDevDescription):: Bool
-    @assert qccd1.adjacency.nodes == qccd2.adjacency.nodes
-    traps1 = qccd1.trap.traps
-    traps2 = qccd2.trap.traps
-    @assert size(traps1) == size(traps2)
-    @assert qccd1.trap.capacity == qccd2.trap.capacity
-    for (trap1,trap2) in zip(traps1,traps2)
-        @assert trap1.id == trap2.id
-        @assert trap1.end0 == trap2.end0
-        @assert trap1.end1 == trap2.end1
-        @assert trap1.gate == trap2.gate
-        @assert trap1.loading_zone == trap2.loading_zone
+    # Compare gate zones
+    gateZones1 = qccd1.gateZone.gateZones
+    gateZones2 = qccd2.gateZone.gateZones
+    @assert size(gateZones1) == size(gateZones2)
+    for (gateZone1,gateZone2) in zip(gateZones1,gateZones2)
+        @assert gateZone1.id == gateZone2.id
+        @assert gateZone1.end0 == gateZone2.end0
+        @assert gateZone1.end1 == gateZone2.end1
+        @assert gateZone1.capacity == gateZone2.capacity
     end
+    # Compare auxiliary zones
+    auxZones1 = qccd1.auxZone.auxZones
+    auxZones2 = qccd2.auxZone.auxZones
+    @assert size(auxZones1) == size(auxZones2)
+    for (auxZone1,auxZone2) in zip(auxZones1,auxZones2)
+        @assert auxZone1.id == auxZone2.id
+        @assert auxZone1.end0 == auxZone2.end0
+        @assert auxZone1.end1 == auxZone2.end1
+        @assert auxZone1.capacity == auxZone2.capacity
+    end
+    # Compare junctions
     juns1 = qccd1.junction.junctions
     juns2 = qccd2.junction.junctions
     @assert size(juns1) == size(juns2)
@@ -34,13 +43,14 @@ function checkEqualQCCD(qccd1::QCCDevDescription, qccd2::QCCDevDescription):: Bo
         @assert jun1.id == jun2.id
         @assert jun1.type == jun2.type
     end
-    shs1 = qccd1.shuttle.shuttles
-    shs2 = qccd2.shuttle.shuttles
-    @assert size(shs1) == size(shs2)
-    for (sh1,sh2) in zip(shs1,shs2)
-        @assert sh1.id == sh2.id
-        @assert sh1.end0 == sh2.end0
-        @assert sh1.end1 == sh2.end1
+    # Compare loading zones
+    loadZones1 = qccd1.loadZone.loadZones
+    loadZones2 = qccd2.loadZone.loadZones
+    @assert size(loadZones1) == size(loadZones2)
+    for (loadZone1,loadZone2) in zip(loadZones1,loadZones2)
+        @assert loadZone1.id == loadZone2.id
+        @assert loadZone1.end0 == loadZone2.end0
+        @assert loadZone1.end1 == loadZone2.end1
     end
     return true
 end
