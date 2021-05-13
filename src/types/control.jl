@@ -1,5 +1,5 @@
 module QCCDevControl_Types
-export GateZone, Junction, AuxZone, Qubit, LoadingZone
+export GateZone, Junction, AuxZone, Qubit, LoadingZone, QubitStatus, typesSizes
 
 using LightGraphs
 

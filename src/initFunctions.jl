@@ -116,7 +116,7 @@ end
 """
 Throws an error if trapsEnds shuttles don't exists or don't correspond with Shuttle adjacency
 """
-function _checkGateZones(traps::Dict{Symbol,Trap}, shuttles::Dict{Symbol,Shuttle})
+function _checkGateZones(traps::Dict{Symbol,GateZone}, shuttles::Dict{Symbol,AuxZone})
 
     err = trapId-> ArgumentError("Shuttle connected to trap ID $trapId does "*
                                  "not exist or is wrong connected.")
@@ -131,7 +131,7 @@ end
 """
 Throws an error if shuttle ends don't correspond JSON adjacency.
 """
-function _checkAuxZones(adjacency:: Dict{String, Array{Int64}}, shuttles::Dict{Symbol,Shuttle})
+function _checkAuxZones(adjacency:: Dict{String, Array{Int64}}, shuttles::Dict{Symbol,AuxZone})
 
     errSh = shuttleId -> ArgumentError("Ends don't correspond to adjacency in shuttle "*
                                         "ID $shuttleId.")
@@ -153,7 +153,7 @@ end
 Creates a dictionary of qubits using a object TrapJSON.
 Throws ArgumentError if qubit appears in more than one trap.
 """
-function initQubits(trapDesctraps::TrapDesc)::Dict{String,Qubit}
+function initQubits(trapDesctraps::GateZone)::Dict{String,Qubit}
     qubits = Dict{String,Qubit}()
     err = (trapId, qubitPos, qubitId) -> ArgumentError("Repeated Ion ID: $qubitId
                                                         ,in traps $trapId, $qubitPos.")
