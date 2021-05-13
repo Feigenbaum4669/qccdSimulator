@@ -181,11 +181,11 @@ function initAuxZonesTestInvAuxZone()
 end
 
 function initAuxZonesTest()
-    _auxZones = giveShuttles(10)
-    auxZones = qccdSimulator.QCCDevControl._initShuttles(_auxZones)
+    _auxZones = giveAuxZones(10)
+    auxZones = qccdSimulator.QCCDevControl._initAuxZones(_auxZones)
     @assert length(_auxZones.auxZones) == length(auxZones)
     for _auxZone in _auxZones.auxZones
-        auxZone = shuttles[Symbol(_shuttle.id)]
+        auxZone = auxZones[Symbol(_auxZone.id)]
         @assert _auxZone.end0 == parse(Int,string(auxZone.end0))
         @assert _auxZone.end1 == parse(Int,string(auxZone.end1))
     end

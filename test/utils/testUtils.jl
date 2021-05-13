@@ -42,18 +42,18 @@ function giveShuttlesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
 end
 
 """
-Creates some shuttle objects.
+Creates some AuxZone objects.
 """
-function giveShuttles(nShuttles:: Int64;  invShuttle=false)::ShuttleDesc
-    shuttles = ShuttleInfoDesc[]
-    for i in 1:nShuttles
-        if invShuttle
-            push!(shuttles,ShuttleInfoDesc("$i",i,i))
+function giveAuxZones(nAuxZones:: Int64;  invAuxZone=false)::AuxZoneDesc
+    auxZones = ZoneInfoDesc[]
+    for i in 1:nAuxZones
+        if invAuxZone
+            push!(auxZones,ZoneInfoDesc("$i",i,i))
             invShuttle = false
         end
-        push!(shuttles,ShuttleInfoDesc("$i",i,i+1))
+        push!(auxZones,ZoneInfoDesc("$i",i,i+1))
     end
-    return ShuttleDesc(shuttles)
+    return AuxZoneDesc(auxZones)
 end
 
 """ 

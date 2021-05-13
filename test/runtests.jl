@@ -22,14 +22,14 @@ end
     # @test_throws ArgumentError("Junction with ID 1 isolated.") initJunctionsTestIsolated()
     # @test_throws ArgumentError("Junction with ID 1 of type T has 2 ends. " * 
     #                            "It should have 3 ends.") initJunctionsTestWrongType()
-    # @test_throws ArgumentError initAuxZonesTestRepId()
-    # @test_throws ArgumentError initAuxZonesTestInvAuxZone()
-    # @test initAuxZonesTest()
+    @test_throws ArgumentError initAuxZonesTestRepId()
+    @test_throws ArgumentError initAuxZonesTestInvAuxZone()
+    @test initAuxZonesTest()
     # @test checkAuxZonesTest()
     # @test checkAuxZonesTestMissingAdj()
     # @test checkAuxZonesTestMissingAuxZone()
     # @test checkAuxZonesTestModifyConnections()
-    @test initGateZoneTest()
+    #@test initGateZoneTest()
     # @test_throws ArgumentError("Repeated Trap ID: 1.") initGateZoneRepeatedIdTest()
     # @test checkGateZonesTest()
     # @test_throws ArgumentError("Zone connected to gate zone ID 2 does not exist or is" * 
