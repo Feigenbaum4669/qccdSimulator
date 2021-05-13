@@ -60,34 +60,32 @@ end
 Creates a struct QCCDevDescription based in the file topology.json
 """
 function giveQccDes()::QCCDevDescription
-    adjacency:: AdjacencyDesc = AdjacencyDesc(
-                    Dict(("4" => [1],"1" => [5],"5" => [2, 3],"2" => [4],"3" => [4]))
-    )
-    trap:: TrapDesc = TrapDesc(
-        3,
+    gateZone:: GateZoneDesc = GateZoneDesc(
         [ 
-            TrapInfoDesc( 1, "", "s1", true, true),
-            TrapInfoDesc( 2, "s3", "", false, true),
-            TrapInfoDesc( 3, "s6", "", true, false)
+            ZoneInfoDesc( 1, "", "4", 2),
+            ZoneInfoDesc( 2, "4", "5", 2),
+            ZoneInfoDesc( 3, "7", "8", 2)
+        ]
+    )
+    auxZone:: AuxZoneDesc = AuxZoneDesc(
+        [ 
+            ZoneInfoDesc( 4, "1", "2", 2),
+            ZoneInfoDesc( 5, "5", "9", 2),
+            ZoneInfoDesc( 6, "9", "", 2),
+            ZoneInfoDesc( 7, "9", "3", 2)
         ]
     )
     junction:: JunctionDesc = JunctionDesc(
         [
-            JunctionInfoDesc( 4, "T"),
-            JunctionInfoDesc( 5, "T")
+            JunctionInfoDesc( 9, "T")
         ]
     )
-    shuttle:: ShuttleDesc = ShuttleDesc(
-        [
-            ShuttleInfoDesc( "s1", 1, 5),
-            ShuttleInfoDesc( "s2", 5, 2),
-            ShuttleInfoDesc( "s3", 2, 4),
-            ShuttleInfoDesc( "s4", 4, 1),
-            ShuttleInfoDesc( "s5", 5, 3),
-            ShuttleInfoDesc( "s6", 3, 4)
+    loadZone:: LoadZoneDesc = LoadZoneDesc(
+        [ 
+            LoadZoneInfoDesc( 8, "3", "")
         ]
     )
-    return  QCCDevDescription(adjacency,trap,junction,shuttle)
+    return  QCCDevDescription(gateZone,auxZone,junction,loadZone)
 end
 
 """
@@ -121,29 +119,27 @@ function giveShuttlesAdjacency(;faultyEnd0 = false,faultyEnd1 = false)::
     return adj, shuttles
 end
 """
-Creates a struct TrapDesc with repeated Ids
+Creates a struct GateZoneDesc with repeated Ids
 """
-function giveTrapDescRepeatedId()::TrapDesc
-    return TrapDesc(
-        3,
+function giveGateZoneDescRepeatedId()::GateZoneDesc
+    return GateZoneDesc(
         [ 
-            TrapInfoDesc( 1, "", "s1", false, true),
-            TrapInfoDesc( 2, "s3", "", true, true),
-            TrapInfoDesc( 1, "s6", "", true, true)
+            ZoneInfoDesc( 1, "", "4", 2),
+            ZoneInfoDesc( 2, "4", "5", 2),
+            ZoneInfoDesc( 1, "7", "8", 2)
         ]
     )
 end
 
 """
-Creates a struct TrapDesc with inexistent shuttle
+Creates a struct GateZoneDesc with inexistent connection
 """
-function giveTrapDescNonShuttleId()::TrapDesc
-    return TrapDesc(
-        3,
+function giveGateZoneDescNoConnection()::GateZoneDesc
+    return GateZoneDesc(
         [ 
-            TrapInfoDesc( 1, "", "s1", false, true),
-            TrapInfoDesc( 2, "s100", "", true, true),
-            TrapInfoDesc( 3, "s6", "", true, true)
+            ZoneInfoDesc( 1, "", "4", 2),
+            ZoneInfoDesc( 2, "9999999999", "5", 2),
+            ZoneInfoDesc( 3, "7", "8", 2)
         ]
     )
 end
@@ -151,13 +147,12 @@ end
 """
 Creates a struct TrapDesc with wrong connected shuttle
 """
-function giveTrapDescWrongConnectedShuttle()::TrapDesc
-    return TrapDesc(
-        3,
+function giveGateZoneDescWrongConnectedShuttle()::GateZoneDesc
+    return GateZoneDesc(
         [ 
-            TrapInfoDesc( 1, "s5", "s1", false, true),
-            TrapInfoDesc( 2, "s3", "", true, true),
-            TrapInfoDesc( 3, "s6", "", true, true)
+            ZoneInfoDesc( 1, "", "4", 2),
+            ZoneInfoDesc( 2, "7", "5", 2),
+            ZoneInfoDesc( 3, "7", "8", 2)
         ]
     )
 end
