@@ -1,5 +1,5 @@
 module QCCDevControl_Types
-export Trap, Junction, Shuttle, Qubit, TrapEnd, JunctionType
+export GateZone, Junction, AuxZone, Qubit, LoadingZone, JunctionType
 export QubitStatus, typesSizes
 
 using LightGraphs
