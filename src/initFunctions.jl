@@ -17,19 +17,20 @@ function _addToAdjacency(adjacency ::Dict{String,Array{Symbol}}, collection)
         elseif !haskey(adjacency, element.end1)
             adjacency[element.id] = [element.end1]
         end
+    end
 end
 
 """
 Creates adjacency list from QCCDevCtrl attributes.
 """
-function _initAdjacency(device ::QCCDevCtrl)::Dict{Symbol,Array{Symbol}}
-    adjacency = Dict{Symbol, Array{Symbol}}()
-    _addToAdjacency(adjacency, device.gateZones)
-    _addToAdjacency(adjacency, device.junctions)
-    _addToAdjacency(adjacency, device.auxZones)
-    _addToAdjacency(adjacency, device.loadingZones)
-    return adjacency
-end
+# function _initAdjacency(device ::QCCDevCtrl)::Dict{Symbol,Array{Symbol}}
+#     adjacency = Dict{Symbol, Array{Symbol}}()
+#     _addToAdjacency(adjacency, device.gateZones)
+#     _addToAdjacency(adjacency, device.junctions)
+#     _addToAdjacency(adjacency, device.auxZones)
+#     _addToAdjacency(adjacency, device.loadingZones)
+#     return adjacency
+# end
 
 """
 Creates a graph using an object QCCDevDescription.
@@ -55,7 +56,7 @@ Creates a dictionary of junctions from JSON objects.
 Throws ArgumentError if junction IDs are repeated.
 Throws ArgumentError if unsupported junction type is passed.
 """
-function _initJunctions(shuttles::Array{ShuttleInfoDesc},
+function _initJunctions(shuttles::Array{AuxZone},
             junctions::Array{JunctionInfoDesc})::Dict{Symbol,Junction}
     res = Dict{Symbol,Junction}()
     for j ∈ junctions
