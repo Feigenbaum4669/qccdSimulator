@@ -168,10 +168,10 @@ Creates a struct QCCDevCtrl based in the file giveQccDes()
 """
 function giveQccCtrl()::QCCDevCtrl
     qccd::QCCDevDescription = giveQccDes()
-    traps = Dict{Symbol,Trap}()
-    map(tr -> traps[Symbol(tr.id)] = Trap(Symbol(tr.id), qccd.trap.capacity,
-                              TrapEnd(Symbol(tr.end0)), TrapEnd(Symbol(tr.end1))
-                              , tr.gate, tr.loading_zone), qccd.trap.traps)
+    gateZones = Dict{Symbol,GateZone}()
+    map(tr -> gateZones[Symbol(tr.id)] = GateZone(Symbol(tr.id), qccd.trap.capacity,
+                              Symbol(tr.end0), Symbol(tr.end1)
+                              , tr.gate, tr.loading_zone), qccd.trap.gateZones)
     shuttles = Dict{Symbol,Shuttle}()
     map(sh -> shuttles[Symbol(sh.id)] = Shuttle(Symbol(sh.id), Symbol(sh.end0), Symbol(sh.end1)),
               qccd.shuttle.shuttles)
@@ -188,5 +188,5 @@ function giveQccCtrl()::QCCDevCtrl
             add_edge!(graph, parse(Int64, nodes), node)
         end
     end
-    return QCCDevCtrl(qccd,:No,false,0,traps,junctions,shuttles, graph)
+    return QCCDevCtrl(qccd,:No,false,0,gateZones,junctions,shuttles, graph)
 end

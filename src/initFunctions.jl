@@ -26,30 +26,30 @@ end
 Creates a dictionary of shuttles using a object shuttleDesc
 Throws ArgumentError if shuttle ID is repeated.
 """
-function _initShuttles(shuttleDesc::ShuttleDesc)::Dict{Symbol,Shuttle}
-    shuttles = Dict{Symbol,Shuttle}()
+function _initAuxZones(auxZoneDesc::AuxZoneDesc)::Dict{Symbol,AuxZone}
+    auxZonesCtrl = Dict{Symbol,AuxZone}()
     err = id -> ArgumentError("Repeated Shuttle ID: $id ")
 
-    map(sh -> haskey(shuttles, Symbol(sh.id)) ? throw(err(sh.id)) :
-              shuttles[Symbol(sh.id)] = Shuttle(Symbol(sh.id), Symbol(sh.end0), Symbol(sh.end1)),
-              shuttleDesc.shuttles)
-    return shuttles
+    map(sh -> haskey(auxZonesCtrl, Symbol(sh.id)) ? throw(err(sh.id)) :
+              auxZonesCtrl[Symbol(sh.id)] = AuxZone(Symbol(sh.id), sh.capacity,
+                                                    Symbol(sh.end0), Symbol(sh.end1)),
+              auxZoneDesc.auxZones)
+    return auxZonesCtrl
 end
 
 """
 Creates a dictionary of traps using a object trapDesc.
 Throws ArgumentError if trap ID is repeated.
 """
-function _initTraps(trapDesc::TrapDesc)::Dict{Symbol,Trap}
-    traps = Dict{Symbol,Trap}()
+function _initGateZone(gateZoneDesc::GateZoneDesc)::Dict{Symbol,GateZone}
+    gateZonessCtrl = Dict{Symbol,GateZone}()
     err = id -> ArgumentError("Repeated Trap ID: $id.")
 
-    map(tr -> haskey(traps, Symbol(tr.id)) ? throw(err(tr.id)) :
-              traps[Symbol(tr.id)] = Trap(Symbol(tr.id),trapDesc.capacity,
-                                        TrapEnd(Symbol(tr.end0)), TrapEnd(Symbol(tr.end1)),
-                                        tr.gate, tr.loading_zone),
-              trapDesc.traps)
-    return traps
+    map(tr -> haskey(gateZonessCtrl, Symbol(tr.id)) ? throw(err(tr.id)) :
+                     gateZonessCtrl[Symbol(tr.id)] = GateZone(Symbol(tr.id), tr.capacity,
+                                                        Symbol(tr.end0), Symbol(tr.end1)),
+             gateZoneDesc.gateZones)
+    return gateZonessCtrl
 end
 
 """
@@ -57,17 +57,18 @@ Throws error when:
     - Shuttle ends don't correspond to JSON adjacency
     - Throws an error if trapsEnds shuttles don't exists or don't correspond with Shuttle adjacency
 """
-function _checkInitErrors(adjacency:: Dict{String, Array{Int64}}, traps::Dict{Symbol,Trap},
-                                                        shuttles::Dict{Symbol,Shuttle})
+function _checkInitErrors(adjacency:: Dict{String, Array{Int64}}, 
+                          gateZones::Dict{Symbol,GateZoneDesc},
+                          auxZones::Dict{Symbol,AuxZone})
 
-    _checkShuttles(adjacency,shuttles)
-    _checkTraps(traps,shuttles)
+    _checkAuxZones(adjacency,auxZones)
+    _checkGateZones(gateZones,auxZones)
 end
 
 """
 Throws an error if trapsEnds shuttles don't exists or don't correspond with Shuttle adjacency
 """
-function _checkTraps(traps::Dict{Symbol,Trap}, shuttles::Dict{Symbol,Shuttle})
+function _checkGateZones(traps::Dict{Symbol,Trap}, shuttles::Dict{Symbol,Shuttle})
 
     err = trapId-> ArgumentError("Shuttle connected to trap ID $trapId does "*
                                  "not exist or is wrong connected.")
@@ -82,7 +83,7 @@ end
 """
 Throws an error if shuttle ends don't correspond JSON adjacency.
 """
-function _checkShuttles(adjacency:: Dict{String, Array{Int64}}, shuttles::Dict{Symbol,Shuttle})
+function _checkAuxZones(adjacency:: Dict{String, Array{Int64}}, shuttles::Dict{Symbol,Shuttle})
 
     errSh = shuttleId -> ArgumentError("Ends don't correspond to adjacency in shuttle "*
                                         "ID $shuttleId.")

@@ -94,25 +94,24 @@ function checkEqualQCCDevCtrl(qccdc1::QCCDevCtrl,qccdc2::QCCDevCtrl):: Bool
     return true
 end
 
-function initTrapTest()
-    trapDesc::TrapDesc = giveQccDes().trap
-    traps = qccdSimulator.QCCDevControl._initTraps(trapDesc)
-    for (key, value) in traps
+function initGateZoneTest()
+    gateZoneDesc::GateZoneDesc = giveQccDes().gateZone
+    gateZones = qccdSimulator.QCCDevControl._initGateZone(gateZoneDesc)
+    for (key, value) in gateZones
         @assert key == value.id
-        @assert trapDesc.capacity == value.capacity
-        aux = filter(x-> Symbol(x.id)==key,trapDesc.traps)
+        aux = filter(x-> Symbol(x.id)==key, gateZoneDesc.gateZones)
         @assert length(aux) == 1
+        @assert aux.capacity == value.capacity
         @assert isempty(value.chain)
-        @assert value.end0.qubit == value.end1.qubit == nothing
-        tmp = aux[1].end0 == "" ? nothing : Symbol(aux[1].end0)
-        @assert tmp == value.end0.shuttle
-        tmp = aux[1].end1 == "" ? nothing : Symbol(aux[1].end1)
-        @assert tmp == value.end1.shuttle
+        tmp = aux.end0 == "" ? nothing : Symbol(aux.end0)
+        @assert tmp == value.end0
+        tmp = aux.end1 == "" ? nothing : Symbol(aux.end1)
+        @assert tmp == value.end1
     end
     return true
 end
 
-function initTrapRepeatedIdTest()
+function initGateZoneRepeatedIdTest()
     trapDesc::TrapDesc = giveTrapDescRepeatedId()
     return qccdSimulator.QCCDevControl._initTraps(trapDesc)
 end
@@ -171,24 +170,24 @@ function initJunctionsTestWrongType()
     junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
 end
 
-function initShuttlesTestRepId()
-    shuttles, _ = giveShuttlesJunctions(2, ["T","T"];repShuttle = true)
-    shDesc = ShuttleDesc(shuttles)
-    qccdSimulator.QCCDevControl._initShuttles(shDesc)
+function initAuxZonesTestRepId()
+    auxZones, _ = giveAuxZonesJunctions(2, ["T","T"];repShuttle = true)
+    shDesc = AuxZoneDesc(auxZones)
+    qccdSimulator.QCCDevControl._initAuxZones(shDesc)
 end
 
-function initShuttlesTestInvShuttle()
-    qccdSimulator.QCCDevControl._initShuttles(giveShuttles(5;invShuttle=true))
+function initAuxZonesTestInvAuxZone()
+    qccdSimulator.QCCDevControl._initAuxZones(giveAuxZones(5;invAuxZones=true))
 end
 
-function initShuttlesTest()
-    _shuttles = giveShuttles(10)
-    shuttles = qccdSimulator.QCCDevControl._initShuttles(_shuttles)
-    @assert length(_shuttles.shuttles) == length(shuttles)
-    for _shuttle in _shuttles.shuttles
-        shuttle = shuttles[Symbol(_shuttle.id)]
-        @assert _shuttle.end0 == parse(Int,string(shuttle.end0))
-        @assert _shuttle.end1 == parse(Int,string(shuttle.end1))
+function initAuxZonesTest()
+    _auxZones = giveShuttles(10)
+    auxZones = qccdSimulator.QCCDevControl._initShuttles(_auxZones)
+    @assert length(_auxZones.auxZones) == length(auxZones)
+    for _auxZone in _auxZones.auxZones
+        auxZone = shuttles[Symbol(_shuttle.id)]
+        @assert _auxZone.end0 == parse(Int,string(auxZone.end0))
+        @assert _auxZone.end1 == parse(Int,string(auxZone.end1))
     end
     return true
 end
@@ -198,36 +197,36 @@ function QCCDevCtrlTest()
     return QCCDevCtrl(qdd)
 end
 
-function checkShuttlesTest()
-    adj, shuttles = giveShuttlesAdjacency()
-    qccdSimulator.QCCDevControl._checkShuttles(adj, shuttles)
+function checkAuxZonesTest()
+    adj, auxZones = giveAuxZonesAdjacency()
+    qccdSimulator.QCCDevControl._checkAuxZones(adj, auxZones)
     return true
 end
 
-function checkShuttlesTestMissingAdj()
-    adj, shuttles = giveShuttlesAdjacency()
+function checkAuxZonesTestMissingAdj()
+    adj, auxZones = giveAuxZonesAdjacency()
     try 
-        qccdSimulator.QCCDevControl._checkShuttles(delete!(adj, collect(keys(adj))[1]), shuttles)
+        qccdSimulator.QCCDevControl._checkAuxZones(delete!(adj, collect(keys(adj))[1]), shutauxZonestles)
     catch e
-        @assert e.msg == "Number of elements in adjacency list and number of shuttles don't match"
+        @assert e.msg == "Number of elements in adjacency list and number of auxZones don't match"
     end
     return true
 end
 
-function checkShuttlesTestMissingShuttle()
-    adj, shuttles = giveShuttlesAdjacency()
+function checkAuxZonesTestMissingAuxZone()
+    adj, auxZones = giveAuxZonesAdjacency()
     try 
         qccdSimulator.QCCDevControl.
-                        _checkShuttles(adj, delete!(shuttles, collect(keys(shuttles))[1]))
+                    _checkAuxZones(adj, delete!(auxZones, collect(keys(auxZones))[1]))
     catch e
-        @assert e.msg == "Number of elements in adjacency list and number of shuttles don't match"
+        @assert e.msg == "Number of elements in adjacency list and number of auxZones don't match"
     end
     return true
 end
 
-"""Checks all combinations for _checkShuttles check function"""
-function checkShuttlesTestModifyConnections()
-    adj, shuttles = giveShuttlesAdjacency()
+"""Checks all combinations for _checkAuxZones check function"""
+function checkAuxZonesTestModifyConnections()
+    adj, auxZones = giveAuxZonesAdjacency()
     
     # Tamper a 'random' key in the dictionary
     _adj = deepcopy(adj)
@@ -235,9 +234,9 @@ function checkShuttlesTestModifyConnections()
     _adj[k*"_"] = _adj[k] 
     delete!(_adj, k) # So there isn't a size mismatch
     try
-        qccdSimulator.QCCDevControl._checkShuttles(_adj, shuttles)
+        qccdSimulator.QCCDevControl._checkAuxZones(_adj, auxZones)
     catch e
-        @assert startswith(e.msg, "Ends don't correspond to adjacency in shuttle ID")
+        @assert startswith(e.msg, "Ends don't correspond to adjacency in auxZone ID")
     end
     _adj = nothing
 
@@ -245,26 +244,26 @@ function checkShuttlesTestModifyConnections()
     _adj = deepcopy(adj)
     _adj[rand(keys(_adj))][1] = -1 
     try
-        qccdSimulator.QCCDevControl._checkShuttles(_adj, shuttles)
+        qccdSimulator.QCCDevControl._checkShuttles(_adj, auxZones)
     catch e
-        @assert startswith(e.msg, "Ends don't correspond to adjacency in shuttle ID")
+        @assert startswith(e.msg, "Ends don't correspond to adjacency in auxZone ID")
     end
     _adj = nothing
 
     # An end0 is going to be wrong
-    adj, shuttles = giveShuttlesAdjacency(;faultyEnd0=true)
+    adj, auxZones = giveAuxZonesAdjacency(;faultyEnd0=true)
     try
-        qccdSimulator.QCCDevControl._checkShuttles(adj, shuttles)
+        qccdSimulator.QCCDevControl._checkAuxZones(adj, auxZones)
     catch e
-        @assert startswith(e.msg, "Ends don't correspond to adjacency in shuttle ID")
+        @assert startswith(e.msg, "Ends don't correspond to adjacency in auxZone ID")
     end
 
     # An end1 is going to be wrong
-    adj, shuttles = giveShuttlesAdjacency(;faultyEnd1=true)
+    adj, auxZones = giveAuxZonesAdjacency(;faultyEnd1=true)
     try
-        qccdSimulator.QCCDevControl._checkShuttles(adj, shuttles)
+        qccdSimulator.QCCDevControl._checkAuxZones(adj, auxZones)
     catch e
-        @assert startswith(e.msg, "Ends don't correspond to adjacency in shuttle ID")
+        @assert startswith(e.msg, "Ends don't correspond to adjacency in auxZone ID")
     end
 
     return true
