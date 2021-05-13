@@ -1,14 +1,11 @@
 module QCCDevControl_Types
-export Trap, Junction, Shuttle, Qubit, JunctionEnd, TrapEnd, JunctionType, JunctionEndStatus
+export Trap, Junction, Shuttle, Qubit, TrapEnd, JunctionType
 export QubitStatus, typesSizes
 
 using LightGraphs
 
 # Possible Qubits Status
 const QubitStatus = Set([:inLoadingZone, :inGateZone])
-
-# Possible junction status
-const JunctionEndStatus = Set([:free, :blocked])
 
 # Supported junction types with corresponding sizes
 const JunctionType = Set([:T, :Y, :X ])
@@ -18,14 +15,14 @@ const typesSizes = Dict(:T => 3, :Y => 3, :X => 4)
 Struct for junction.
 id: Junction ID.
 type: Type of the junction. Each type may define how the junction works differently
-ends: Dict with key being the shuttle ID the junction is connected to and value a JunctionEnd
+ends: Array os its connections Id's
 Throws ArgumentError if junction type doesn't match with number of ends.
 """
 struct Junction
     id::Symbol 
     type::Symbol
     ends::Array{Symbol}
-    function Junction(id::Symbol, type::Symbol, ends::Dict{Symbol,JunctionEnd})
+    function Junction(id::Symbol, type::Symbol, ends::Array{Symbol})
         type in JunctionType || throw(ArgumentError("Junction type $type not supported"))
         if length(ends) != typesSizes[type]
             throw(ArgumentError("Junction with ID $id of type $type has $(length(ends)) ends." *
