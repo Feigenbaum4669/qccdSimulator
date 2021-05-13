@@ -17,6 +17,7 @@ function _addToAdjacency(adjacency ::Dict{String,Array{Symbol}}, collection)
         elseif !haskey(adjacency, element.end1)
             adjacency[element.id] = [element.end1]
         end
+    end
 end
 
 """
@@ -70,16 +71,16 @@ function _initJunctions(shuttles::Array{ShuttleInfoDesc},
 end
 
 """
-Creates a dictionary of shuttles using a object shuttleDesc
-Throws ArgumentError if shuttle ID is repeated.
+Creates a dictionary of auxiliary zones using an object AuxZoneDesc.
+Throws ArgumentError if auxiliary zones IDs are repeated.
 """
 function _initAuxZones(auxZoneDesc::AuxZoneDesc)::Dict{Symbol,AuxZone}
     auxZonesCtrl = Dict{Symbol,AuxZone}()
-    err = id -> ArgumentError("Repeated Shuttle ID: $id ")
+    err = id -> ArgumentError("Repeated auxiliary zone ID: $id ")
 
-    map(sh -> haskey(auxZonesCtrl, Symbol(sh.id)) ? throw(err(sh.id)) :
-              auxZonesCtrl[Symbol(sh.id)] = AuxZone(Symbol(sh.id), sh.capacity,
-                                                    Symbol(sh.end0), Symbol(sh.end1)),
+    map(aux -> haskey(auxZonesCtrl, Symbol(aux.id)) ? throw(err(aux.id)) :
+              auxZonesCtrl[Symbol(aux.id)] = AuxZone(Symbol(aux.id), aux.capacity,
+                                                    Symbol(aux.end0), Symbol(aux.end1)),
               auxZoneDesc.auxZones)
     return auxZonesCtrl
 end
