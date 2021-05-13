@@ -103,8 +103,10 @@ function initGateZoneTest()
         @assert length(aux) == 1
         aux = aux[1]
         @assert aux.capacity == value.capacity
-        @assert isempty(value.chain)
+        @assert length(value.chain) == 1 && isempty(value.chain[1]) 
         tmp = aux.end0 == "" ? nothing : Symbol(aux.end0)
+        @show tmp
+        @show value.end0
         @assert tmp == value.end0
         tmp = aux.end1 == "" ? nothing : Symbol(aux.end1)
         @assert tmp == value.end1
