@@ -1,6 +1,5 @@
 module QCCDevControl_Types
-export GateZone, Junction, AuxZone, Qubit, LoadingZone, JunctionType
-export QubitStatus, typesSizes
+export GateZone, Junction, AuxZone, Qubit, LoadingZone, QubitStatus, typesSizes, JunctionType
 
 using LightGraphs
 
@@ -67,7 +66,7 @@ struct LoadingZone
     end0::Union{Symbol, Nothing}
     end1::Union{Symbol, Nothing}
     hole::Union{Int, Nothing}
-    AuxZone(id, end0, end1) = new(id, end0, end1, nothing)
+    LoadingZone(id, end0, end1) = new(id, end0, end1, nothing)
 end
 
 """  

@@ -23,14 +23,14 @@ end
 """
 Creates adjacency list from QCCDevCtrl attributes.
 """
-function _initAdjacency(device ::QCCDevCtrl)::Dict{Symbol,Array{Symbol}}
-    adjacency = Dict{Symbol, Array{Symbol}}()
-    _addToAdjacency(adjacency, device.gateZones)
-    _addToAdjacency(adjacency, device.junctions)
-    _addToAdjacency(adjacency, device.auxZones)
-    _addToAdjacency(adjacency, device.loadingZones)
-    return adjacency
-end
+# function _initAdjacency(device ::QCCDevCtrl)::Dict{Symbol,Array{Symbol}}
+#     adjacency = Dict{Symbol, Array{Symbol}}()
+#     _addToAdjacency(adjacency, device.gateZones)
+#     _addToAdjacency(adjacency, device.junctions)
+#     _addToAdjacency(adjacency, device.auxZones)
+#     _addToAdjacency(adjacency, device.loadingZones)
+#     return adjacency
+# end
 
 """
 Creates a graph using an object QCCDevDescription.
@@ -56,7 +56,7 @@ Creates a dictionary of junctions from JSON objects.
 Throws ArgumentError if junction IDs are repeated.
 Throws ArgumentError if unsupported junction type is passed.
 """
-function _initJunctions(shuttles::Array{ShuttleInfoDesc},
+function _initJunctions(shuttles::Array{AuxZone},
             junctions::Array{JunctionInfoDesc})::Dict{Symbol,Junction}
     res = Dict{Symbol,Junction}()
     for j ∈ junctions
@@ -116,7 +116,7 @@ end
 """
 Throws an error if trapsEnds shuttles don't exists or don't correspond with Shuttle adjacency
 """
-function _checkGateZones(traps::Dict{Symbol,Trap}, shuttles::Dict{Symbol,Shuttle})
+function _checkGateZones(traps::Dict{Symbol,GateZone}, shuttles::Dict{Symbol,AuxZone})
 
     err = trapId-> ArgumentError("Shuttle connected to trap ID $trapId does "*
                                  "not exist or is wrong connected.")
@@ -131,7 +131,7 @@ end
 """
 Throws an error if shuttle ends don't correspond JSON adjacency.
 """
-function _checkAuxZones(adjacency:: Dict{String, Array{Int64}}, shuttles::Dict{Symbol,Shuttle})
+function _checkAuxZones(adjacency:: Dict{String, Array{Int64}}, shuttles::Dict{Symbol,AuxZone})
 
     errSh = shuttleId -> ArgumentError("Ends don't correspond to adjacency in shuttle "*
                                         "ID $shuttleId.")
@@ -153,7 +153,7 @@ end
 Creates a dictionary of qubits using a object TrapJSON.
 Throws ArgumentError if qubit appears in more than one trap.
 """
-function initQubits(trapDesctraps::TrapDesc)::Dict{String,Qubit}
+function initQubits(trapDesctraps::GateZone)::Dict{String,Qubit}
     qubits = Dict{String,Qubit}()
     err = (trapId, qubitPos, qubitId) -> ArgumentError("Repeated Ion ID: $qubitId
                                                         ,in traps $trapId, $qubitPos.")
