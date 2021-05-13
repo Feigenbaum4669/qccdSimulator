@@ -112,7 +112,7 @@ function initGateZoneTest()
 end
 
 function initGateZoneRepeatedIdTest()
-    trapDesc::TrapDesc = giveTrapDescRepeatedId()
+    trapDesc::TrapDesc = giveGateZoneDescRepeatedId()
     return qccdSimulator.QCCDevControl._initTraps(trapDesc)
 end
 
@@ -124,14 +124,14 @@ end
 
 function checkTrapsShuttleNotExistTest()
     qdd::QCCDevCtrl = giveQccCtrl()
-    traps::Dict{Symbol,Trap} = qccdSimulator.QCCDevControl._initTraps(giveTrapDescNonShuttleId())
+    traps::Dict{Symbol,Trap} = qccdSimulator.QCCDevControl._initTraps(giveGateZoneDescNoConnection())
     qccdSimulator.QCCDevControl._checkTraps(traps,qdd.shuttles)
     return true
 end
 
 function checkTrapsShuttleWrongConnectedTest()
     qdd::QCCDevCtrl = giveQccCtrl()
-    traps::Dict{Symbol,Trap} = qccdSimulator.QCCDevControl._initTraps(giveTrapDescWrongConnectedShuttle())
+    traps::Dict{Symbol,Trap} = qccdSimulator.QCCDevControl._initTraps(giveGateZoneDescWrongConnectedShuttle())
     qccdSimulator.QCCDevControl._checkTraps(traps,qdd.shuttles)
     return true
 end

@@ -4,6 +4,53 @@ using .QCCDevControl_Types
 
 
 """
+Helper function  for `_initAdjacency`. Takes the current adjacency object and modifies it in-place.
+It adds new connections to the adjacency list if they're not already added.
+"""
+function _addToAdjacency(adjacency ::Dict{String,Array{Symbol}}, collection)
+    for element ∈ collection
+        if !haskey(adjacency, element.end0)
+            adjacency[element.id] = [element.end0]
+            if !haskey(adjacency, element.end1)
+                push!(adjacency[element.id], element.end1)
+            end
+        elseif !haskey(adjacency, element.end1)
+            adjacency[element.id] = [element.end1]
+        end
+end
+
+"""
+Creates adjacency list from QCCDevCtrl attributes.
+"""
+function _initAdjacency(device ::QCCDevCtrl)::Dict{Symbol,Array{Symbol}}
+    adjacency = Dict{Symbol, Array{Symbol}}()
+    _addToAdjacency(adjacency, device.gateZones)
+    _addToAdjacency(adjacency, device.junctions)
+    _addToAdjacency(adjacency, device.auxZones)
+    _addToAdjacency(adjacency, device.loadingZones)
+    return adjacency
+end
+
+"""
+Creates a graph using an object QCCDevDescription.
+Throws ArgumentError if LightGraphs fails to add a node. This will happen
+    if there are redundancies in the adjacency list (i.e. repeated edges),
+    so maybe is not worth having.
+"""
+function initGraph(topology::QCCDevDescription)::SimpleGraph{Int64}
+    nodesAdjacency::Dict{String,Array{Int64}} = topology.adjacency.nodes
+    graph::SimpleGraph{Int64} = SimpleGraph(length(nodesAdjacency))
+
+    for nodes in keys(nodesAdjacency) 
+        for node in nodesAdjacency[nodes]
+            stat = add_edge!(graph, parse(Int64, nodes), node)
+            stat || throw(ArgumentError("Failed adding edge ($nodes,$node) to graph."))
+        end
+    end
+    return graph
+end
+
+"""
 Creates a dictionary of junctions from JSON objects.
 Throws ArgumentError if junction IDs are repeated.
 Throws ArgumentError if unsupported junction type is passed.

@@ -103,7 +103,7 @@ function QCCDevCtrl(qdd             ::QCCDevDescription
 
     dev   = qdd
     t_now = 0
-    # Initializes devices componentes
+    # Initializes devices components
     junctions = _initJunctions(qdd.shuttle.shuttles, qdd.junction.junctions)
     auxZones = _initAuxZones(qdd.shuttle)
     gateZones = _initGateZones(qdd.trap)
