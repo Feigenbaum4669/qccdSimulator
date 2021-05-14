@@ -103,7 +103,7 @@ function initGateZoneTest()
         @assert length(aux) == 1
         aux = aux[1]
         @assert aux.capacity == value.capacity
-        @assert isempty(value.chain)
+        @assert length(value.chain) == 1 && isempty(value.chain[1]) 
         tmp = aux.end0 == "" ? nothing : Symbol(aux.end0)
         @assert tmp == value.end0
         tmp = aux.end1 == "" ? nothing : Symbol(aux.end1)
@@ -113,8 +113,8 @@ function initGateZoneTest()
 end
 
 function initGateZoneRepeatedIdTest()
-    trapDesc::TrapDesc = giveGateZoneDescRepeatedId()
-    return qccdSimulator.QCCDevControl._initTraps(trapDesc)
+    gateZoneDesc::GateZoneDesc = giveGateZoneDescRepeatedId()
+    return qccdSimulator.QCCDevControl._initGateZone(gateZoneDesc)
 end
 
 function checkTrapsTest()
@@ -123,7 +123,7 @@ function checkTrapsTest()
     return true
 end
 
-function checkTrapsShuttleNotExistTest()
+function checkGateZonesAuxZoneNotExistTest()
     qdd::QCCDevCtrl = giveQccCtrl()
     traps::Dict{Symbol,Trap} = qccdSimulator.QCCDevControl._initTraps(giveGateZoneDescNoConnection())
     qccdSimulator.QCCDevControl._checkTraps(traps,qdd.shuttles)
