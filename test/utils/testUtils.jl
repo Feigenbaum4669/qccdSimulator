@@ -4,20 +4,20 @@ using Random
 using qccdSimulator.QCCDevControl
 
 """
-##################################################################### Does this even do something logical? lol
-Generates n junctions connected to auxZones.
-repJunction: Repeats a junction ID.
-wrongJunctType: Gives a wrong junction type to a auxZone.
-isolatedJunc: The first junction is not connected to any auxZone.
+Generates n junctions connected to ZoneInfoDesc (auxZones or gateZones).
+repJunc: Repeats a junction ID.
+wrongJunctType: Gives a wrong junction type to a ZoneInfoDesc.
+isolatedJunc: The first junction is not connected to any ZoneInfoDesc.
+repJunc: Repeats a zone ID.
 """
-function giveAuxZonesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
-            repJunc=false, wrongJuncType=false, isolatedJunc=false, repAuxZone=false)::
+function giveZonesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
+            repJunc=false, wrongJuncType=false, isolatedJunc=false, repZone=false)::
             Tuple{Array{ZoneInfoDesc},Array{JunctionInfoDesc}}
-    auxZones = ZoneInfoDesc[]
+
+    zones = ZoneInfoDesc[]
     junctions = JunctionInfoDesc[]
     sId = 0
     skipAuxZone = wrongJuncType
-    isolatedJunc = isolatedJunc
     for i in 1:nJunctions
         repJunc && i > 1 ? push!(junctions, JunctionInfoDesc(string(i-1), juncTypes[i])) : 
         push!(junctions, JunctionInfoDesc(string(i), juncTypes[i]))
@@ -30,30 +30,34 @@ function giveAuxZonesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
                 skipAuxZone = false
                 continue
             end
-            push!(auxZones, ZoneInfoDesc(string(sId),string(i),string(-1),3))
-            if repAuxZone
-                repAuxZone = false
+            push!(zones, ZoneInfoDesc(string(sId),string(i),string(-1),3))
+            if repZone
+                repZone = false
                 continue
             end
             sId += 1
         end
     end
-    return auxZones, junctions
+    return zones, junctions
 end
 
 """
-Creates some AuxZone objects.
+Creates some ZoneInfoDesc objects.
 """
-function giveAuxZones(nAuxZones:: Int64;  invAuxZone=false)::AuxZoneDesc
-    auxZones = ZoneInfoDesc[]
-    for i in 1:nAuxZones
-        if invAuxZone
-            push!(auxZones,ZoneInfoDesc(string(i),string(i),string(i),2))
-            invAuxZone = false
+function giveZoneInfo(nZones:: Int64;  invZone=false, giveNothing=false)::Array{ZoneInfoDesc}
+    zones = ZoneInfoDesc[]
+    for i in 1:nZones
+        if invZone
+            push!(zones,ZoneInfoDesc(string(i),string(i),string(i),2))
+            invZone = false
+        elseif giveNothing
+            push!(zones,ZoneInfoDesc(string(i),"","",2))
+            giveNothing = false
+        else
+            push!(zones,ZoneInfoDesc(string(i),string(i+1),string(i+2),2))
         end
-        push!(auxZones,ZoneInfoDesc(string(i),string(i+1),string(i+2),2))
     end
-    return AuxZoneDesc(auxZones)
+    return zones
 end
 
 """ 
