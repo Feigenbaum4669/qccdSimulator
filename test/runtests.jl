@@ -14,7 +14,7 @@ using LightGraphs
 end
 
 @testset "QCCDevCtrl initialization" begin
-    @test QCCDevCtrlOKTest()
+    #@test QCCDevCtrlOKTest()
     # @test nv(QCCDevCtrlTest().graph) == 5
     # @test ne(QCCDevCtrlTest().graph) == 6
     # @test initJunctionsTest()
@@ -22,9 +22,10 @@ end
     # @test_throws ArgumentError("Junction with ID 1 isolated.") initJunctionsTestIsolated()
     # @test_throws ArgumentError("Junction with ID 1 of type T has 2 ends. " * 
     #                            "It should have 3 ends.") initJunctionsTestWrongType()
-    @test_throws ArgumentError initAuxZonesTestRepId()
-    #@test_throws ArgumentError initAuxZonesTestInvAuxZone()
-    #@test initAuxZonesTest()
+    @test initAuxGateZonesTestRepId()
+    @test initAuxGateZonesTestInvZone()
+    @test initAuxGateZonesTestWithNothing()
+    @test initAuxZonesTest()
     # @test checkAuxZonesTest()
     # @test checkAuxZonesTestMissingAdj()
     # @test checkAuxZonesTestMissingAuxZone()

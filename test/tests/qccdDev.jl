@@ -171,24 +171,53 @@ function initJunctionsTestWrongType()
     junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
 end
 
-function initAuxZonesTestRepId()
-    auxZones, _ = giveAuxZonesJunctions(2, ["T","T"];repAuxZone = true)
-    auxDesc = AuxZoneDesc(auxZones)
-    qccdSimulator.QCCDevControl._initAuxZones(auxDesc)
+function initAuxGateZonesTestRepId()
+    zones, _ = giveZonesJunctions(2, ["T","T"];repZone = true)
+    auxDesc = AuxZoneDesc(zones)
+    try
+        qccdSimulator.QCCDevControl._initAuxZones(auxDesc)
+    catch e
+        @assert startswith(e.msg, "Repeated")
+    end
+    gateDesc = GateZoneDesc(zones)
+    try
+        qccdSimulator.QCCDevControl._initGateZone(gateDesc)
+    catch e
+        @assert startswith(e.msg, "Repeated")
+    end
+    return true
 end
 
-function initAuxZonesTestInvAuxZone()
-    qccdSimulator.QCCDevControl._initAuxZones(giveAuxZones(5;invAuxZone=true))
+function initAuxGateZonesTestInvZone()
+    try
+        qccdSimulator.QCCDevControl._initAuxZones(AuxZoneDesc(giveZoneInfo(rand(5:10);invZone=true)))
+    catch e
+        @assert endswith(e.msg, "\"end0\" and \"end1\" must be different")
+    end
+    try
+        qccdSimulator.QCCDevControl._initGateZone(GateZoneDesc(giveZoneInfo(rand(5:10);invZone=true)))
+    catch e
+        @assert endswith(e.msg, "\"end0\" and \"end1\" must be different")
+    end
+    return true
+end
+
+function initAuxGateZonesTestWithNothing()
+    zones = giveZoneInfo(rand(5:10);giveNothing=true)
+    qccdSimulator.QCCDevControl._initAuxZones(AuxZoneDesc(zones))
+    qccdSimulator.QCCDevControl._initGateZone(GateZoneDesc(zones))
+    return true
 end
 
 function initAuxZonesTest()
-    _auxZones = giveAuxZones(10)
+    _auxZones = AuxZoneDesc(giveZoneInfo(rand(10:15)))
     auxZones = qccdSimulator.QCCDevControl._initAuxZones(_auxZones)
     @assert length(_auxZones.auxZones) == length(auxZones)
     for _auxZone in _auxZones.auxZones
         auxZone = auxZones[Symbol(_auxZone.id)]
         @assert _auxZone.end0 == string(auxZone.end0)
         @assert _auxZone.end1 == string(auxZone.end1)
+        @assert _auxZone.capacity == auxZone.capacity
     end
     return true
 end
