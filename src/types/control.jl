@@ -66,7 +66,9 @@ struct LoadingZone
     end0::Union{Symbol, Nothing}
     end1::Union{Symbol, Nothing}
     hole::Union{Int, Nothing}
-    LoadingZone(id, end0, end1) = new(id, end0, end1, nothing)
+    LoadingZone(id, end0, end1) = end0 == end1 && (!isnothing(end0) || !isnothing(end1)) ? 
+    throw(ArgumentError("In loading zone $id : \"end0\" and \"end1\" must be different")) : 
+    new(id, end0, end1, nothing)
 end
 
 """  
@@ -82,7 +84,9 @@ struct AuxZone
     end0::Union{Symbol, Nothing}
     end1::Union{Symbol, Nothing}
     chain::Array{Array{Int64,1},1}
-    AuxZone(id, capacity, end0, end1) = new(id, capacity, end0, end1, [[]])
+    AuxZone(id, capacity, end0, end1) = end0 == end1 && (!isnothing(end0) || !isnothing(end1)) ? 
+    throw(ArgumentError("In aux zone $id : \"end0\" and \"end1\" must be different")) : 
+    new(id, capacity, end0, end1, [[]])
 end
 
 
@@ -99,7 +103,9 @@ struct GateZone
     end0::Union{Symbol, Nothing}
     end1::Union{Symbol, Nothing}
     chain::Array{Array{Int64,1},1}
-    GateZone(id, capacity, end0, end1) = new(id, capacity, end0, end1, [[]])
+    GateZone(id, capacity, end0, end1) = end0 == end1 && (!isnothing(end0) || !isnothing(end1)) ? 
+    throw(ArgumentError("In gate zone $id : \"end0\" and \"end1\" must be different")) : 
+    new(id, capacity, end0, end1, [[]])
 end
 
 end

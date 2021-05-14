@@ -33,25 +33,6 @@ Creates adjacency list from QCCDevCtrl attributes.
 # end
 
 """
-Creates a graph using an object QCCDevDescription.
-Throws ArgumentError if LightGraphs fails to add a node. This will happen
-    if there are redundancies in the adjacency list (i.e. repeated edges),
-    so maybe is not worth having.
-"""
-function initGraph(topology::QCCDevDescription)::SimpleGraph{Int64}
-    nodesAdjacency::Dict{String,Array{Int64}} = topology.adjacency.nodes
-    graph::SimpleGraph{Int64} = SimpleGraph(length(nodesAdjacency))
-
-    for nodes in keys(nodesAdjacency) 
-        for node in nodesAdjacency[nodes]
-            stat = add_edge!(graph, parse(Int64, nodes), node)
-            stat || throw(ArgumentError("Failed adding edge ($nodes,$node) to graph."))
-        end
-    end
-    return graph
-end
-
-"""
 Creates a dictionary of junctions from JSON objects.
 Throws ArgumentError if junction IDs are repeated.
 Throws ArgumentError if unsupported junction type is passed.

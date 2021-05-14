@@ -172,13 +172,13 @@ function initJunctionsTestWrongType()
 end
 
 function initAuxZonesTestRepId()
-    auxZones, _ = giveAuxZonesJunctions(2, ["T","T"];repShuttle = true)
-    shDesc = AuxZoneDesc(auxZones)
-    qccdSimulator.QCCDevControl._initAuxZones(shDesc)
+    auxZones, _ = giveAuxZonesJunctions(2, ["T","T"];repAuxZone = true)
+    auxDesc = AuxZoneDesc(auxZones)
+    qccdSimulator.QCCDevControl._initAuxZones(auxDesc)
 end
 
 function initAuxZonesTestInvAuxZone()
-    qccdSimulator.QCCDevControl._initAuxZones(giveAuxZones(5;invAuxZones=true))
+    qccdSimulator.QCCDevControl._initAuxZones(giveAuxZones(5;invAuxZone=true))
 end
 
 function initAuxZonesTest()
@@ -187,8 +187,8 @@ function initAuxZonesTest()
     @assert length(_auxZones.auxZones) == length(auxZones)
     for _auxZone in _auxZones.auxZones
         auxZone = auxZones[Symbol(_auxZone.id)]
-        @assert _auxZone.end0 == parse(Int,string(auxZone.end0))
-        @assert _auxZone.end1 == parse(Int,string(auxZone.end1))
+        @assert _auxZone.end0 == string(auxZone.end0)
+        @assert _auxZone.end1 == string(auxZone.end1)
     end
     return true
 end

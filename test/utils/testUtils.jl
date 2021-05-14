@@ -4,19 +4,19 @@ using Random
 using qccdSimulator.QCCDevControl
 
 """
-Generates n junctions connected to shuttles.
+##################################################################### Does this even do something logical? lol
+Generates n junctions connected to auxZones.
 repJunction: Repeats a junction ID.
-wrongJunctType: Gives a wrong junction type to a shuttle.
-isolatedJunc: The first junction is not connected to any shuttle.
+wrongJunctType: Gives a wrong junction type to a auxZone.
+isolatedJunc: The first junction is not connected to any auxZone.
 """
-function giveShuttlesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
-            repJunc=false, wrongJuncType=false, isolatedJunc=false, repShuttle=false)::
-            Tuple{Array{ShuttleInfoDesc},Array{JunctionInfoDesc}}
-
-    shuttles = ShuttleInfoDesc[]
+function giveAuxZonesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
+            repJunc=false, wrongJuncType=false, isolatedJunc=false, repAuxZone=false)::
+            Tuple{Array{ZoneInfoDesc},Array{JunctionInfoDesc}}
+    auxZones = ZoneInfoDesc[]
     junctions = JunctionInfoDesc[]
     sId = 0
-    skipShuttle = wrongJuncType
+    skipAuxZone = wrongJuncType
     isolatedJunc = isolatedJunc
     for i in 1:nJunctions
         repJunc && i > 1 ? push!(junctions, JunctionInfoDesc(i-1, juncTypes[i])) : 
@@ -26,19 +26,19 @@ function giveShuttlesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
             continue
         end
         for j in 1:typesSizes[Symbol(juncTypes[i])]
-            if skipShuttle
-                skipShuttle = false
+            if skipAuxZone
+                skipAuxZone = false
                 continue
             end
-            push!(shuttles, ShuttleInfoDesc(string(sId),i,-1))
-            if repShuttle
-                repShuttle = false
+            push!(auxZones, ZoneInfoDesc(sId,string(i),string(-1),3))
+            if repAuxZone
+                repAuxZone = false
                 continue
             end
             sId += 1
         end
     end
-    return shuttles, junctions
+    return auxZones, junctions
 end
 
 """
@@ -48,10 +48,10 @@ function giveAuxZones(nAuxZones:: Int64;  invAuxZone=false)::AuxZoneDesc
     auxZones = ZoneInfoDesc[]
     for i in 1:nAuxZones
         if invAuxZone
-            push!(auxZones,ZoneInfoDesc("$i",i,i))
-            invShuttle = false
+            push!(auxZones,ZoneInfoDesc(i,string(i),string(i),2))
+            invAuxZone = false
         end
-        push!(auxZones,ZoneInfoDesc("$i",i,i+1))
+        push!(auxZones,ZoneInfoDesc(i,string(i+1),string(i+2),2))
     end
     return AuxZoneDesc(auxZones)
 end
