@@ -122,6 +122,7 @@ function giveShuttlesAdjacency(;faultyEnd0 = false,faultyEnd1 = false)::
     end
     return adj, shuttles
 end
+
 """
 Creates a struct GateZoneDesc with repeated Ids
 """
@@ -131,6 +132,19 @@ function giveGateZoneDescRepeatedId()::GateZoneDesc
             ZoneInfoDesc( "1", "", "4", 2),
             ZoneInfoDesc( "2", "4", "5", 2),
             ZoneInfoDesc( "1", "7", "8", 2)
+        ]
+    )
+end
+
+"""
+Creates a struct LoadZoneDesc with repeated Ids
+"""
+function giveLoadZoneDescRepeatedId()::LoadZoneDesc
+    return LoadZoneDesc(
+        [ 
+            LoadZoneInfoDesc( "1", "", "4"),
+            LoadZoneInfoDesc( "2", "4", "5"),
+            LoadZoneInfoDesc( "1", "7", "8")
         ]
     )
 end

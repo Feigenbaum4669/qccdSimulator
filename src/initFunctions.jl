@@ -78,7 +78,7 @@ Throws ArgumentError if loading zones IDs are repeated.
 """
 function _initLoadingZones(loadZoneDesc::LoadZoneDesc)::Dict{Symbol,LoadingZone}
     loadingZonesCtrl = Dict{Symbol, LoadingZone}()
-    err = id -> ArgumentError("Repeated loading zone ID: $id ")
+    err = id -> ArgumentError("Repeated loading zone with ID: $id")
     endId = id -> id == "" ? nothing : Symbol(id)
 
     map(aux -> haskey(loadingZonesCtrl, Symbol(aux.id)) ? throw(err(aux.id)) :

@@ -177,6 +177,28 @@ function initJunctionsTestWrongType()
 end
 # ========= END Junction tests =========
 
+# ========= Loading zones tests =========
+function initLoadingZoneTest()
+    loadZoneDesc::LoadZoneDesc = giveQccDes().loadZone
+    loadZones = qccdSimulator.QCCDevControl._initLoadingZones(loadZoneDesc)
+    for (key, value) in loadZones
+        @assert key == value.id
+        aux = filter(x-> Symbol(x.id)==key, loadZoneDesc.loadZones)
+        @assert length(aux) == 1
+        aux = aux[1]
+        tmp = aux.end0 == "" ? nothing : Symbol(aux.end0)
+        @assert tmp == value.end0
+        tmp = aux.end1 == "" ? nothing : Symbol(aux.end1)
+        @assert tmp == value.end1
+    end
+    return true
+end
+
+function initLoadingZoneRepeatedIdTest()
+    loadZoneDesc::LoadZoneDesc = giveLoadZoneDescRepeatedId()
+    return qccdSimulator.QCCDevControl._initLoadingZones(loadZoneDesc)
+end
+# ========= END Loading zones tests =========
 
 # ========= Auxiliary and Gate zones tests =========
 function initGateZoneTest()

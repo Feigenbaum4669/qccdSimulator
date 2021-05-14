@@ -37,4 +37,6 @@ end
     #                           " wrong connected.") checkTrapsAuxZoneNotExistTest()
     # @test_throws ArgumentError("Zoone connected to gate zone ID 1 does not exist or is" * 
     # " wrong connected.") checkGateZonesWrongConnectedTest()
+    @test initLoadingZoneTest()
+    @test_throws ArgumentError("Repeated loading zone with ID: 1") initLoadingZoneRepeatedIdTest()
 end
