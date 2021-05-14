@@ -164,24 +164,21 @@ Creates a struct QCCDevCtrl based in the file giveQccDes()
 function giveQccCtrl()::QCCDevCtrl
     qccd::QCCDevDescription = giveQccDes()
     gateZones = Dict{Symbol,GateZone}()
-    map(tr -> gateZones[Symbol(tr.id)] = GateZone(Symbol(tr.id), qccd.trap.capacity,
-                              Symbol(tr.end0), Symbol(tr.end1)
-                              , tr.gate, tr.loading_zone), qccd.trap.gateZones)
-    shuttles = Dict{Symbol,Shuttle}()
-    map(sh -> shuttles[Symbol(sh.id)] = Shuttle(Symbol(sh.id), Symbol(sh.end0), Symbol(sh.end1)),
-              qccd.shuttle.shuttles)
+    endId = id -> id == "" ? nothing : Symbol(id)
+    map(tr -> gateZones[Symbol(tr.id)] = GateZone(Symbol(tr.id), tr.capacity,
+                                endId(tr.end0), endId(tr.end1)
+                              , tr.gate, tr.loading_zone), qccd.gateZone.gateZones)
+    auxZones = Dict{Symbol,AuxZone}()
+    map(sh -> auxZones[Symbol(sh.id)] = AuxZone(Symbol(sh.id), sh.capacity,
+                                                endId(sh.end0), endId(sh.end1)),
+              qccd.auxZone.auxZones)
+              
     junctions = Dict{Symbol,Junction}()
     for j ∈ qccd.junction.junctions
         connectedShuttles = filter(x -> x.end0 == j.id || x.end1 == j.id, qccd.shuttle.shuttles)
         junctionEnds = Dict(Symbol(s.id) => JunctionEnd() for s ∈ connectedShuttles)
         junctions[Symbol(j.id)] = Junction(Symbol(j.id), Symbol(j.type), junctionEnds)
     end
-    nodesAdjacency::Dict{String,Array{Int64}} = qccd.adjacency.nodes
-    graph::SimpleGraph{Int64} = SimpleGraph(length(nodesAdjacency))
-    for nodes in keys(nodesAdjacency) 
-        for node in nodesAdjacency[nodes]
-            add_edge!(graph, parse(Int64, nodes), node)
-        end
-    end
-    return QCCDevCtrl(qccd,:No,false,0,gateZones,junctions,shuttles, graph)
+
+    return QCCDevCtrl(qccd,:No,false,0,gateZones,junctions,auxZones, graph)
 end

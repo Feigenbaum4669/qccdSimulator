@@ -2,19 +2,19 @@
     "gateZone": {
         "gateZones": [
             {
-                "id": 1,
+                "id": "1",
                 "end0": "",
                 "end1": "4",
                 "capacity": 2
             },
             {
-                "id": 2,
+                "id": "2",
                 "end0": "4",
                 "end1": "5",
                 "capacity": 2
             },
             {
-                "id": 3,
+                "id": "3",
                 "end0": "7",
                 "end1": "8",
                 "capacity": 2
@@ -24,7 +24,7 @@
     "junction": {
         "junctions": [
             {
-                "id": 9,
+                "id": "9",
                 "type": "T"
             }
         ]
@@ -32,25 +32,25 @@
     "auxZone": {
         "auxZones": [
             {
-                "id": 4,
+                "id": "4",
                 "end0": "1",
                 "end1": "2",
                 "capacity": 2
             },
             {
-                "id": 5,
+                "id": "5",
                 "end0": "5",
                 "end1": "9",
                 "capacity": 2
             },
             {
-                "id": 6,
+                "id": "6",
                 "end0": "9",
                 "end1": "",
                 "capacity": 2
             },
             {
-                "id": 7,
+                "id": "7",
                 "end0": "9",
                 "end1": "3",
                 "capacity": 2
@@ -60,7 +60,7 @@
     "loadZone": {
         "loadZones": [
             {
-                "id": 8,
+                "id": "8",
                 "end0": "3",
                 "end1": ""
             }
