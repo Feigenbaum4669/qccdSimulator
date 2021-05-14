@@ -63,10 +63,11 @@ Throws ArgumentError if auxiliary zones IDs are repeated.
 function _initAuxZones(auxZoneDesc::AuxZoneDesc)::Dict{Symbol,AuxZone}
     auxZonesCtrl = Dict{Symbol,AuxZone}()
     err = id -> ArgumentError("Repeated auxiliary zone ID: $id ")
+    endId = id -> id == "" ? nothing : Symbol(id)
 
     map(aux -> haskey(auxZonesCtrl, Symbol(aux.id)) ? throw(err(aux.id)) :
               auxZonesCtrl[Symbol(aux.id)] = AuxZone(Symbol(aux.id), aux.capacity,
-                                                    Symbol(aux.end0), Symbol(aux.end1)),
+                                                    endId(aux.end0), endId(aux.end1)),
               auxZoneDesc.auxZones)
     return auxZonesCtrl
 end

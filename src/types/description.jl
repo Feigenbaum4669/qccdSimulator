@@ -9,7 +9,7 @@ OperationTimes = Dict{Symbol, Int64}()
 setOperationTimes(times :: Dict{Symbol, Int64}) = global OperationTimes = times
 
 struct ZoneInfoDesc
-    id:: Int64
+    id:: String
     end0:: String
     end1:: String
     capacity:: Int64
@@ -22,7 +22,7 @@ end
 
 
 struct JunctionInfoDesc
-    id:: Int64
+    id:: String
     type:: String
 end
 struct JunctionDesc
@@ -36,7 +36,7 @@ end
 
 
 struct LoadZoneInfoDesc
-    id:: Int64
+    id:: String
     end0:: String
     end1:: String
 end
