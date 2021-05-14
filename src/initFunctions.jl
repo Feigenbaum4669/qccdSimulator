@@ -7,30 +7,35 @@ using .QCCDevControl_Types
 Helper function  for `_initAdjacency`. Takes the current adjacency object and modifies it in-place.
 It adds new connections to the adjacency list if they're not already added.
 """
-function _addToAdjacency(adjacency ::Dict{String,Array{Symbol}}, collection)
+function _addToAdjacency(adjacency ::Dict{String, Array{String}}, collection ::Array{T}) where T
     for element ∈ collection
-        if !haskey(adjacency, element.end0)
-            adjacency[element.id] = [element.end0]
-            if !haskey(adjacency, element.end1)
-                push!(adjacency[element.id], element.end1)
+        id = element.id
+        end0 = element.end0
+        end1 = element.end1
+        if !haskey(adjacency, end0)
+            adjacency[id] = [end0]
+            if !haskey(adjacency, end1)
+                push!(adjacency[id], end1)
             end
-        elseif !haskey(adjacency, element.end1)
-            adjacency[element.id] = [element.end1]
+        elseif !haskey(adjacency, end1)
+            adjacency[id] = [end1]
         end
     end
 end
 
 """
 Creates adjacency list from QCCDevCtrl attributes.
+The adjacency list is a dictionary in which the key is the ID of one device component, and the value
+is an array of Ids to the element its adjacent to.
 """
-# function _initAdjacency(device ::QCCDevCtrl)::Dict{Symbol,Array{Symbol}}
-#     adjacency = Dict{Symbol, Array{Symbol}}()
-#     _addToAdjacency(adjacency, device.gateZones)
-#     _addToAdjacency(adjacency, device.junctions)
-#     _addToAdjacency(adjacency, device.auxZones)
-#     _addToAdjacency(adjacency, device.loadingZones)
-#     return adjacency
-# end
+function _initAdjacency(device ::QCCDevDescription)::Dict{String,Array{String}}
+    adjacency = Dict{String, Array{String}}()
+    _addToAdjacency(adjacency, device.gateZone)
+    _addToAdjacency(adjacency, device.auxZone)
+    _addToAdjacency(adjacency, device.junction)
+    _addToAdjacency(adjacency, device.loadZone)
+    return adjacency
+end
 
 """
 Creates a dictionary of junctions from JSON objects.

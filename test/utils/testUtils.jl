@@ -4,23 +4,23 @@ using Random
 using qccdSimulator.QCCDevControl
 
 """
-##################################################################### Does this even do something logical? lol
-Generates n junctions connected to auxZones.
+Generates n junctions connected to ZoneInfoDesc (auxZones or gateZones).
 repJunction: Repeats a junction ID.
-wrongJunctType: Gives a wrong junction type to a auxZone.
-isolatedJunc: The first junction is not connected to any auxZone.
+wrongJunctType: Gives a wrong junction type to a ZoneInfoDesc.
+isolatedJunc: The first junction is not connected to any ZoneInfoDesc.
 """
 function giveAuxZonesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
             repJunc=false, wrongJuncType=false, isolatedJunc=false, repAuxZone=false)::
             Tuple{Array{ZoneInfoDesc},Array{JunctionInfoDesc}}
+
     auxZones = ZoneInfoDesc[]
     junctions = JunctionInfoDesc[]
     sId = 0
     skipAuxZone = wrongJuncType
     isolatedJunc = isolatedJunc
     for i in 1:nJunctions
-        repJunc && i > 1 ? push!(junctions, JunctionInfoDesc(i-1, juncTypes[i])) : 
-        push!(junctions, JunctionInfoDesc(i, juncTypes[i]))
+        repJunc && i > 1 ? push!(junctions, JunctionInfoDesc(string(i-1), juncTypes[i])) : 
+        push!(junctions, JunctionInfoDesc(string(i), juncTypes[i]))
         if isolatedJunc
             isolatedJunc = false
             continue
@@ -30,7 +30,7 @@ function giveAuxZonesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
                 skipAuxZone = false
                 continue
             end
-            push!(auxZones, ZoneInfoDesc(sId,string(i),string(-1),3))
+            push!(auxZones, ZoneInfoDesc(string(sId),string(i),string(-1),3))
             if repAuxZone
                 repAuxZone = false
                 continue
@@ -48,10 +48,10 @@ function giveAuxZones(nAuxZones:: Int64;  invAuxZone=false)::AuxZoneDesc
     auxZones = ZoneInfoDesc[]
     for i in 1:nAuxZones
         if invAuxZone
-            push!(auxZones,ZoneInfoDesc(i,string(i),string(i),2))
+            push!(auxZones,ZoneInfoDesc(string(i),string(i),string(i),2))
             invAuxZone = false
         end
-        push!(auxZones,ZoneInfoDesc(i,string(i+1),string(i+2),2))
+        push!(auxZones,ZoneInfoDesc(string(i),string(i+1),string(i+2),2))
     end
     return AuxZoneDesc(auxZones)
 end
