@@ -19,8 +19,8 @@ function giveAuxZonesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
     skipAuxZone = wrongJuncType
     isolatedJunc = isolatedJunc
     for i in 1:nJunctions
-        repJunc && i > 1 ? push!(junctions, JunctionInfoDesc(i-1, juncTypes[i])) : 
-        push!(junctions, JunctionInfoDesc(i, juncTypes[i]))
+        repJunc && i > 1 ? push!(junctions, JunctionInfoDesc(string(i-1), juncTypes[i])) : 
+        push!(junctions, JunctionInfoDesc(string(i), juncTypes[i]))
         if isolatedJunc
             isolatedJunc = false
             continue
@@ -30,7 +30,7 @@ function giveAuxZonesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
                 skipAuxZone = false
                 continue
             end
-            push!(auxZones, ZoneInfoDesc(sId,string(i),string(-1),3))
+            push!(auxZones, ZoneInfoDesc(string(sId),string(i),string(-1),3))
             if repAuxZone
                 repAuxZone = false
                 continue
@@ -48,10 +48,10 @@ function giveAuxZones(nAuxZones:: Int64;  invAuxZone=false)::AuxZoneDesc
     auxZones = ZoneInfoDesc[]
     for i in 1:nAuxZones
         if invAuxZone
-            push!(auxZones,ZoneInfoDesc(i,string(i),string(i),2))
+            push!(auxZones,ZoneInfoDesc(string(i),string(i),string(i),2))
             invAuxZone = false
         end
-        push!(auxZones,ZoneInfoDesc(i,string(i+1),string(i+2),2))
+        push!(auxZones,ZoneInfoDesc(string(i),string(i+1),string(i+2),2))
     end
     return AuxZoneDesc(auxZones)
 end
@@ -62,27 +62,27 @@ Creates a struct QCCDevDescription based in the file topology.json
 function giveQccDes()::QCCDevDescription
     gateZone:: GateZoneDesc = GateZoneDesc(
         [ 
-            ZoneInfoDesc( 1, "", "4", 2),
-            ZoneInfoDesc( 2, "4", "5", 2),
-            ZoneInfoDesc( 3, "7", "8", 2)
+            ZoneInfoDesc("1", "", "4", 2),
+            ZoneInfoDesc("2", "4", "5", 2),
+            ZoneInfoDesc( "3", "7", "8", 2)
         ]
     )
     auxZone:: AuxZoneDesc = AuxZoneDesc(
         [ 
-            ZoneInfoDesc( 4, "1", "2", 2),
-            ZoneInfoDesc( 5, "5", "9", 2),
-            ZoneInfoDesc( 6, "9", "", 2),
-            ZoneInfoDesc( 7, "9", "3", 2)
+            ZoneInfoDesc( "4", "1", "2", 2),
+            ZoneInfoDesc( "5", "5", "9", 2),
+            ZoneInfoDesc( "6", "9", "", 2),
+            ZoneInfoDesc( "7", "9", "3", 2)
         ]
     )
     junction:: JunctionDesc = JunctionDesc(
         [
-            JunctionInfoDesc( 9, "T")
+            JunctionInfoDesc( "9", "T")
         ]
     )
     loadZone:: LoadZoneDesc = LoadZoneDesc(
         [ 
-            LoadZoneInfoDesc( 8, "3", "")
+            LoadZoneInfoDesc( "8", "3", "")
         ]
     )
     return  QCCDevDescription(gateZone,auxZone,junction,loadZone)
@@ -124,9 +124,9 @@ Creates a struct GateZoneDesc with repeated Ids
 function giveGateZoneDescRepeatedId()::GateZoneDesc
     return GateZoneDesc(
         [ 
-            ZoneInfoDesc( 1, "", "4", 2),
-            ZoneInfoDesc( 2, "4", "5", 2),
-            ZoneInfoDesc( 1, "7", "8", 2)
+            ZoneInfoDesc( "1", "", "4", 2),
+            ZoneInfoDesc( "2", "4", "5", 2),
+            ZoneInfoDesc( "1", "7", "8", 2)
         ]
     )
 end
@@ -137,9 +137,9 @@ Creates a struct GateZoneDesc with inexistent connection
 function giveGateZoneDescNoConnection()::GateZoneDesc
     return GateZoneDesc(
         [ 
-            ZoneInfoDesc( 1, "", "4", 2),
-            ZoneInfoDesc( 2, "9999999999", "5", 2),
-            ZoneInfoDesc( 3, "7", "8", 2)
+            ZoneInfoDesc( "1", "", "4", 2),
+            ZoneInfoDesc( "2", "9999999999", "5", 2),
+            ZoneInfoDesc( "3", "7", "8", 2)
         ]
     )
 end
@@ -150,9 +150,9 @@ Creates a struct TrapDesc with wrong connected shuttle
 function giveGateZoneDescWrongConnectedShuttle()::GateZoneDesc
     return GateZoneDesc(
         [ 
-            ZoneInfoDesc( 1, "", "4", 2),
-            ZoneInfoDesc( 2, "7", "5", 2),
-            ZoneInfoDesc( 3, "7", "8", 2)
+            ZoneInfoDesc( "1", "", "4", 2),
+            ZoneInfoDesc( "2", "7", "5", 2),
+            ZoneInfoDesc( "3", "7", "8", 2)
         ]
     )
 end
@@ -172,7 +172,7 @@ function giveQccCtrl()::QCCDevCtrl
     map(sh -> auxZones[Symbol(sh.id)] = AuxZone(Symbol(sh.id), sh.capacity,
                                                 endId(sh.end0), endId(sh.end1)),
               qccd.auxZone.auxZones)
-              
+
     junctions = Dict{Symbol,Junction}()
     for j ∈ qccd.junction.junctions
         connectedShuttles = filter(x -> x.end0 == j.id || x.end1 == j.id, qccd.shuttle.shuttles)
