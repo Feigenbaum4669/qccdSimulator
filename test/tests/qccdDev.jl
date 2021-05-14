@@ -2,12 +2,52 @@ include("../utils/testUtils.jl")
 using qccdSimulator.QCCDevControl_Types
 using qccdSimulator.QCCDevControl
 
+# ========= JSON tests =========
 function readJSONOK(path::String)::Bool
     qccd1 = readJSON(path) 
     qccd2 = giveQccDes()
     return checkEqualQCCD(qccd1,qccd2)
 end
 
+function readTimeJSONOK(path ::String)
+    readTimeJSON(path)
+    @assert OperationTimes[:load] == 5
+    @assert OperationTimes[:linear_transport] == 78
+    @assert OperationTimes[:loadingHole_transport] == 35
+    @assert OperationTimes[:swap] == 2
+    @assert OperationTimes[:split] == 55
+    return true
+end
+
+function readTimeJSONfail(paths ::Array{String})
+   errormsg1 = "Time values can't be negative"
+   errormsg2 = "invalid JSON"
+   errorcount = 0
+   for path ∈ paths
+        try
+            readTimeJSON(path)
+        catch e
+            @assert startswith(e.msg, errormsg1) || startswith(e.msg, errormsg2)
+            errorcount += 1
+        end
+   end
+   @assert errorcount == length(paths)
+   return true
+end
+
+function readTimeJSONnoFile()
+    try
+        readTimeJSON("foo")
+    catch e
+        @assert startswith(e.msg, "Input is not a file")
+    end
+    
+    return true
+end
+# ========= END JSON tests =========
+
+
+# ========= Device comparison tests =========
 function QCCDevCtrlOKTest()::Bool
     qccd1 = giveQccCtrl()
     qccd2 = QCCDevCtrl(giveQccDes())
@@ -94,6 +134,51 @@ function checkEqualQCCDevCtrl(qccdc1::QCCDevCtrl,qccdc2::QCCDevCtrl):: Bool
     return true
 end
 
+function QCCDevCtrlTest()
+    qdd::QCCDevDescription = giveQccDes()
+    return QCCDevCtrl(qdd)
+end
+# ========= END Device comparison tests =========
+
+
+# ========= Junction tests =========
+function initJunctionsTest()
+    _typeSizes = Dict(:T => 3, :Y => 3, :X => 4)
+    shuttles, _junctions = giveShuttlesJunctions(9, ["X", "Y", "T","X", "Y", "T","X", "Y", "T"])
+    junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
+    for (k,junction) in junctions
+        @assert k == junction.id
+        juncType = filter(x-> Symbol(x.id)==k,_junctions)[1].type
+        juncType = Symbol(juncType)
+        @assert junction.type == juncType
+        shuttleIds = keys(junction.ends)
+        @assert length(shuttleIds) == _typeSizes[juncType]
+        for shuttleId in shuttleIds
+            shuttle = filter(x -> Symbol(x.id) == shuttleId, shuttles)[1]
+            @assert Symbol(string(shuttle.end0)) == k || Symbol(shuttle.end1) == k
+        end
+    end
+    return true
+end
+
+function initJunctionsTestRepId()
+    shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];repJunc = true)
+    junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
+end
+
+function initJunctionsTestIsolated()
+    shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];isolatedJunc = true)
+    junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
+end
+
+function initJunctionsTestWrongType()
+    shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];wrongJuncType = true)
+    junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
+end
+# ========= END Junction tests =========
+
+
+# ========= Auxiliary and Gate zones tests =========
 function initGateZoneTest()
     gateZoneDesc::GateZoneDesc = giveQccDes().gateZone
     gateZones = qccdSimulator.QCCDevControl._initGateZone(gateZoneDesc)
@@ -135,40 +220,6 @@ function checkTrapsShuttleWrongConnectedTest()
     traps::Dict{Symbol,Trap} = qccdSimulator.QCCDevControl._initTraps(giveGateZoneDescWrongConnectedShuttle())
     qccdSimulator.QCCDevControl._checkTraps(traps,qdd.shuttles)
     return true
-end
-
-function initJunctionsTest()
-    _typeSizes = Dict(:T => 3, :Y => 3, :X => 4)
-    shuttles, _junctions = giveShuttlesJunctions(9, ["X", "Y", "T","X", "Y", "T","X", "Y", "T"])
-    junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
-    for (k,junction) in junctions
-        @assert k == junction.id
-        juncType = filter(x-> Symbol(x.id)==k,_junctions)[1].type
-        juncType = Symbol(juncType)
-        @assert junction.type == juncType
-        shuttleIds = keys(junction.ends)
-        @assert length(shuttleIds) == _typeSizes[juncType]
-        for shuttleId in shuttleIds
-            shuttle = filter(x -> Symbol(x.id) == shuttleId, shuttles)[1]
-            @assert Symbol(string(shuttle.end0)) == k || Symbol(shuttle.end1) == k
-        end
-    end
-    return true
-end
-
-function initJunctionsTestRepId()
-    shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];repJunc = true)
-    junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
-end
-
-function initJunctionsTestIsolated()
-    shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];isolatedJunc = true)
-    junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
-end
-
-function initJunctionsTestWrongType()
-    shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];wrongJuncType = true)
-    junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
 end
 
 function initAuxGateZonesTestRepId()
@@ -220,11 +271,6 @@ function initAuxZonesTest()
         @assert _auxZone.capacity == auxZone.capacity
     end
     return true
-end
-
-function QCCDevCtrlTest()
-    qdd::QCCDevDescription = giveQccDes()
-    return QCCDevCtrl(qdd)
 end
 
 function checkAuxZonesTest()
@@ -298,39 +344,4 @@ function checkAuxZonesTestModifyConnections()
 
     return true
 end
-
-function readTimeJSONOK(path ::String)
-    readTimeJSON(path)
-    @assert OperationTimes[:load] == 5
-    @assert OperationTimes[:linear_transport] == 78
-    @assert OperationTimes[:loadingHole_transport] == 35
-    @assert OperationTimes[:swap] == 2
-    @assert OperationTimes[:split] == 55
-    return true
-end
-
-function readTimeJSONfail(paths ::Array{String})
-   errormsg1 = "Time values can't be negative"
-   errormsg2 = "invalid JSON"
-   errorcount = 0
-   for path ∈ paths
-        try
-            readTimeJSON(path)
-        catch e
-            @assert startswith(e.msg, errormsg1) || startswith(e.msg, errormsg2)
-            errorcount += 1
-        end
-   end
-   @assert errorcount == length(paths)
-   return true
-end
-
-function readTimeJSONnoFile()
-    try
-        readTimeJSON("foo")
-    catch e
-        @assert startswith(e.msg, "Input is not a file")
-    end
-    
-    return true
-end
+# ========= END Auxiliary and Gate zones tests =========
