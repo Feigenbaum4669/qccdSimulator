@@ -31,12 +31,12 @@ end
     # @test checkAuxZonesTestMissingAuxZone()
     # @test checkAuxZonesTestModifyConnections()
     @test initGateZoneTest()
-    @test_throws ArgumentError("Repeated gate zone with ID: 1.") initGateZoneRepeatedIdTest()
-    # @test checkGateZonesTest()
+    @test_throws ArgumentError("Repeated gate zone with ID: 1.") initGateZoneRepeatedIdTest()   
     #@test_throws ArgumentError("Zone connected to gate zone ID 2 does not exist or is" * 
     #                           " wrong connected.") checkTrapsAuxZoneNotExistTest()
     # @test_throws ArgumentError("Zoone connected to gate zone ID 1 does not exist or is" * 
     # " wrong connected.") checkGateZonesWrongConnectedTest()
     @test initLoadingZoneTest()
     @test_throws ArgumentError("Repeated loading zone with ID: 1") initLoadingZoneRepeatedIdTest()
+    @test checkInitErrorsTest()
 end

@@ -4,40 +4,6 @@ using .QCCDevControl_Types
 
 
 """
-Helper function  for `_initAdjacency`. Takes the current adjacency object and modifies it in-place.
-It adds new connections to the adjacency list if they're not already added.
-"""
-function _addToAdjacency(adjacency ::Dict{String, Array{String}}, collection ::Array{T}) where T
-    for element ∈ collection
-        id = element.id
-        end0 = element.end0
-        end1 = element.end1
-        if !haskey(adjacency, end0)
-            adjacency[id] = [end0]
-            if !haskey(adjacency, end1)
-                push!(adjacency[id], end1)
-            end
-        elseif !haskey(adjacency, end1)
-            adjacency[id] = [end1]
-        end
-    end
-end
-
-"""
-Creates adjacency list from QCCDevCtrl attributes.
-The adjacency list is a dictionary in which the key is the ID of one device component, and the value
-is an array of Ids to the element its adjacent to.
-"""
-function _initAdjacency(device ::QCCDevDescription)::Dict{String,Array{String}}
-    adjacency = Dict{String, Array{String}}()
-    _addToAdjacency(adjacency, device.gateZone)
-    _addToAdjacency(adjacency, device.auxZone)
-    _addToAdjacency(adjacency, device.junction)
-    _addToAdjacency(adjacency, device.loadZone)
-    return adjacency
-end
-
-"""
 Creates a dictionary of junctions from JSON objects.
 Throws ArgumentError if junction IDs are repeated.
 Throws ArgumentError if unsupported junction type is passed.
@@ -107,50 +73,37 @@ end
 
 """
 Throws error when:
-    - Shuttle ends don't correspond to JSON adjacency
-    - Throws an error if trapsEnds shuttles don't exists or don't correspond with Shuttle adjacency
+    - Zones are wrong connected
+    - Zones don't exist
 """
-function _checkInitErrors(adjacency:: Dict{String, Array{Int64}}, 
-                          gateZones::Dict{Symbol,GateZoneDesc},
-                          auxZones::Dict{Symbol,AuxZone})
+function _checkInitErrors(junctions:: Dict{String, Junction}, 
+                          auxZones::Dict{Symbol,AuxZone},
+                          gateZones::Dict{Symbol,GateZone},
+                          loadingZones::Dict{Symbol,LoadingZone})
 
-    _checkAuxZones(adjacency,auxZones)
-    _checkGateZones(gateZones,auxZones)
+    map(aux -> __auxCheck(aux.end0,aux.end1,gateZones,loadingZones,junctions),
+        values(auxZones))
+    map(aux -> __auxCheck(aux.end0,aux.end1,auxZones,loadingZones,junctions),
+        values(gateZones))
+    map(aux -> __auxCheck(aux.end0,aux.end1,auxZones,gateZones,junctions),
+        values(loadingZones))
+
 end
 
-"""
-Throws an error if trapsEnds shuttles don't exists or don't correspond with Shuttle adjacency
-"""
-function _checkGateZones(traps::Dict{Symbol,GateZone}, shuttles::Dict{Symbol,AuxZone})
+function __auxCheck(end0::Symbol, end1::Symbol,
+                    zone1::Dict{Symbol,T}, zone2::Dict{Symbol,N},
+                     zone3::Dict{Symbol,Z}) where {T, N, Z}
 
-    err = trapId-> ArgumentError("Shuttle connected to trap ID $trapId does "*
-                                 "not exist or is wrong connected.")
+    check = id -> id != nothing &&
+                           !(haskey(zone1,id) || haskey(zone2,id) || haskey(zone3,id))
+    
+    if end0 == nothing && end1 == nothing
+        throw(ArgumentError("Topology's elements cannot be isolated"))
+    elseif check(zone1,zone2,zone3,end0) || check(zone1,zone2,zone3,end1)
+        throw(ArgumentError("Topology's element with ID $key is connected to a non existing element."))
 
-    check = (trEnd,trId) -> trEnd.shuttle isa Nothing || (haskey(shuttles, trEnd.shuttle) && 
-                            trId in [shuttles[trEnd.shuttle].end0, shuttles[trEnd.shuttle].end1])
-
-    map(tr-> check(tr.end0,tr.id) && check(tr.end1,tr. id) || throw(err(tr.id))
-        ,values(traps))
+    end
 end
-
-"""
-Throws an error if shuttle ends don't correspond JSON adjacency.
-"""
-function _checkAuxZones(adjacency:: Dict{String, Array{Int64}}, shuttles::Dict{Symbol,AuxZone})
-
-    errSh = shuttleId -> ArgumentError("Ends don't correspond to adjacency in shuttle "*
-                                        "ID $shuttleId.")
-    length(shuttles) == sum(length, values(adjacency)) ||
-        throw(ArgumentError(
-            "Number of elements in adjacency list and number of shuttles don't match"))
-            
-    check = sh ->
-        (haskey(adjacency,string(sh.end0)) && parse(Int,string(sh.end1)) in adjacency[string(sh.end0)]) ||
-        (haskey(adjacency,string(sh.end1)) && parse(Int,string(sh.end0)) in adjacency[string(sh.end1)])
-
-    map(sh ->  check(sh) || throw(errSh(sh.id)), values(shuttles))
-end
-
 ########################################################################################################
 
 """
@@ -192,3 +145,41 @@ function initGraph(topology::QCCDevDescription)::SimpleGraph{Int64}
     end
     return graph
 end
+
+########################################################################################################
+
+# Doesn't work && not needed.
+
+# """
+# Helper function  for `_initAdjacency`. Takes the current adjacency object and modifies it in-place.
+# It adds new connections to the adjacency list if they're not already added.
+# """
+# function _addToAdjacency(adjacency ::Dict{String, Array{String}}, collection ::Array{T}) where T
+#     for element ∈ collection
+#         id = element.id
+#         end0 = element.end0
+#         end1 = element.end1
+#         if !haskey(adjacency, end0)
+#             adjacency[id] = [end0]
+#             if !haskey(adjacency, end1)
+#                 push!(adjacency[id], end1)
+#             end
+#         elseif !haskey(adjacency, end1)
+#             adjacency[id] = [end1]
+#         end
+#     end
+# end
+# 
+# """
+# Creates adjacency list from QCCDevCtrl attributes.
+# The adjacency list is a dictionary in which the key is the ID of one device component, and the value
+# is an array of Ids to the element its adjacent to.
+# """
+# function _initAdjacency(device ::QCCDevDescription)::Dict{String,Array{String}}
+#     adjacency = Dict{String, Array{String}}()
+#     _addToAdjacency(adjacency, device.gateZone.gateZones)
+#     _addToAdjacency(adjacency, device.auxZone.auxZones)
+#     _addToAdjacency(adjacency, device.junction.junctions)
+#     _addToAdjacency(adjacency, device.loadZone.loadZones)
+#     return adjacency
+# end

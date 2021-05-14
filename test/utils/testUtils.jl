@@ -184,8 +184,7 @@ function giveQccCtrl()::QCCDevCtrl
     gateZones = Dict{Symbol,GateZone}()
     endId = id -> id == "" ? nothing : Symbol(id)
     map(tr -> gateZones[Symbol(tr.id)] = GateZone(Symbol(tr.id), tr.capacity,
-                                endId(tr.end0), endId(tr.end1)
-                              , tr.gate, tr.loading_zone), qccd.gateZone.gateZones)
+                                endId(tr.end0), endId(tr.end1)), qccd.gateZone.gateZones)
     auxZones = Dict{Symbol,AuxZone}()
     map(sh -> auxZones[Symbol(sh.id)] = AuxZone(Symbol(sh.id), sh.capacity,
                                                 endId(sh.end0), endId(sh.end1)),

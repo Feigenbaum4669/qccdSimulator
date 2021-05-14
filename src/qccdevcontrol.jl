@@ -112,7 +112,7 @@ function QCCDevCtrl(qdd             ::QCCDevDescription
     # graph = initGraph(qdd)
 
     # Check errors
-    _checkInitErrors(qdd.adjacency.nodes, traps, shuttles)
+    _checkInitErrors(junctions, auxZones, gateZones, loadingZones)
 
     # Initalizate QCCDevCtrl
     return QCCDevCtrl(qdd,
