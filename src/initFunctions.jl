@@ -91,7 +91,7 @@ Throws ArgumentError if trap ID is repeated.
 """
 function _initGateZone(gateZoneDesc::GateZoneDesc)::Dict{Symbol,GateZone}
     gateZonessCtrl = Dict{Symbol,GateZone}()
-    err = id -> ArgumentError("Repeated Trap ID: $id.")
+    err = id -> ArgumentError("Repeated gate zone with ID: $id.")
     endId = id -> id == "" ? nothing : Symbol(id)
 
     map(tr -> haskey(gateZonessCtrl, Symbol(tr.id)) ? throw(err(tr.id)) :
