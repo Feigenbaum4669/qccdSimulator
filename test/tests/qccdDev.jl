@@ -215,6 +215,52 @@ function initJunctionsTestWrongType()
 end
 # ========= END Junction tests =========
 
+# ========= Adjacency tests  =========
+function initAdjacencyTest()
+    device ::QCCDevDescription = giveQccDes()
+    adjacency = qccdSimulator.QCCDevControl._initAdjacency(device)
+
+    @show adjacency
+
+    for (key, value) in adjacency
+        auxGate = filter(x-> Symbol(x.id)==key, device.gateZone.gateZones)
+        auxLoad = filter(x-> Symbol(x.id)==key, device.loadZone.loadZones)
+        auxAux = filter(x-> Symbol(x.id)==key, device.auxZone.auxZones)
+        if !isempty(auxGate)
+            @assert sort(value) == sort([auxGate[0].end0, auxGate[0].end1])
+        elseif !isempty(auxLoad)
+            @assert sort(value) == sort([auxLoad[0].end0, auxLoad[0].end1])
+        elseif !isempty(auxAux)
+            @assert sort(value) == sort([auxAux[0].end0, auxAux[0].end1])
+        end
+    end
+end
+
+
+# ========= END Adjacency tests  =========
+
+# ========= Loading zones tests =========
+function initLoadingZoneTest()
+    loadZoneDesc::LoadZoneDesc = giveQccDes().loadZone
+    loadZones = qccdSimulator.QCCDevControl._initLoadingZones(loadZoneDesc)
+    for (key, value) in loadZones
+        @assert key == value.id
+        aux = filter(x-> Symbol(x.id)==key, loadZoneDesc.loadZones)
+        @assert length(aux) == 1
+        aux = aux[1]
+        tmp = aux.end0 == "" ? nothing : Symbol(aux.end0)
+        @assert tmp == value.end0
+        tmp = aux.end1 == "" ? nothing : Symbol(aux.end1)
+        @assert tmp == value.end1
+    end
+    return true
+end
+
+function initLoadingZoneRepeatedIdTest()
+    loadZoneDesc::LoadZoneDesc = giveLoadZoneDescRepeatedId()
+    return qccdSimulator.QCCDevControl._initLoadingZones(loadZoneDesc)
+end
+# ========= END Loading zones tests =========
 
 # ========= Auxiliary and Gate zones tests =========
 function initGateZoneTest()
@@ -240,9 +286,10 @@ function initGateZoneRepeatedIdTest()
     return qccdSimulator.QCCDevControl._initGateZone(gateZoneDesc)
 end
 
-function checkTrapsTest()
+function checkInitErrorsTest()
     qdd::QCCDevCtrl = giveQccCtrl()
-    qccdSimulator.QCCDevControl._checkTraps(qdd.traps,qdd.shuttles)
+    qccdSimulator.QCCDevControl._checkInitErrors(qdd.junctions,qdd.auxZones,
+                                                 qdd.gateZones, qccd.loadingZones)
     return true
 end
 
