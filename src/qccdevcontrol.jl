@@ -3,12 +3,13 @@
 # MIT license
 # Sub-module QCCDevCtrl
 
-module QCCDevControl
+module QCCDDevControl
 
 export QCCDevCtrl
 
 using ..QCCDevDes_Types
 using ..QCCDevControl_Types
+using ..QCCDev_Feasible
 
 include("initFunctions.jl")
 
@@ -17,8 +18,7 @@ This sub-module provides the type `QCCDevCtrl` and functions for controlling the
 simulated quantum device.
 
 # Exported
-- Type `QCCDevCtrl` w/ constructor
-- Type `QCCDevCtrl__Operation_Not_Allowed_Exception`  subtype of `Exception`
+- `QCCDevCtrl()`
 
 # Not Exported Interface
 - `load()`
@@ -33,35 +33,6 @@ simulated quantum device.
 """
 
 struct QCCDevCtrl__Operation_Not_Allowed_Exception end
-
-"""
-Type for time inside the qdev, in [change if necessary]   10^{-10}
-seconds, i.e., ns/10.  All times are ≥0; negative value of expressions
-of this type are errors (and may carry local error information).
-"""
-const Time_t = Int64
-
-struct QCCDevCtrl
-    dev            ::QCCDevDescription
-
-    simulate       ::Symbol                   # one of `:No`, `:PureStates`, `:MixedStates`
-    qnoise_esimate ::Bool                     # whether estimation of noise takes place
-
-    t_now          ::Time_t
-# Descomment when load() function is done
-#    qubits      ::Dict{Int,Qubit}
-    gateZones      ::Dict{Symbol,GateZone}
-    junctions      ::Dict{Symbol,Junction}
-    auxZones       ::Dict{Symbol,AuxZone}
-    loadingZones   ::Dict{Symbol,LoadingZone}
-
-    # graph          ::SimpleGraph{Int64}
-
-    # Rest of struct contains description of current status of qdev
-    # and its ions, such as the list of operations that are ongoing
-    # right now.
-end
-
 
 
 ####################################################################################################
@@ -87,7 +58,7 @@ Currently none.  Possible:
 function QCCDevCtrl(qdd             ::QCCDevDescription
                     ;
                     simulate ::Symbol = :No,
-                    qnoise_estimate::Bool = false        ) ::QCCDevCtrl
+                    qnoise_estimate::Bool = false        ) ::QCCDevControl
 
     @assert simulate        ∈ [:No, :PureStates, :MixedStates]
     @assert qnoise_estimate ∈ [true,false] # 😃
@@ -101,8 +72,6 @@ function QCCDevCtrl(qdd             ::QCCDevDescription
     #                                                                   #
     #-------------------------------------------------------------------#
 
-    dev   = qdd
-    t_now = 0
     # Initializes devices components
     gateZones = _initGateZone(qdd.gateZone)
     junctions = _initJunctions(qdd.gateZone.gateZones, qdd.auxZone.auxZones, qdd.loadZone.loadZones, qdd.junction.junctions)
@@ -115,9 +84,8 @@ function QCCDevCtrl(qdd             ::QCCDevDescription
     _checkInitErrors(junctions, auxZones, gateZones, loadingZones)
 
     # Initalizate QCCDevCtrl
-    return QCCDevCtrl(qdd,
+    return QCCDevControl(qdd,
                       simulate, qnoise_estimate,
-                      t_now,
                       gateZones,junctions,auxZones, loadingZones)
 end #^ QCCDevCtrl()
 
@@ -134,7 +102,7 @@ The function returns a named tuple consisting of:
 - `new_ion_idx` — the index identifying the new ion
 - `t₀` — the time at which the loaded ion will be usable (for transport off the loading zone);
 """
-function load(qdc           ::QCCDevCtrl,
+function load(qdc           ::QCCDevControl,
               t             ::Time_t,
               loading_zone  ::Any       )  ::@NamedTuple{new_ion_idx::Int,t₀::Time_t}
 
@@ -178,7 +146,7 @@ Function `linear_transport()` — moves ions between zones/junctions.
 
 The function returns the time at which the operation will be completed.
 """
-function linear_transport(qdc           :: QCCDevCtrl,
+function linear_transport(qdc           :: QCCDevControl,
                           t             :: Time_t,
                           ion_idx       :: Int,
                           edge_idx      :: Int       ) ::Time_t
@@ -198,7 +166,7 @@ Function `junction_transport()` — moves around a junction.
 
 The function returns the time at which the operation will be completed.
 """
-function junction_transport(qdc           :: QCCDevCtrl,
+function junction_transport(qdc           :: QCCDevControl,
                             t             :: Time_t,
                             ion_idx       :: Int,
                             edge_idx      :: Int       ) ::Time_t
@@ -219,7 +187,7 @@ Function `swap()` — physically swaps the positions of two ions
 
 The function returns the time at which the operation will be completed.
 """
-function swap(qdc           :: QCCDevCtrl,
+function swap(qdc           :: QCCDevControl,
               t             :: Time_t,
               ion1_idx      :: Int,
               ion2_idx      :: Int       ) ::Time_t
@@ -241,7 +209,7 @@ Function `split()` — move ion out of gate zone into edge
 
 The function returns the time at which the operation will be completed.
 """
-function split(qdc           :: QCCDevCtrl,
+function split(qdc           :: QCCDevControl,
                t             :: Time_t,
                ion_idx       :: Int,
                edge_idx      :: Int) ::Time_t
@@ -261,7 +229,7 @@ Function `merge()` — move ion out of gate zone into edge
 
 The function returns the time at which the operation will be completed.
 """
-function merge(qdc           :: QCCDevCtrl,
+function merge(qdc           :: QCCDevControl,
                t             :: Time_t,
                ion_idx       :: Int,
                edge_idx      :: Int) ::Time_t
@@ -281,7 +249,7 @@ Function `Rz` — single qubit Z-rotation
 
 The function returns the time at which the operation will be completed.
 """
-function Rz(qdc           :: QCCDevCtrl,
+function Rz(qdc           :: QCCDevControl,
             t             :: Time_t,
             ion_idx       :: Int,
             θ             :: Real      ) ::Time_t
@@ -302,7 +270,7 @@ Function `Rxy` — single qubit XY-plane rotation
 
 The function returns the time at which the operation will be completed.
 """
-function Rxy(qdc           :: QCCDevCtrl,
+function Rxy(qdc           :: QCCDevControl,
              t             :: Time_t,
              ion_idx       :: Int,
              ϕ             :: Real,
@@ -324,7 +292,7 @@ Function `XX` — two qubit XX-rotation
 
 The function returns the time at which the operation will be completed.
 """
-function XX(qdc           :: QCCDevCtrl,
+function XX(qdc           :: QCCDevControl,
             t             :: Time_t,
             ion1_idx      :: Int,
             ion2_idx      :: Int,
@@ -346,7 +314,7 @@ Function `ZZ` — two qubit ZZ-rotation
 
 The function returns the time at which the operation will be completed.
 """
-function ZZ(qdc           :: QCCDevCtrl,
+function ZZ(qdc           :: QCCDevControl,
             t             :: Time_t,
             ion1_idx      :: Int,
             ion2_idx      :: Int,

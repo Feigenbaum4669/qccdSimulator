@@ -13,7 +13,7 @@ using LightGraphs
     @test readTimeJSONnoFile()
 end
 
-@testset "QCCDevCtrl initialization" begin
+@testset "QCCDevControl initialization" begin
     @test QCCDevCtrlOKTest()
     # @test nv(QCCDevCtrlTest().graph) == 5
     # @test ne(QCCDevCtrlTest().graph) == 6

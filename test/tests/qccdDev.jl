@@ -1,6 +1,6 @@
 include("../utils/testUtils.jl")
 using qccdSimulator.QCCDevControl_Types
-using qccdSimulator.QCCDevControl
+using qccdSimulator.QCCDDevControl
 
 # ========= JSON tests =========
 function readJSONOK(path::String)::Bool
@@ -95,7 +95,7 @@ function checkEqualQCCD(qccd1::QCCDevDescription, qccd2::QCCDevDescription):: Bo
     return true
 end
 
-function checkEqualQCCDevCtrl(qccdc1::QCCDevCtrl,qccdc2::QCCDevCtrl):: Bool
+function checkEqualQCCDevCtrl(qccdc1::QCCDevControl,qccdc2::QCCDevControl):: Bool
     @assert qccdc1.t_now == qccdc2.t_now
     @assert qccdc1.simulate == qccdc2.simulate
     @assert qccdc1.qnoise_esimate == qccdc2.qnoise_esimate
@@ -162,7 +162,7 @@ function initJunctionsTest()
         end
     end
 
-    junctions = qccdSimulator.QCCDevControl._initJunctions(gateZones,
+    junctions = qccdSimulator.QCCDDevControl._initJunctions(gateZones,
                                             auxZones, loadZones, _junctions)
     for (k,junction) in junctions
         @assert k == junction.id
@@ -181,7 +181,7 @@ end
 function initJunctionsTestRepId()
     zones, _junctions = giveZonesJunctions(2, ["T","T"];repJunc = true)
     try
-        qccdSimulator.QCCDevControl._initJunctions(zones, nothing, nothing, _junctions)
+        qccdSimulator.QCCDDevControl._initJunctions(zones, nothing, nothing, _junctions)
     catch e
         @assert startswith(e.msg, "Repeated junction ID")
         return true
@@ -192,7 +192,7 @@ end
 function initJunctionsTestIsolated()
     zones, _junctions = giveZonesJunctions(2, ["T","T"];isolatedJunc = true)
     try
-        qccdSimulator.QCCDevControl._initJunctions(nothing, zones, nothing, _junctions)
+        qccdSimulator.QCCDDevControl._initJunctions(nothing, zones, nothing, _junctions)
     catch e
         @assert endswith(e.msg, "is not connected to anything.")
         return true
@@ -208,7 +208,7 @@ function initJunctionsTestWrongType()
         push!(loadZones, load)
     end
     try
-        qccdSimulator.QCCDevControl._initJunctions(nothing,nothing,loadZones, _junctions)
+        qccdSimulator.QCCDDevControl._initJunctions(nothing,nothing,loadZones, _junctions)
     catch e
         @assert(e.msg == "Junction with ID 1 of type T has 2 ends. It should have 3 ends.")
         return true
@@ -220,7 +220,7 @@ end
 # ========= Adjacency tests  =========
 function initAdjacencyTest()
     device ::QCCDevDescription = giveQccDes()
-    adjacency = qccdSimulator.QCCDevControl._initAdjacency(device)
+    adjacency = qccdSimulator.QCCDDevControl._initAdjacency(device)
 
     @show adjacency
 
@@ -244,7 +244,7 @@ end
 # ========= Loading zones tests =========
 function initLoadingZoneTest()
     loadZoneDesc::LoadZoneDesc = giveQccDes().loadZone
-    loadZones = qccdSimulator.QCCDevControl._initLoadingZones(loadZoneDesc)
+    loadZones = qccdSimulator.QCCDDevControl._initLoadingZones(loadZoneDesc)
     for (key, value) in loadZones
         @assert key == value.id
         aux = filter(x-> Symbol(x.id)==key, loadZoneDesc.loadZones)
@@ -260,14 +260,14 @@ end
 
 function initLoadingZoneRepeatedIdTest()
     loadZoneDesc::LoadZoneDesc = giveLoadZoneDescRepeatedId()
-    return qccdSimulator.QCCDevControl._initLoadingZones(loadZoneDesc)
+    return qccdSimulator.QCCDDevControl._initLoadingZones(loadZoneDesc)
 end
 # ========= END Loading zones tests =========
 
 # ========= Auxiliary and Gate zones tests =========
 function initGateZoneTest()
     gateZoneDesc::GateZoneDesc = giveQccDes().gateZone
-    gateZones = qccdSimulator.QCCDevControl._initGateZone(gateZoneDesc)
+    gateZones = qccdSimulator.QCCDDevControl._initGateZone(gateZoneDesc)
     for (key, value) in gateZones
         @assert key == value.id
         aux = filter(x-> Symbol(x.id)==key, gateZoneDesc.gateZones)
@@ -285,27 +285,27 @@ end
 
 function initGateZoneRepeatedIdTest()
     gateZoneDesc::GateZoneDesc = giveGateZoneDescRepeatedId()
-    return qccdSimulator.QCCDevControl._initGateZone(gateZoneDesc)
+    return qccdSimulator.QCCDDevControl._initGateZone(gateZoneDesc)
 end
 
 function checkInitErrorsTest()
-    qdd::QCCDevCtrl = giveQccCtrl()
-    qccdSimulator.QCCDevControl._checkInitErrors(qdd.junctions,qdd.auxZones,
+    qdd::QCCDevControl = giveQccCtrl()
+    qccdSimulator.QCCDDevControl._checkInitErrors(qdd.junctions,qdd.auxZones,
                                                  qdd.gateZones, qdd.loadingZones)
     return true
 end
 
 function checkGateZonesAuxZoneNotExistTest()
-    qdd::QCCDevCtrl = giveQccCtrl()
-    traps::Dict{Symbol,Trap} = qccdSimulator.QCCDevControl._initTraps(giveGateZoneDescNoConnection())
-    qccdSimulator.QCCDevControl._checkTraps(traps,qdd.shuttles)
+    qdd::QCCDevControl = giveQccCtrl()
+    traps::Dict{Symbol,Trap} = qccdSimulator.QCCDDevControl._initTraps(giveGateZoneDescNoConnection())
+    qccdSimulator.QCCDDevControl._checkTraps(traps,qdd.shuttles)
     return true
 end
 
 function checkTrapsShuttleWrongConnectedTest()
-    qdd::QCCDevCtrl = giveQccCtrl()
-    traps::Dict{Symbol,Trap} = qccdSimulator.QCCDevControl._initTraps(giveGateZoneDescWrongConnectedShuttle())
-    qccdSimulator.QCCDevControl._checkTraps(traps,qdd.shuttles)
+    qdd::QCCDevControl = giveQccCtrl()
+    traps::Dict{Symbol,Trap} = qccdSimulator.QCCDDevControl._initTraps(giveGateZoneDescWrongConnectedShuttle())
+    qccdSimulator.QCCDDevControl._checkTraps(traps,qdd.shuttles)
     return true
 end
 
@@ -313,13 +313,13 @@ function initAuxGateZonesTestRepId()
     zones, _ = giveZonesJunctions(2, ["T","T"];repZone = true)
     auxDesc = AuxZoneDesc(zones)
     try
-        qccdSimulator.QCCDevControl._initAuxZones(auxDesc)
+        qccdSimulator.QCCDDevControl._initAuxZones(auxDesc)
     catch e
         @assert startswith(e.msg, "Repeated")
     end
     gateDesc = GateZoneDesc(zones)
     try
-        qccdSimulator.QCCDevControl._initGateZone(gateDesc)
+        qccdSimulator.QCCDDevControl._initGateZone(gateDesc)
     catch e
         @assert startswith(e.msg, "Repeated")
     end
@@ -328,12 +328,12 @@ end
 
 function initAuxGateZonesTestInvZone()
     try
-        qccdSimulator.QCCDevControl._initAuxZones(AuxZoneDesc(giveZoneInfo(rand(5:10);invZone=true)))
+        qccdSimulator.QCCDDevControl._initAuxZones(AuxZoneDesc(giveZoneInfo(rand(5:10);invZone=true)))
     catch e
         @assert endswith(e.msg, "\"end0\" and \"end1\" must be different")
     end
     try
-        qccdSimulator.QCCDevControl._initGateZone(GateZoneDesc(giveZoneInfo(rand(5:10);invZone=true)))
+        qccdSimulator.QCCDDevControl._initGateZone(GateZoneDesc(giveZoneInfo(rand(5:10);invZone=true)))
     catch e
         @assert endswith(e.msg, "\"end0\" and \"end1\" must be different")
     end
@@ -342,14 +342,14 @@ end
 
 function initAuxGateZonesTestWithNothing()
     zones = giveZoneInfo(rand(5:10);giveNothing=true)
-    qccdSimulator.QCCDevControl._initAuxZones(AuxZoneDesc(zones))
-    qccdSimulator.QCCDevControl._initGateZone(GateZoneDesc(zones))
+    qccdSimulator.QCCDDevControl._initAuxZones(AuxZoneDesc(zones))
+    qccdSimulator.QCCDDevControl._initGateZone(GateZoneDesc(zones))
     return true
 end
 
 function initAuxZonesTest()
     _auxZones = AuxZoneDesc(giveZoneInfo(rand(10:15)))
-    auxZones = qccdSimulator.QCCDevControl._initAuxZones(_auxZones)
+    auxZones = qccdSimulator.QCCDDevControl._initAuxZones(_auxZones)
     @assert length(_auxZones.auxZones) == length(auxZones)
     for _auxZone in _auxZones.auxZones
         auxZone = auxZones[Symbol(_auxZone.id)]
