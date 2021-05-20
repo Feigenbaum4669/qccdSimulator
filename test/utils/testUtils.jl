@@ -208,7 +208,8 @@ function giveQccCtrl()::QCCDevCtrl
         map(x -> push!(ends,Symbol(x.id)), connectedGateZones)
         map(x -> push!(ends,Symbol(x.id)), connectedAuxZones)
         map(x -> push!(ends,Symbol(x.id)), connectedLoadZones)
-        junctions[Symbol(j.id)] = Junction(Symbol(j.id), Symbol(j.type), ends)
+        tmpId = j.id == "" ? nothing : Symbol(j.id)
+        junctions[tmpId] = Junction(tmpId, Symbol(j.type), ends)
     end
 
     return QCCDevCtrl(qccd,:No,false,0,gateZones,junctions,auxZones,loadZones)

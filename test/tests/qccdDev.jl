@@ -97,39 +97,41 @@ end
 
 function checkEqualQCCDevCtrl(qccdc1::QCCDevCtrl,qccdc2::QCCDevCtrl):: Bool
     @assert qccdc1.t_now == qccdc2.t_now
+    @assert qccdc1.simulate == qccdc2.simulate
+    @assert qccdc1.qnoise_esimate == qccdc2.qnoise_esimate
     @assert checkEqualQCCD(qccdc1.dev, qccdc2.dev)
-    @assert nv(qccdc1.graph) == nv(qccdc2.graph)
-    @assert ne(qccdc1.graph) == ne(qccdc2.graph)
-    @assert length(qccdc1.traps) == length(qccdc2.traps)
+    @assert length(qccdc1.gateZones) == length(qccdc2.gateZones)
     @assert length(qccdc1.junctions) == length(qccdc2.junctions)
-    @assert length(qccdc1.shuttles) == length(qccdc2.shuttles)
-    for (key,value) in qccdc1.traps
-        @assert haskey(qccdc2.traps, key)
-        @assert qccdc2.traps[key].id == value.id
-        @assert qccdc2.traps[key].capacity == value.capacity
-        @assert qccdc2.traps[key].chain == value.chain
-        @assert qccdc2.traps[key].end0.qubit == value.end0.qubit
-        @assert qccdc2.traps[key].end0.shuttle == value.end0.shuttle
-        @assert qccdc2.traps[key].end1.qubit == value.end1.qubit
-        @assert qccdc2.traps[key].end1.shuttle == value.end1.shuttle
-        @assert qccdc2.traps[key].gate == value.gate
-        @assert qccdc2.traps[key].loading_hole == value.loading_hole
+    @assert length(qccdc1.auxZones) == length(qccdc2.auxZones)
+    @assert length(qccdc1.loadingZones) == length(qccdc2.loadingZones)
+    for (key,value) in qccdc1.gateZones
+        @assert haskey(qccdc2.gateZones, key)
+        @assert qccdc2.gateZones[key].id == value.id
+        @assert qccdc2.gateZones[key].capacity == value.capacity
+        @assert qccdc2.gateZones[key].chain == value.chain
+        @assert qccdc2.gateZones[key].end0 == value.end0
+        @assert qccdc2.gateZones[key].end1 == value.end1
     end
-    for (key,value) in qccdc1.shuttles
-        @assert haskey(qccdc2.shuttles, key)
-        @assert qccdc2.shuttles[key].id == value.id
-        @assert qccdc2.shuttles[key].end0 == value.end0
-        @assert qccdc2.shuttles[key].end1 == value.end1
+    for (key,value) in qccdc1.auxZones
+        @assert haskey(qccdc2.auxZones, key)
+        @assert qccdc2.auxZones[key].id == value.id
+        @assert qccdc2.auxZones[key].capacity == value.capacity
+        @assert qccdc2.auxZones[key].chain == value.chain
+        @assert qccdc2.auxZones[key].end0 == value.end0
+        @assert qccdc2.auxZones[key].end1 == value.end1
+    end
+    for (key,value) in qccdc1.loadingZones
+        @assert haskey(qccdc2.loadingZones, key)
+        @assert qccdc2.loadingZones[key].id == value.id
+        @assert qccdc2.loadingZones[key].end0 == value.end0
+        @assert qccdc2.loadingZones[key].end1 == value.end1
+        @assert qccdc2.loadingZones[key].hole == value.hole == nothing
     end
     for (key,value) in qccdc1.junctions
         @assert haskey(qccdc2.junctions, key)
         @assert qccdc2.junctions[key].id == value.id
+        @assert qccdc2.junctions[key].ends == value.ends
         @assert qccdc2.junctions[key].type == value.type
-        for (k,v) in qccdc1.junctions[key].ends
-            @assert haskey(qccdc1.junctions[key].ends,k)
-            @assert qccdc1.junctions[key].ends[k].qubit == v.qubit
-            @assert qccdc1.junctions[key].ends[k].status == v.status
-        end
     end
     return true
 end
