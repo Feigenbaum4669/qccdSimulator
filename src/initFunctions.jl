@@ -32,8 +32,8 @@ function _initJunctions(gateZones::Union{Nothing,Array{ZoneInfoDesc}},
         map(x -> push!(ends,Symbol(x.id)), connectedAuxZones)
         map(x -> push!(ends,Symbol(x.id)), connectedLoadZones)
 
-        j.id = j.id == "" ? nothing : Symbol(j.id)
-        res[j.id] = Junction(j.id, Symbol(j.type), ends)
+        tmpId = j.id == "" ? nothing : Symbol(j.id)
+        res[tmpId] = Junction(tmpId, Symbol(j.type), ends)
     end
     return res
 end
