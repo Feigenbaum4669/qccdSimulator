@@ -13,31 +13,25 @@ function _initJunctions(gateZones::Union{Nothing,Array{ZoneInfoDesc}},
     auxZones::Union{Nothing,Array{ZoneInfoDesc}}, loadZones ::Union{Nothing,Array{LoadZoneInfoDesc}},
     junctions::Array{JunctionInfoDesc})::Dict{Symbol,Junction}
 
+    aux = (zone,id) -> !isnothing(zone) ? filter(x -> x.end0 == id || x.end1 == id, zone) : []
+
     res = Dict{Symbol,Junction}()
     for j ∈ junctions
         haskey(res, Symbol(j.id)) && throw(ArgumentError("Repeated junction ID: $(j.id)."))
         
-        connectedGateZones =
-            !isnothing(gateZones) ? filter(x -> x.end0 == j.id || x.end1 == j.id, gateZones) : []
-        connectedAuxZones =
-            !isnothing(auxZones) ? filter(x -> x.end0 == j.id || x.end1 == j.id, auxZones) : []
-        connectedLoadZones =
-            !isnothing(loadZones) ? filter(x -> x.end0 == j.id || x.end1 == j.id, loadZones) : []
+        connectedGateZones = aux(gateZones,j.id)
+        connectedAuxZones = aux(auxZones,j.id)
+        connectedLoadZones = aux(loadZones,j.id)
 
         if isempty(connectedGateZones) && isempty(connectedAuxZones) && isempty(connectedLoadZones)
             throw(ArgumentError("Junction with ID $(j.id) is not connected to anything."))
         end
 
         ends = Symbol[]
-        for el ∈ connectedGateZones
-            push!(ends,Symbol(el.id))
-        end
-        for el ∈ connectedAuxZones
-            push!(ends,Symbol(el.id))
-        end
-        for el ∈ connectedLoadZones
-            push!(ends,Symbol(el.id))
-        end
+        map(x -> push!(ends,Symbol(x.id)), connectedGateZones)
+        map(x -> push!(ends,Symbol(x.id)), connectedAuxZones)
+        map(x -> push!(ends,Symbol(x.id)), connectedLoadZones)
+
         res[Symbol(j.id)] = Junction(Symbol(j.id), Symbol(j.type), ends)
     end
     return res
