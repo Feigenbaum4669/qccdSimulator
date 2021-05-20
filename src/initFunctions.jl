@@ -32,7 +32,8 @@ function _initJunctions(gateZones::Union{Nothing,Array{ZoneInfoDesc}},
         map(x -> push!(ends,Symbol(x.id)), connectedAuxZones)
         map(x -> push!(ends,Symbol(x.id)), connectedLoadZones)
 
-        res[Symbol(j.id)] = Junction(Symbol(j.id), Symbol(j.type), ends)
+        j.id = j.id == "" ? nothing : Symbol(j.id)
+        res[j.id] = Junction(j.id, Symbol(j.type), ends)
     end
     return res
 end
@@ -109,18 +110,19 @@ function __auxCheck(end0::Union{Symbol, Nothing}, end1::Union{Symbol, Nothing},
                     zone1::Dict{Symbol,T}, zone2::Dict{Symbol,N},
                      zone3::Dict{Symbol,Z}, id::Symbol) where {T, N, Z}
 
-    check = (zone1,zone2,zone3,id) -> id != nothing &&
+    isWrong = (zone1,zone2,zone3,id) -> id != nothing &&
                            !(haskey(zone1,id) || haskey(zone2,id) || haskey(zone3,id))
     
-    if end0 == nothing && end1 == nothing
+    if isnothing(end0) && isnothing(end1)
         throw(ArgumentError("Topology's element with ID $id is isolated." *
                             " Element cannot be isolated"))
-    elseif check(zone1,zone2,zone3,end0) || check(zone1,zone2,zone3,end1)
+    elseif isWrong(zone1,zone2,zone3,end0) || isWrong(zone1,zone2,zone3,end1)
         throw(ArgumentError("Topology's element with ID $id is wrong connected."))
 
     end
 end
-########################################################################################################
+
+################################### ↓↓↓↓↓↓ DEPRECATED ZONE ↓↓↓↓↓↓ #####################################################################
 
 """
 --> DEPRECATED

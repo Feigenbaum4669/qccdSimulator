@@ -25,7 +25,6 @@ end
     @test initAuxGateZonesTestInvZone()
     @test initAuxGateZonesTestWithNothing()
     @test initAuxZonesTest()
-    # @test checkAuxZonesTestModifyConnections()
     @test initGateZoneTest()
     @test_throws ArgumentError("Repeated gate zone with ID: 1.") initGateZoneRepeatedIdTest()   
     @test initLoadingZoneTest()
