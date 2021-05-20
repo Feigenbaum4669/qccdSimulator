@@ -143,7 +143,9 @@ end
 
 # ========= Junction tests =========
 function initJunctionsTest()
-    zones, _junctions = giveZonesJunctions(9, ["X", "Y", "T","X", "Y", "T","X", "Y", "T"])
+    nJunctions = rand(5:30)
+    juncTypes = [string(type) for type ∈ JunctionType]
+    zones, _junctions = giveZonesJunctions(nJunctions, rand(juncTypes, nJunctions))
     #Convert the generic zones to Gate, auxiliary, and loading zones.
     gateZones = ZoneInfoDesc[]
     auxZones = ZoneInfoDesc[]
@@ -170,7 +172,7 @@ function initJunctionsTest()
         @assert length(junction.ends) == typesSizes[juncType]
         for zoneId in junction.ends
             zone = filter(x -> Symbol(x.id) == zoneId, zones)[1] #[1] : get first and only element
-            @assert Symbol(string(zone.end0)) == k || Symbol(zone.end1) == k
+            @assert Symbol(zone.end0) == k || Symbol(zone.end1) == k
         end
     end
     return true
@@ -286,13 +288,6 @@ function initGateZoneRepeatedIdTest()
     return qccdSimulator.QCCDevControl._initGateZone(gateZoneDesc)
 end
 
-function checkInitErrorsTest()
-    qdd::QCCDevCtrl = giveQccCtrl()
-    qccdSimulator.QCCDevControl._checkInitErrors(qdd.junctions,qdd.auxZones,
-                                                 qdd.gateZones, qdd.loadingZones)
-    return true
-end
-
 function checkGateZonesAuxZoneNotExistTest()
     qdd::QCCDevCtrl = giveQccCtrl()
     traps::Dict{Symbol,Trap} = qccdSimulator.QCCDevControl._initTraps(giveGateZoneDescNoConnection())
@@ -359,3 +354,112 @@ function initAuxZonesTest()
 end
 
 # ========= END Auxiliary and Gate zones tests =========
+
+# ========= Init functions check tests =========
+function checkInitErrorsTest()
+    qdd::QCCDevCtrl = giveQccCtrl()
+    qccdSimulator.QCCDevControl._checkInitErrors(qdd.junctions,qdd.auxZones,
+                                                 qdd.gateZones, qdd.loadingZones)
+    return true
+end
+
+"""
+This function checks the edge cases of __auxCheck.
+It repeats the same errors for aux, gate, and loading zones.
+"""
+function checkInitErrorsTestEdgeCases()
+    qdd::QCCDevCtrl = giveQccCtrl()
+    
+    #Aux zone with 'nothing' in both ends should throw error:
+    _qdd = deepcopy(qdd)
+    k = rand(keys(_qdd.auxZones))
+    _qdd.auxZones[k] = AuxZone(k,_qdd.auxZones[k].capacity,nothing,nothing)
+    try
+        qccdSimulator.QCCDevControl._checkInitErrors(_qdd.junctions,_qdd.auxZones,
+                                                 _qdd.gateZones, _qdd.loadingZones)
+    catch e
+        @assert endswith(e.msg, "Element cannot be isolated")
+    end
+    _qdd = deepcopy(qdd)
+
+    # Randomly pick aux zones (by keys) and change their end0 or end1 to be nonsense.
+    # This should throw error too.
+    for k ∈ rand(keys(_qdd.auxZones), min(length(keys(_qdd.auxZones)), rand(1:10)))
+        _qdd = deepcopy(qdd)
+    
+        if !isnothing(_qdd.auxZones[k].end0)
+            _qdd.auxZones[k] = AuxZone(k,_qdd.auxZones[k].capacity,:nonsense,_qdd.auxZones[k].end1)
+        else
+            _qdd.auxZones[k] = AuxZone(k,_qdd.auxZones[k].capacity,_qdd.auxZones[k].end0,:nonsense)
+        end
+        try
+            qccdSimulator.QCCDevControl._checkInitErrors(_qdd.junctions,_qdd.auxZones,
+                                                 _qdd.gateZones, _qdd.loadingZones)
+        catch e
+            @assert endswith(e.msg, "is wrong connected.")
+        end
+    end
+
+    #Gate zone with 'nothing' in both ends should throw error:
+    _qdd = deepcopy(qdd)
+    k = rand(keys(_qdd.gateZones))
+    _qdd.gateZones[k] = GateZone(k,_qdd.gateZones[k].capacity,nothing,nothing)
+    try
+        qccdSimulator.QCCDevControl._checkInitErrors(_qdd.junctions,_qdd.auxZones,
+                                                 _qdd.gateZones, _qdd.loadingZones)
+    catch e
+        @assert endswith(e.msg, "Element cannot be isolated")
+    end
+    _qdd = deepcopy(qdd)
+
+    # Randomly pick gate zones (by keys) and change their end0 or end1 to be nonsense.
+    # This should throw error too.
+    for k ∈ rand(keys(_qdd.gateZones), min(length(keys(_qdd.gateZones)), rand(1:10)))
+        _qdd = deepcopy(qdd)
+    
+        if !isnothing(_qdd.gateZones[k].end0)
+            _qdd.gateZones[k] = GateZone(k,_qdd.gateZones[k].capacity,:nonsense,_qdd.gateZones[k].end1)
+        else
+            _qdd.gateZones[k] = GateZone(k,_qdd.gateZones[k].capacity,_qdd.gateZones[k].end0,:nonsense)
+        end
+        try
+            qccdSimulator.QCCDevControl._checkInitErrors(_qdd.junctions,_qdd.auxZones,
+                                                 _qdd.gateZones, _qdd.loadingZones)
+        catch e
+            @assert endswith(e.msg, "is wrong connected.")
+        end
+    end
+
+    #Load zone with 'nothing' in both ends should throw error:
+    _qdd = deepcopy(qdd)
+    k = rand(keys(_qdd.loadingZones))
+    _qdd.loadingZones[k] = LoadingZone(k,nothing,nothing)
+    try
+        qccdSimulator.QCCDevControl._checkInitErrors(_qdd.junctions,_qdd.auxZones,
+                                                 _qdd.gateZones, _qdd.loadingZones)
+    catch e
+        @assert endswith(e.msg, "Element cannot be isolated")
+    end
+    _qdd = deepcopy(qdd)
+
+    # Randomly pick load zones (by keys) and change their end0 or end1 to be nonsense.
+    # This should throw error too.
+    for k ∈ rand(keys(_qdd.loadingZones), min(length(keys(_qdd.loadingZones)), rand(1:10)))
+        _qdd = deepcopy(qdd)
+    
+        if !isnothing(_qdd.loadingZones[k].end0)
+            _qdd.loadingZones[k] = LoadingZone(k,:nonsense,_qdd.loadingZones[k].end1)
+        else
+            _qdd.loadingZones[k] = LoadingZone(k,_qdd.gateZones[k].end0,:nonsense)
+        end
+        try
+            qccdSimulator.QCCDevControl._checkInitErrors(_qdd.junctions,_qdd.auxZones,
+                                                 _qdd.gateZones, _qdd.loadingZones)
+        catch e
+            @assert endswith(e.msg, "is wrong connected.")
+        end
+    end
+    return true
+end
+
+# ========= END functions check tests =========
