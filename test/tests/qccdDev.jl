@@ -358,48 +358,4 @@ function initAuxZonesTest()
     return true
 end
 
-"""Checks all combinations for _checkAuxZones check function"""
-function checkAuxZonesTestModifyConnections()
-    adj, auxZones = giveAuxZonesAdjacency()
-    
-    # Tamper a 'random' key in the dictionary
-    _adj = deepcopy(adj)
-    k = collect(keys(_adj))[1]
-    _adj[k*"_"] = _adj[k] 
-    delete!(_adj, k) # So there isn't a size mismatch
-    try
-        qccdSimulator.QCCDevControl._checkAuxZones(_adj, auxZones)
-    catch e
-        @assert startswith(e.msg, "Ends don't correspond to adjacency in auxZone ID")
-    end
-    _adj = nothing
-
-    # Tamper a random value in the dictionary
-    _adj = deepcopy(adj)
-    _adj[rand(keys(_adj))][1] = -1 
-    try
-        qccdSimulator.QCCDevControl._checkShuttles(_adj, auxZones)
-    catch e
-        @assert startswith(e.msg, "Ends don't correspond to adjacency in auxZone ID")
-    end
-    _adj = nothing
-
-    # An end0 is going to be wrong
-    adj, auxZones = giveAuxZonesAdjacency(;faultyEnd0=true)
-    try
-        qccdSimulator.QCCDevControl._checkAuxZones(adj, auxZones)
-    catch e
-        @assert startswith(e.msg, "Ends don't correspond to adjacency in auxZone ID")
-    end
-
-    # An end1 is going to be wrong
-    adj, auxZones = giveAuxZonesAdjacency(;faultyEnd1=true)
-    try
-        qccdSimulator.QCCDevControl._checkAuxZones(adj, auxZones)
-    catch e
-        @assert startswith(e.msg, "Ends don't correspond to adjacency in auxZone ID")
-    end
-
-    return true
-end
 # ========= END Auxiliary and Gate zones tests =========
