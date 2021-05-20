@@ -74,7 +74,7 @@ function giveQccDes()::QCCDevDescription
     auxZone:: AuxZoneDesc = AuxZoneDesc(
         [ 
             ZoneInfoDesc( "4", "1", "2", 2),
-            ZoneInfoDesc( "5", "5", "9", 2),
+            ZoneInfoDesc( "5", "", "9", 2),
             ZoneInfoDesc( "6", "9", "", 2),
             ZoneInfoDesc( "7", "9", "3", 2)
         ]
@@ -190,12 +190,26 @@ function giveQccCtrl()::QCCDevCtrl
                                                 endId(sh.end0), endId(sh.end1)),
               qccd.auxZone.auxZones)
 
+    loadZones = Dict{Symbol, LoadingZone}()
+
+    endId = id -> id == "" ? nothing : Symbol(id)
+    map(aux -> haskey(loadZones, Symbol(aux.id)) ? throw(err(aux.id)) :
+               loadZones[Symbol(aux.id)] = LoadingZone(Symbol(aux.id),
+               endId(aux.end0), endId(aux.end1)),
+               qccd.loadZone.loadZones)
+    
+    aux = (zone,id) -> !isnothing(zone) ? filter(x -> x.end0 == id || x.end1 == id, zone) : []
     junctions = Dict{Symbol,Junction}()
     for j ∈ qccd.junction.junctions
-        connectedShuttles = filter(x -> x.end0 == j.id || x.end1 == j.id, qccd.shuttle.shuttles)
-        junctionEnds = Dict(Symbol(s.id) => JunctionEnd() for s ∈ connectedShuttles)
-        junctions[Symbol(j.id)] = Junction(Symbol(j.id), Symbol(j.type), junctionEnds)
+        connectedGateZones = aux(qccd.gateZone.gateZones,j.id)
+        connectedAuxZones = aux(qccd.auxZone.auxZones,j.id)
+        connectedLoadZones = aux(qccd.loadZone.loadZones,j.id)
+        ends = Symbol[]
+        map(x -> push!(ends,Symbol(x.id)), connectedGateZones)
+        map(x -> push!(ends,Symbol(x.id)), connectedAuxZones)
+        map(x -> push!(ends,Symbol(x.id)), connectedLoadZones)
+        junctions[Symbol(j.id)] = Junction(Symbol(j.id), Symbol(j.type), ends)
     end
 
-    return QCCDevCtrl(qccd,:No,false,0,gateZones,junctions,auxZones, graph)
+    return QCCDevCtrl(qccd,:No,false,0,gateZones,junctions,auxZones,loadZones)
 end

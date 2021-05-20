@@ -289,7 +289,7 @@ end
 function checkInitErrorsTest()
     qdd::QCCDevCtrl = giveQccCtrl()
     qccdSimulator.QCCDevControl._checkInitErrors(qdd.junctions,qdd.auxZones,
-                                                 qdd.gateZones, qccd.loadingZones)
+                                                 qdd.gateZones, qdd.loadingZones)
     return true
 end
 
@@ -354,33 +354,6 @@ function initAuxZonesTest()
         @assert _auxZone.end0 == string(auxZone.end0)
         @assert _auxZone.end1 == string(auxZone.end1)
         @assert _auxZone.capacity == auxZone.capacity
-    end
-    return true
-end
-
-function checkAuxZonesTest()
-    adj, auxZones = giveAuxZonesAdjacency()
-    qccdSimulator.QCCDevControl._checkAuxZones(adj, auxZones)
-    return true
-end
-
-function checkAuxZonesTestMissingAdj()
-    adj, auxZones = giveAuxZonesAdjacency()
-    try 
-        qccdSimulator.QCCDevControl._checkAuxZones(delete!(adj, collect(keys(adj))[1]), shutauxZonestles)
-    catch e
-        @assert e.msg == "Number of elements in adjacency list and number of auxZones don't match"
-    end
-    return true
-end
-
-function checkAuxZonesTestMissingAuxZone()
-    adj, auxZones = giveAuxZonesAdjacency()
-    try 
-        qccdSimulator.QCCDevControl.
-                    _checkAuxZones(adj, delete!(auxZones, collect(keys(auxZones))[1]))
-    catch e
-        @assert e.msg == "Number of elements in adjacency list and number of auxZones don't match"
     end
     return true
 end

@@ -91,31 +91,32 @@ Throws error when:
     - Zones are wrong connected
     - Zones don't exist
 """
-function _checkInitErrors(junctions:: Dict{String, Junction}, 
+function _checkInitErrors(junctions:: Dict{Symbol, Junction}, 
                           auxZones::Dict{Symbol,AuxZone},
                           gateZones::Dict{Symbol,GateZone},
                           loadingZones::Dict{Symbol,LoadingZone})
 
-    map(aux -> __auxCheck(aux.end0,aux.end1,gateZones,loadingZones,junctions),
+    map(aux -> __auxCheck(aux.end0,aux.end1,gateZones,loadingZones,junctions,aux.id),
         values(auxZones))
-    map(aux -> __auxCheck(aux.end0,aux.end1,auxZones,loadingZones,junctions),
+    map(aux -> __auxCheck(aux.end0,aux.end1,auxZones,loadingZones,junctions,aux.id),
         values(gateZones))
-    map(aux -> __auxCheck(aux.end0,aux.end1,auxZones,gateZones,junctions),
+    map(aux -> __auxCheck(aux.end0,aux.end1,auxZones,gateZones,junctions,aux.id),
         values(loadingZones))
 
 end
 
-function __auxCheck(end0::Symbol, end1::Symbol,
+function __auxCheck(end0::Union{Symbol, Nothing}, end1::Union{Symbol, Nothing},
                     zone1::Dict{Symbol,T}, zone2::Dict{Symbol,N},
-                     zone3::Dict{Symbol,Z}) where {T, N, Z}
+                     zone3::Dict{Symbol,Z}, id::Symbol) where {T, N, Z}
 
-    check = id -> id != nothing &&
+    check = (zone1,zone2,zone3,id) -> id != nothing &&
                            !(haskey(zone1,id) || haskey(zone2,id) || haskey(zone3,id))
     
     if end0 == nothing && end1 == nothing
-        throw(ArgumentError("Topology's elements cannot be isolated"))
+        throw(ArgumentError("Topology's element with ID $id is isolated." *
+                            " Element cannot be isolated"))
     elseif check(zone1,zone2,zone3,end0) || check(zone1,zone2,zone3,end1)
-        throw(ArgumentError("Topology's element with ID $key is connected to a non existing element."))
+        throw(ArgumentError("Topology's element with ID $id is wrong connected."))
 
     end
 end
