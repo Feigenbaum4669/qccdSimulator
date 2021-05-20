@@ -40,18 +40,39 @@ end
 """
 Creates a dictionary of junctions from JSON objects.
 Throws ArgumentError if junction IDs are repeated.
+Throws ArgumentError if junction is not connected to anything.
 Throws ArgumentError if unsupported junction type is passed.
 """
-function _initJunctions(shuttles::Array{AuxZone},
-            junctions::Array{JunctionInfoDesc})::Dict{Symbol,Junction}
+function _initJunctions(gateZones::Union{Nothing,Array{ZoneInfoDesc}},
+    auxZones::Union{Nothing,Array{ZoneInfoDesc}}, loadZones ::Union{Nothing,Array{LoadZoneInfoDesc}},
+    junctions::Array{JunctionInfoDesc})::Dict{Symbol,Junction}
+
     res = Dict{Symbol,Junction}()
     for j ∈ junctions
-        !haskey(res, Symbol(j.id)) || throw(ArgumentError("Repeated junction ID: $(j.id)."))
+        haskey(res, Symbol(j.id)) && throw(ArgumentError("Repeated junction ID: $(j.id)."))
+        
+        connectedGateZones =
+            !isnothing(gateZones) ? filter(x -> x.end0 == j.id || x.end1 == j.id, gateZones) : []
+        connectedAuxZones =
+            !isnothing(auxZones) ? filter(x -> x.end0 == j.id || x.end1 == j.id, auxZones) : []
+        connectedLoadZones =
+            !isnothing(loadZones) ? filter(x -> x.end0 == j.id || x.end1 == j.id, loadZones) : []
 
-        connectedShuttles = filter(x -> x.end0 == j.id || x.end1 == j.id, shuttles)
-        isempty(connectedShuttles) && throw(ArgumentError("Junction with ID $(j.id) isolated."))
-        junctionEnds = Dict(Symbol(s.id) => JunctionEnd() for s ∈ connectedShuttles)
-        res[Symbol(j.id)] = Junction(Symbol(j.id), Symbol(j.type), junctionEnds)
+        if isempty(connectedGateZones) && isempty(connectedAuxZones) && isempty(connectedLoadZones)
+            throw(ArgumentError("Junction with ID $(j.id) is not connected to anything."))
+        end
+
+        ends = Symbol[]
+        for el ∈ connectedGateZones
+            push!(ends,Symbol(el.id))
+        end
+        for el ∈ connectedAuxZones
+            push!(ends,Symbol(el.id))
+        end
+        for el ∈ connectedLoadZones
+            push!(ends,Symbol(el.id))
+        end
+        res[Symbol(j.id)] = Junction(Symbol(j.id), Symbol(j.type), ends)
     end
     return res
 end

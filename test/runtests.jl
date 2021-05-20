@@ -4,24 +4,23 @@ using Test
 using LightGraphs
 
 @testset "Read JSON" begin
-    #@test readJSONOK("./testFiles/topology.json")
-    #@test_throws ArgumentError("Input is not a file") readJSON(".")
-    #@test_throws ArgumentError readJSON("./testFiles/wrongTopology.json")
-    #@test readTimeJSONOK("./testFiles/times.json")
-    #@test readTimeJSONfail(["./testFiles/negativeTimes.json",
-    #                                    "testFiles/wrongTimes.json","testFiles/wrongTimes2.json"])
-    #@test readTimeJSONnoFile()
+    @test readJSONOK("./testFiles/topology.json")
+    @test_throws ArgumentError("Input is not a file") readJSON(".")
+    @test_throws ArgumentError readJSON("./testFiles/wrongTopology.json")
+    @test readTimeJSONOK("./testFiles/times.json")
+    @test readTimeJSONfail(["./testFiles/negativeTimes.json",
+                                        "testFiles/wrongTimes.json","testFiles/wrongTimes2.json"])
+    @test readTimeJSONnoFile()
 end
 
 @testset "QCCDevCtrl initialization" begin
     # @test QCCDevCtrlOKTest()
     # @test nv(QCCDevCtrlTest().graph) == 5
     # @test ne(QCCDevCtrlTest().graph) == 6
-    # @test initJunctionsTest()
-    # @test_throws ArgumentError("Repeated junction ID: 1.") initJunctionsTestRepId()
-    # @test_throws ArgumentError("Junction with ID 1 isolated.") initJunctionsTestIsolated()
-    # @test_throws ArgumentError("Junction with ID 1 of type T has 2 ends. " * 
-    #                            "It should have 3 ends.") initJunctionsTestWrongType()
+    @test initJunctionsTest()
+    @test initJunctionsTestRepId()
+    @test initJunctionsTestIsolated()
+    @test initJunctionsTestWrongType()
     @test initAuxGateZonesTestRepId()
     @test initAuxGateZonesTestInvZone()
     @test initAuxGateZonesTestWithNothing()

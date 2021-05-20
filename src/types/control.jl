@@ -14,7 +14,7 @@ const typesSizes = Dict(:T => 3, :Y => 3, :X => 4)
 Struct for junction.
 id: Junction ID.
 type: Type of the junction. Each type may define how the junction works differently
-ends: Array os its connections Id's
+ends: Array of its connections Id's
 Throws ArgumentError if junction type doesn't match with number of ends.
 """
 struct Junction

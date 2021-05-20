@@ -143,37 +143,75 @@ end
 
 # ========= Junction tests =========
 function initJunctionsTest()
-    _typeSizes = Dict(:T => 3, :Y => 3, :X => 4)
-    shuttles, _junctions = giveShuttlesJunctions(9, ["X", "Y", "T","X", "Y", "T","X", "Y", "T"])
-    junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
+    zones, _junctions = giveZonesJunctions(9, ["X", "Y", "T","X", "Y", "T","X", "Y", "T"])
+    #Convert the generic zones to Gate, auxiliary, and loading zones.
+    gateZones = ZoneInfoDesc[]
+    auxZones = ZoneInfoDesc[]
+    loadZones = LoadZoneInfoDesc[]
+    for zone ∈ zones
+        r = rand()
+        if 0 ≤ r ≤ 0.33
+            push!(gateZones, zone)
+        elseif 0.33 < r ≤ 0.66
+            push!(auxZones, zone)
+        else
+            load = LoadZoneInfoDesc(zone.id,zone.end0,zone.end1)
+            push!(loadZones, load)
+        end
+    end
+
+    junctions = qccdSimulator.QCCDevControl._initJunctions(gateZones,
+                                            auxZones, loadZones, _junctions)
     for (k,junction) in junctions
         @assert k == junction.id
-        juncType = filter(x-> Symbol(x.id)==k,_junctions)[1].type
+        juncType = filter(x-> Symbol(x.id)==k,_junctions)[1].type #[1] : get first and only element
         juncType = Symbol(juncType)
         @assert junction.type == juncType
-        shuttleIds = keys(junction.ends)
-        @assert length(shuttleIds) == _typeSizes[juncType]
-        for shuttleId in shuttleIds
-            shuttle = filter(x -> Symbol(x.id) == shuttleId, shuttles)[1]
-            @assert Symbol(string(shuttle.end0)) == k || Symbol(shuttle.end1) == k
+        @assert length(junction.ends) == typesSizes[juncType]
+        for zoneId in junction.ends
+            zone = filter(x -> Symbol(x.id) == zoneId, zones)[1] #[1] : get first and only element
+            @assert Symbol(string(zone.end0)) == k || Symbol(zone.end1) == k
         end
     end
     return true
 end
 
 function initJunctionsTestRepId()
-    shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];repJunc = true)
-    junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
+    zones, _junctions = giveZonesJunctions(2, ["T","T"];repJunc = true)
+    try
+        qccdSimulator.QCCDevControl._initJunctions(zones, nothing, nothing, _junctions)
+    catch e
+        @assert startswith(e.msg, "Repeated junction ID")
+        return true
+    end
+    return false
 end
 
 function initJunctionsTestIsolated()
-    shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];isolatedJunc = true)
-    junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
+    zones, _junctions = giveZonesJunctions(2, ["T","T"];isolatedJunc = true)
+    try
+        qccdSimulator.QCCDevControl._initJunctions(nothing, zones, nothing, _junctions)
+    catch e
+        @assert endswith(e.msg, "is not connected to anything.")
+        return true
+    end
+    return false
 end
 
 function initJunctionsTestWrongType()
-    shuttles, _junctions = giveShuttlesJunctions(2, ["T","T"];wrongJuncType = true)
-    junctions = qccdSimulator.QCCDevControl._initJunctions(shuttles, _junctions)
+    zones, _junctions = giveZonesJunctions(2, ["T","T"];wrongJuncType = true)
+    loadZones = LoadZoneInfoDesc[]
+    for zone ∈ zones
+        load = LoadZoneInfoDesc(zone.id,zone.end0,zone.end1)
+        push!(loadZones, load)
+    end
+    try
+        qccdSimulator.QCCDevControl._initJunctions(nothing,nothing,loadZones, _junctions)
+    catch e
+        @assert(e.msg == "Junction with ID 1 of type T has 2 ends. It should have 3 ends.")
+        return true
+    end
+    return false
 end
 # ========= END Junction tests =========
 
