@@ -1,6 +1,7 @@
 include("../utils/testUtils.jl")
 using qccdSimulator.QCCDevControl_Types
 using qccdSimulator.QCCDDevControl
+using qccdSimulator.QCCDev_Feasible
 
 # ========= JSON tests =========
 function readJSONOK(path::String)::Bool
@@ -299,22 +300,6 @@ function checkInitErrorsTest()
     return true
 end
 
-function checkGateZonesAuxZoneNotExistTest()
-    qdd::QCCDevControl = giveQccCtrl()
-    traps::Dict{Symbol,Trap} = qccdSimulator.QCCDDevControl._initTraps(giveGateZoneDescNoConnection())
-    qccdSimulator.QCCDDevControl._checkTraps(traps,qdd.shuttles)
-    return true
-end
-
-function checkTrapsShuttleWrongConnectedTest()
-    qdd::QCCDevControl = giveQccCtrl()
-    traps::Dict{Symbol,Trap} = qccdSimulator.QCCDDevControl._initTraps(giveGateZoneDescWrongConnectedShuttle())
-    qccdSimulator.QCCDDevControl._checkTraps(traps,qdd.shuttles)
-    return true
-end
-
-
-
 function initAuxGateZonesTestRepId()
     zones, _ = giveZonesJunctions(2, ["T","T"];repZone = true)
     auxDesc = AuxZoneDesc(zones)
@@ -476,3 +461,36 @@ function checkInitErrorsTestEdgeCases()
 end
 
 # ========= END functions check tests =========
+
+# ========= load functiong test =========
+function initQubitTest()
+    for i in 1:25
+        qubit1 = Qubit(i,:test)
+        qubit2 = qccdSimulator.QCCDDevControl.initQubit(:test)
+        @assert qubit1.id == qubit2.id == i
+        @assert qubit1.status == qubit2.status == :inLoadingZone
+        @assert qubit1.position == qubit2.position == :test
+        @assert qubit1.destination == qubit2.destination == nothing
+    end
+    return true
+end
+
+function isallowedLoad_timeFailsTest()
+    qccd = giveQccCtrl()
+    qccd.t_now = 10
+    isallowed_load(qccd, :test, 3)
+end
+
+function isallowedLoad_zoneNotExistTest()
+    qccd = giveQccCtrl()
+    isallowed_load(qccd,:test,4)
+    return true
+end
+
+function isallowedLoad_loadingHoleBusyTest()
+    qccd = giveQccCtrl()
+    qccd.loadingZones[Symbol(8)].hole = 3
+    isallowed_load(qccd,Symbol(8),4)
+    return true
+end
+# ========= END load functiong test =========

@@ -104,33 +104,23 @@ The function returns a named tuple consisting of:
 """
 function load(qdc           ::QCCDevControl,
               t             ::Time_t,
-              loading_zone  ::Any       )  ::@NamedTuple{new_ion_idx::Int,t₀::Time_t}
+              loading_zone  ::Symbol       )  ::@NamedTuple{new_ion_idx::Int,t₀::Time_t}
 
-# TODO: Replace `Any` by correct type
+  isallowed_load(qdc, loading_zone, t)
 
-    @assert 0 ≤ t            ≤ qdc.t_now
-    # ⟶  isallowed...:  @assert 1 ≤ loading_zone ≤ dev.num_loading_zones
+  qubit = initQubit(loading_zone)
+  qdc.qubits[qubit.id] = qubit
+  qccd.loadingZones[loading_zone].hole = qubit.id
+  # TODO: TIMES!!!
+  # local t₀ =
+  #     compute_end_time() ::Time_t            # todo
 
-    if ! isallowed_load(qdc, t, loading_zone)
-        throw(QCCDevCtrl__Operation_Not_Allowed_Exception())
-    end
+  # @assert t₀ > t                             "Something went horribly wrong: Time has stopped!"
 
-    local t₀ =
-        compute_end_time() ::Time_t            # todo
+  # qdc.t_now = t
 
-
-    local new_ion_idx =
-        do_the_work()  ::Int
-
-    @assert t₀ > t                             "Something went horribly wrong: Time has stopped!"
-    @assert new_ion_idx > 0                    "New ion index is ≤ 0 WTF!"
-
-    modify_status()                            # todo
-
-    qdc.t_now = t
-
-    return (new_ion_idx=new_ion_idx, t₀=t₀)
-end #^ module
+  return (new_ion_idx=qubit.id, t₀=0)
+end #^ module 
 # EOF
 
 ####################################################################################################

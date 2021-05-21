@@ -47,9 +47,8 @@ Function `isallowed_load()` — checks if load operation is posisble
 """
 function isallowed_load(qdc::QCCDevControl, loading_zone::Symbol, t::Time_t)
     _time_check(qdc.t_now, t)
-    length(qdc.qubits) < qdc.max_capacity || opError("Device's maximum capacity ($(qdc.max_capacity)) already achieved.")
-    haskey(qdc.traps, loading_zone) || opError("Trap with given id $loading_zone doesn't exist.")
-    qdc.traps[loading_zone].getIonInLoadingHole() && opError("Loading hole is busy.")
+    haskey(qdc.loadingZones, loading_zone) || opError("Loading zone with id $loading_zone doesn't exist.")
+    qdc.loadingZones[loading_zone] != nothing && opError("Loading hole is busy.")
 end
 
 end 

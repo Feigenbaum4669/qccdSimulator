@@ -32,3 +32,17 @@ end
     @test checkInitErrorsTest()
     @test checkInitErrorsTestEdgeCases()
 end
+
+# TODO: TIMES!
+@testset "Load ions `load()` and `isallowed_load()`" begin
+    @test initQubitTest()
+    # Check time is okay
+    @test_throws OperationNotAllowedException("Time must be higher than " *
+                                                     "10") isallowedLoad_timeFailsTest()
+
+    @test_throws OperationNotAllowedException("Loading zone with id test doesn't" *
+                                    " exist.") isallowedLoad_zoneNotExistTest()
+    @test_throws OperationNotAllowedException("Loading hole is " *
+                                              "busy.") isallowedLoad_loadingHoleBusyTest()
+    # AddQubit works
+end 

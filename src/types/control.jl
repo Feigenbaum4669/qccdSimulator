@@ -57,11 +57,7 @@ struct Qubit
     status::Symbol
     position::Symbol
     destination::Union{Nothing,Symbol}
-    function Qubit(id::Int, status::Symbol, position::Symbol,
-                                            destination::Union{Nothing,Symbol})
-        status in QubitStatus || throw(ArgumentError("Qubit status $status not supported"))
-        return new(id, status, position, destination)
-    end
+    Qubit(id::Int, position::Symbol) = new(id, :inLoadingZone, position, nothing)
 end
 
 """  
@@ -71,7 +67,7 @@ capacity: maximum qubits in the trap
 chain: Ordered Qubits in the trap (from end0 to end1)
 end0 & end1: Trap endings
 """
-struct LoadingZone
+mutable struct LoadingZone
     id::Symbol
     end0::Union{Symbol, Nothing}
     end1::Union{Symbol, Nothing}
@@ -132,8 +128,8 @@ mutable struct QCCDevControl
     qnoise_esimate ::Bool                     # whether estimation of noise takes place
 
     t_now          ::Time_t
-# Descomment when load() function is done
-#    qubits      ::Dict{Int,Qubit}
+
+    qubits      ::Dict{Int,Qubit}
     gateZones      ::Dict{Symbol,GateZone}
     junctions      ::Dict{Symbol,Junction}
     auxZones       ::Dict{Symbol,AuxZone}
@@ -141,18 +137,10 @@ mutable struct QCCDevControl
 
     # graph          ::SimpleGraph{Int64}
 
-    QCCDevControl(dev, simulate, qnoise_estimate,
-            gateZones, junctions, auxZones, loadingZones) = 
-            new(dev, simulate, qnoise_estimate, 0,
-                gateZones, junctions, auxZones, loadingZones)
+    QCCDevControl(dev, simulate, qnoise_estimate, gateZones, junctions, auxZones, loadingZones) = 
+            new(dev, simulate, qnoise_estimate, 0, Dict{String,Qubit}(),
+            gateZones, junctions, auxZones, loadingZones)
 
-    """"
-    Use this when initQubits
-    QCCDevControl(dev, simulate, qnoise_estimate,
-    gateZones, junctions, auxZones, loadingZones) = 
-            new(dev, simulate, qnoise_estimate, 0,
-                Dict{String,Qubit}(), gateZones, junctions, auxZones, loadingZones)
-    """
 end
 
 end
