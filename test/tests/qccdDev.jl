@@ -1,6 +1,7 @@
 include("../utils/testUtils.jl")
 using qccdSimulator.QCCDevControl_Types
 using qccdSimulator.QCCDDevControl
+using qccdSimulator.QCCDev_Feasible
 
 # ========= JSON tests =========
 function readJSONOK(path::String)::Bool
@@ -299,22 +300,6 @@ function checkInitErrorsTest()
     return true
 end
 
-function checkGateZonesAuxZoneNotExistTest()
-    qdd::QCCDevControl = giveQccCtrl()
-    traps::Dict{Symbol,Trap} = qccdSimulator.QCCDDevControl._initTraps(giveGateZoneDescNoConnection())
-    qccdSimulator.QCCDDevControl._checkTraps(traps,qdd.shuttles)
-    return true
-end
-
-function checkTrapsShuttleWrongConnectedTest()
-    qdd::QCCDevControl = giveQccCtrl()
-    traps::Dict{Symbol,Trap} = qccdSimulator.QCCDDevControl._initTraps(giveGateZoneDescWrongConnectedShuttle())
-    qccdSimulator.QCCDDevControl._checkTraps(traps,qdd.shuttles)
-    return true
-end
-
-
-
 function initAuxGateZonesTestRepId()
     zones, _ = giveZonesJunctions(2, ["T","T"];repZone = true)
     auxDesc = AuxZoneDesc(zones)
@@ -476,3 +461,53 @@ function checkInitErrorsTestEdgeCases()
 end
 
 # ========= END functions check tests =========
+
+# ========= _time_check functiong test =========
+time_check_timeFailsTest() = qccdSimulator.QCCDev_Feasible._time_check( 10, 9, :load)
+time_check_modelFailsTest() = qccdSimulator.QCCDev_Feasible._time_check( 10, 12, :test)
+time_checkOKTest() = qccdSimulator.QCCDev_Feasible._time_check( 10, 12, :load)
+# ========= _time_check functiong test =========
+
+# ========= load functiong test =========
+function initQubitTest()
+    for i in 1:25
+        qubit1 = Qubit(i,:test)
+        qubit2 = qccdSimulator.QCCDDevControl.initQubit(:test)
+        @assert qubit1.id == qubit2.id == i
+        @assert qubit1.status == qubit2.status == :inLoadingZone
+        @assert qubit1.position == qubit2.position == :test
+        @assert qubit1.destination == qubit2.destination == nothing
+    end
+    return true
+end
+
+function isallowedLoad_zoneNotExistTest()
+    qccd = giveQccCtrl()
+    isallowed_load(qccd,:test,4)
+    return true
+end
+
+function isallowedLoad_loadingHoleBusyTest()
+    qccd = giveQccCtrl()
+    qccd.loadingZones[Symbol(8)].hole = 3
+    isallowed_load(qccd,Symbol(8),4)
+    return true
+end
+
+function isallowedLoad_OK()
+    qccd = giveQccCtrl()
+    isallowed_load(qccd,Symbol(8),4)
+    return true
+end
+
+function loadOKTest()
+    qccd = giveQccCtrl()
+    tmp = qccdSimulator.QCCDDevControl.load(qccd,2,Symbol(8))
+    @assert tmp.new_ion_idx == qccdSimulator.QCCDDevControl.NIONS
+    @assert tmp.t₀ == 7
+    @assert haskey(qccd.qubits, tmp.new_ion_idx)
+    @assert qccd.qubits[tmp.new_ion_idx].position == Symbol(8)
+    @assert qccd.qubits[tmp.new_ion_idx].destination == nothing
+    return true
+end
+# ========= END load functiong test =========

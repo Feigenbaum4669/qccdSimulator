@@ -2,6 +2,7 @@ using LightGraphs
 using .QCCDevDes_Types
 using .QCCDevControl_Types
 
+NIONS = 0
 
 """
 Creates a dictionary of junctions from JSON objects.
@@ -55,6 +56,16 @@ function _initAuxZones(auxZoneDesc::AuxZoneDesc)::Dict{Symbol,AuxZone}
 end
 
 """
+Creates a new Qubit in a loading hole
+"""
+function initQubit(loading_zone::Symbol)::Qubit
+    global NIONS
+    NIONS += 1
+    return Qubit(NIONS, loading_zone)
+end
+
+
+"""
 Creates a dictionary of loading zones using an object LoadZoneDesc.
 Throws ArgumentError if loading zones IDs are repeated.
 """
@@ -71,8 +82,8 @@ function _initLoadingZones(loadZoneDesc::LoadZoneDesc)::Dict{Symbol,LoadingZone}
 end
 
 """
-Creates a dictionary of traps using a object trapDesc.
-Throws ArgumentError if trap ID is repeated.
+Creates a dictionary of gate zones using a object GateZoneDesc.
+Throws ArgumentError if gate zones ID is repeated.
 """
 function _initGateZone(gateZoneDesc::GateZoneDesc)::Dict{Symbol,GateZone}
     gateZonessCtrl = Dict{Symbol,GateZone}()
@@ -124,26 +135,6 @@ function __auxCheck(end0::Union{Symbol, Nothing}, end1::Union{Symbol, Nothing},
 end
 
 ################################### ↓↓↓↓↓↓ DEPRECATED ZONE ↓↓↓↓↓↓ #####################################################################
-
-"""
---> DEPRECATED
-Creates a dictionary of qubits using a object TrapJSON.
-Throws ArgumentError if qubit appears in more than one trap.
-"""
-function initQubits(trapDesctraps::GateZone)::Dict{String,Qubit}
-    qubits = Dict{String,Qubit}()
-    err = (trapId, qubitPos, qubitId) -> ArgumentError("Repeated Ion ID: $qubitId
-                                                        ,in traps $trapId, $qubitPos.")
-
-    for trap in trapDesctraps.traps
-        map(q -> haskey(qubits, q) ? 
-                 throw(err(trap.id, qubits[q].position, qubits[q].id)) :
-                 qubits[q] = Qubit(q, :resting, trap.id, nothing),
-                 trap.chain)
-    end
-    return qubits
-end
-
 
 """
 --> DEPRECATED
