@@ -4,8 +4,9 @@
 # Sub-module QCCDevCtrl
 
 module QCCDev_Feasible
-export load_checks, OperationNotAllowedException, isallowed_load
+export load_checks, OperationNotAllowedException, isallowed_load, isallowed_linear_transport
 
+using ..QCCDevDes_Types
 using ..QCCDevControl_Types
 using ..QCCDev_Utils
 
@@ -29,8 +30,11 @@ Function `time_check()` — checks if given time is correct
 
 The function throws an error if time is not correct.
 """
-_time_check(t_qdc:: Time_t, t::Time_t) = 
+function _time_check(t_qdc:: Time_t, t::Time_t, id::Symbol)
   0 ≤ t_qdc ≤ t  || opError("Time must be higher than $t_qdc")
+  haskey(OperationTimes, id) || opError("Time model for $id not defined")
+end
+
 
 """
 Function `isallowed_load()` — checks if load operation is posisble
@@ -74,13 +78,7 @@ function isallowed_linear_transport(qdc           :: QCCDevControl,
                                     ion_idx       :: Int,
                                     destination_idx      :: Symbol)
 
-  _time_check(qdc.t_now, t)
-
-  symbol = :linear_transport
-
-  if symbol ∉ keys(OperationTimes)
-    opError("Time model for loading hole transport not defined")
-  end
+  _time_check(qdc.t_now, t, :linear_transport)
 
   if ion_idx ∉ keys(qdc.qubits)
     opError("Ion with ID $ion_idx is not in device")

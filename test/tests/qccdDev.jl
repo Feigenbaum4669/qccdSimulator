@@ -1,6 +1,7 @@
 include("../utils/testUtils.jl")
 using qccdSimulator.QCCDevControl_Types
 using qccdSimulator.QCCDDevControl
+using qccdSimulator.QCCDev_Feasible
 
 # ========= JSON tests =========
 function readJSONOK(path::String)::Bool
@@ -484,9 +485,40 @@ end
 # ========= END linear_transport tests =========
 
 # ========= isallowed functions tests =========
-function isallowedLinearTransportTest()
-    
+function isallowedLinearTransportTestTime()
+    qdd::QCCDevControl = giveQccCtrl()
+    try
+        isallowed_linear_transport(qdd, qdd.t_now - 5, 1, :a) 
+    catch e
+        @assert startswith(e.msg,"Time must be higher than")
+        return true
+    end
+    return false
 end
+
+function isallowedLinearTransportTest()
+    qdd::QCCDevControl = giveQccCtrl()
+    try
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, :a) 
+    catch e
+        @assert startswith(e.msg,"Ion with ID 1 is not in device")
+        return true
+    end
+    return false
+end
+
+function isallowedLinearTransportTest2()
+    qdd::QCCDevControl = giveQccCtrl()
+    #load(qdd,qdd8)
+    try
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, :a) 
+    catch e
+        @assert startswith(e.msg,"Ion with ID 1 is not in device")
+        return true
+    end
+    return false
+end
+
 
 # ========= END isallowed functions tests =========
 

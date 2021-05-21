@@ -31,6 +31,12 @@ end
     @test_throws ArgumentError("Repeated loading zone with ID: 1") initLoadingZoneRepeatedIdTest()
     @test checkInitErrorsTest()
     @test checkInitErrorsTestEdgeCases()
-    @test giveZoneTest()
+end
+@testset "Isallowed functions" begin
+    @test isallowedLinearTransportTestTime()
     @test isallowedLinearTransportTest()
+end
+
+@testset "Util functions" begin
+    @test giveZoneTest() 
 end
