@@ -1,93 +1,68 @@
 {
-    "adjacency": {
-        "nodes": {
-            "1": [
-                5
-            ],
-            "2": [
-                4
-            ],
-            "3": [
-                4
-            ],
-            "4": [
-                1
-            ],
-            "5": [
-                2,
-                3
-            ]
-        }
-    },
-    "trap": {
-        "capacity": 3,
-        "traps": [
+    "gateZone": {
+        "gateZones": [
             {
-                "id": 1,
+                "id": "1",
                 "end0": "",
-                "end1": "s1",
-                "gate": true,
-                "loading_zone": true
+                "end1": "4",
+                "capacity": 2
             },
             {
-                "id": 2,
-                "end0": "s3",
-                "end1": "",
-                "gate": false,
-                "loading_zone": true
+                "id": "2",
+                "end0": "4",
+                "end1": "5",
+                "capacity": 2
             },
             {
-                "id": 3,
-                "end0": "s6",
-                "end1": "",
-                "gate": true,
-                "loading_zone": false
+                "id": "3",
+                "end0": "7",
+                "end1": "8",
+                "capacity": 2
             }
         ]
     },
-    "jion": {
+    "junction": {
         "junctions": [
             {
-                "id": 4,
-                "type": "T"
-            },
-            {
-                "id": 5,
+                "id": "9",
                 "type": "T"
             }
         ]
     },
-    "shuttle": {
-        "shuttles": [
+    "auxiZone": {
+        "auxZones": [
             {
-                "id": "s1",
-                "end0": 1,
-                "end1": 5
+                "id": "4",
+                "end0": "1",
+                "end1": "2",
+                "capacity": 2
             },
             {
-                "id": "s2",
-                "end0": 5,
-                "end1": 2
+                "id": "4",
+                "end0": "5",
+                "end1": "9",
+                "capacity": 2
             },
             {
-                "id": "s3",
-                "end0": 2,
-                "end1": 4
+                "id": "6",
+                "end0": "9",
+                "end1": "",
+                "capacity": 2
             },
             {
-                "id": "s4",
-                "end0": 4,
-                "end1": 1
-            },
+                "id": "7",
+                "end0": "9",
+                "end1": "3",
+                "capacity": 2
+            }
+        ]
+    },
+    "loadZone": {
+        "loadZones": [
             {
-                "id": "s5",
-                "end0": 5,
-                "end1": 3
-            },
-            {
-                "id": "s6",
-                "end0": 3,
-                "end1": 4
+                "id": "8",
+                "end0": "3",
+                "end1": ""
             }
         ]
     }

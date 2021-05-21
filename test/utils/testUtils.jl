@@ -4,90 +4,92 @@ using Random
 using qccdSimulator.QCCDevControl
 
 """
-Generates n junctions connected to shuttles.
-repJunction: Repeats a junction ID.
-wrongJunctType: Gives a wrong junction type to a shuttle.
-isolatedJunc: The first junction is not connected to any shuttle.
+Generates n junctions connected to ZoneInfoDesc (auxZones or gateZones).
+repJunc: Repeats a junction ID.
+wrongJunctType: Gives a wrong junction type to a ZoneInfoDesc.
+isolatedJunc: The first junction is not connected to any ZoneInfoDesc.
+repJunc: Repeats a zone ID.
 """
-function giveShuttlesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
-            repJunc=false, wrongJuncType=false, isolatedJunc=false, repShuttle=false)::
-            Tuple{Array{ShuttleInfoDesc},Array{JunctionInfoDesc}}
+function giveZonesJunctions(nJunctions:: Int64, juncTypes:: Array{String};
+            repJunc=false, wrongJuncType=false, isolatedJunc=false, repZone=false)::
+            Tuple{Array{ZoneInfoDesc},Array{JunctionInfoDesc}}
 
-    shuttles = ShuttleInfoDesc[]
+    zones = ZoneInfoDesc[]
     junctions = JunctionInfoDesc[]
     sId = 0
-    skipShuttle = wrongJuncType
-    isolatedJunc = isolatedJunc
+    skipAuxZone = wrongJuncType
     for i in 1:nJunctions
-        repJunc && i > 1 ? push!(junctions, JunctionInfoDesc(i-1, juncTypes[i])) : 
-        push!(junctions, JunctionInfoDesc(i, juncTypes[i]))
+        repJunc && i > 1 ? push!(junctions, JunctionInfoDesc(string(i-1), juncTypes[i])) : 
+        push!(junctions, JunctionInfoDesc(string(i), juncTypes[i]))
         if isolatedJunc
             isolatedJunc = false
             continue
         end
         for j in 1:typesSizes[Symbol(juncTypes[i])]
-            if skipShuttle
-                skipShuttle = false
+            if skipAuxZone
+                skipAuxZone = false
                 continue
             end
-            push!(shuttles, ShuttleInfoDesc(string(sId),i,-1))
-            if repShuttle
-                repShuttle = false
+            push!(zones, ZoneInfoDesc(string(sId),string(i),string(-1),3))
+            if repZone
+                repZone = false
                 continue
             end
             sId += 1
         end
     end
-    return shuttles, junctions
+    return zones, junctions
 end
 
 """
-Creates some shuttle objects.
+Creates some ZoneInfoDesc objects.
 """
-function giveShuttles(nShuttles:: Int64;  invShuttle=false)::ShuttleDesc
-    shuttles = ShuttleInfoDesc[]
-    for i in 1:nShuttles
-        if invShuttle
-            push!(shuttles,ShuttleInfoDesc("$i",i,i))
-            invShuttle = false
+function giveZoneInfo(nZones:: Int64;  invZone=false, giveNothing=false)::Array{ZoneInfoDesc}
+    zones = ZoneInfoDesc[]
+    for i in 1:nZones
+        if invZone
+            push!(zones,ZoneInfoDesc(string(i),string(i),string(i),2))
+            invZone = false
+        elseif giveNothing
+            push!(zones,ZoneInfoDesc(string(i),"","",2))
+            giveNothing = false
+        else
+            push!(zones,ZoneInfoDesc(string(i),string(i+1),string(i+2),2))
         end
-        push!(shuttles,ShuttleInfoDesc("$i",i,i+1))
     end
-    return ShuttleDesc(shuttles)
+    return zones
 end
 
 """ 
 Creates a struct QCCDevDescription based in the file topology.json
 """
 function giveQccDes()::QCCDevDescription
-    adjacency:: AdjacencyDesc = AdjacencyDesc(
-                    Dict(("4" => [1],"1" => [5],"5" => [2, 3],"2" => [4],"3" => [4]))
-    )
-    trap:: TrapDesc = TrapDesc(
-        3,
+    gateZone:: GateZoneDesc = GateZoneDesc(
         [ 
-            TrapInfoDesc( 1, "", "s1", true, true),
-            TrapInfoDesc( 2, "s3", "", false, true),
-            TrapInfoDesc( 3, "s6", "", true, false)
+            ZoneInfoDesc("1", "", "4", 2),
+            ZoneInfoDesc("2", "4", "5", 2),
+            ZoneInfoDesc( "3", "7", "8", 2)
+        ]
+    )
+    auxZone:: AuxZoneDesc = AuxZoneDesc(
+        [ 
+            ZoneInfoDesc( "4", "1", "2", 2),
+            ZoneInfoDesc( "5", "", "9", 2),
+            ZoneInfoDesc( "6", "9", "", 2),
+            ZoneInfoDesc( "7", "9", "3", 2)
         ]
     )
     junction:: JunctionDesc = JunctionDesc(
         [
-            JunctionInfoDesc( 4, "T"),
-            JunctionInfoDesc( 5, "T")
+            JunctionInfoDesc( "9", "T")
         ]
     )
-    shuttle:: ShuttleDesc = ShuttleDesc(
-        [
-            ShuttleInfoDesc( "s1", 1, 5),
-            ShuttleInfoDesc( "s2", 5, 2),
-            ShuttleInfoDesc( "s3", 2, 4),
-            ShuttleInfoDesc( "s4", 4, 1),
-            ShuttleInfoDesc( "s5", 5, 3),
-            ShuttleInfoDesc( "s6", 3, 4)
+    loadZone:: LoadZoneDesc = LoadZoneDesc(
+        [ 
+            LoadZoneInfoDesc( "8", "3", "")
         ]
     )
-    return  QCCDevDescription(adjacency,trap,junction,shuttle)
+    return  QCCDevDescription(gateZone,auxZone,junction,loadZone)
 end
 
 """
@@ -120,30 +122,44 @@ function giveShuttlesAdjacency(;faultyEnd0 = false,faultyEnd1 = false)::
     end
     return adj, shuttles
 end
+
+
+
 """
-Creates a struct TrapDesc with repeated Ids
+Creates a struct GateZoneDesc with repeated Ids
 """
-function giveTrapDescRepeatedId()::TrapDesc
-    return TrapDesc(
-        3,
+function giveGateZoneDescRepeatedId()::GateZoneDesc
+    return GateZoneDesc(
         [ 
-            TrapInfoDesc( 1, "", "s1", false, true),
-            TrapInfoDesc( 2, "s3", "", true, true),
-            TrapInfoDesc( 1, "s6", "", true, true)
+            ZoneInfoDesc( "1", "", "4", 2),
+            ZoneInfoDesc( "2", "4", "5", 2),
+            ZoneInfoDesc( "1", "7", "8", 2)
         ]
     )
 end
 
 """
-Creates a struct TrapDesc with inexistent shuttle
+Creates a struct LoadZoneDesc with repeated Ids
 """
-function giveTrapDescNonShuttleId()::TrapDesc
-    return TrapDesc(
-        3,
+function giveLoadZoneDescRepeatedId()::LoadZoneDesc
+    return LoadZoneDesc(
         [ 
-            TrapInfoDesc( 1, "", "s1", false, true),
-            TrapInfoDesc( 2, "s100", "", true, true),
-            TrapInfoDesc( 3, "s6", "", true, true)
+            LoadZoneInfoDesc( "1", "", "4"),
+            LoadZoneInfoDesc( "2", "4", "5"),
+            LoadZoneInfoDesc( "1", "7", "8")
+        ]
+    )
+end
+
+"""
+Creates a struct GateZoneDesc with inexistent connection
+"""
+function giveGateZoneDescNoConnection()::GateZoneDesc
+    return GateZoneDesc(
+        [ 
+            ZoneInfoDesc( "1", "", "4", 2),
+            ZoneInfoDesc( "2", "9999999999", "5", 2),
+            ZoneInfoDesc( "3", "7", "8", 2)
         ]
     )
 end
@@ -151,13 +167,12 @@ end
 """
 Creates a struct TrapDesc with wrong connected shuttle
 """
-function giveTrapDescWrongConnectedShuttle()::TrapDesc
-    return TrapDesc(
-        3,
+function giveGateZoneDescWrongConnectedShuttle()::GateZoneDesc
+    return GateZoneDesc(
         [ 
-            TrapInfoDesc( 1, "s5", "s1", false, true),
-            TrapInfoDesc( 2, "s3", "", true, true),
-            TrapInfoDesc( 3, "s6", "", true, true)
+            ZoneInfoDesc( "1", "", "4", 2),
+            ZoneInfoDesc( "2", "7", "5", 2),
+            ZoneInfoDesc( "3", "7", "8", 2)
         ]
     )
 end
@@ -168,25 +183,36 @@ Creates a struct QCCDevCtrl based in the file giveQccDes()
 """
 function giveQccCtrl()::QCCDevCtrl
     qccd::QCCDevDescription = giveQccDes()
-    traps = Dict{Symbol,Trap}()
-    map(tr -> traps[Symbol(tr.id)] = Trap(Symbol(tr.id), qccd.trap.capacity,
-                              TrapEnd(Symbol(tr.end0)), TrapEnd(Symbol(tr.end1))
-                              , tr.gate, tr.loading_zone), qccd.trap.traps)
-    shuttles = Dict{Symbol,Shuttle}()
-    map(sh -> shuttles[Symbol(sh.id)] = Shuttle(Symbol(sh.id), Symbol(sh.end0), Symbol(sh.end1)),
-              qccd.shuttle.shuttles)
+    gateZones = Dict{Symbol,GateZone}()
+    endId = id -> id == "" ? nothing : Symbol(id)
+    map(tr -> gateZones[Symbol(tr.id)] = GateZone(Symbol(tr.id), tr.capacity,
+                                endId(tr.end0), endId(tr.end1)), qccd.gateZone.gateZones)
+    auxZones = Dict{Symbol,AuxZone}()
+    map(sh -> auxZones[Symbol(sh.id)] = AuxZone(Symbol(sh.id), sh.capacity,
+                                                endId(sh.end0), endId(sh.end1)),
+              qccd.auxZone.auxZones)
+
+    loadZones = Dict{Symbol, LoadingZone}()
+
+    endId = id -> id == "" ? nothing : Symbol(id)
+    map(aux -> haskey(loadZones, Symbol(aux.id)) ? throw(err(aux.id)) :
+               loadZones[Symbol(aux.id)] = LoadingZone(Symbol(aux.id),
+               endId(aux.end0), endId(aux.end1)),
+               qccd.loadZone.loadZones)
+    
+    aux = (zone,id) -> !isnothing(zone) ? filter(x -> x.end0 == id || x.end1 == id, zone) : []
     junctions = Dict{Symbol,Junction}()
     for j ∈ qccd.junction.junctions
-        connectedShuttles = filter(x -> x.end0 == j.id || x.end1 == j.id, qccd.shuttle.shuttles)
-        junctionEnds = Dict(Symbol(s.id) => JunctionEnd() for s ∈ connectedShuttles)
-        junctions[Symbol(j.id)] = Junction(Symbol(j.id), Symbol(j.type), junctionEnds)
+        connectedGateZones = aux(qccd.gateZone.gateZones,j.id)
+        connectedAuxZones = aux(qccd.auxZone.auxZones,j.id)
+        connectedLoadZones = aux(qccd.loadZone.loadZones,j.id)
+        ends = Symbol[]
+        map(x -> push!(ends,Symbol(x.id)), connectedGateZones)
+        map(x -> push!(ends,Symbol(x.id)), connectedAuxZones)
+        map(x -> push!(ends,Symbol(x.id)), connectedLoadZones)
+        tmpId = j.id == "" ? nothing : Symbol(j.id)
+        junctions[tmpId] = Junction(tmpId, Symbol(j.type), ends)
     end
-    nodesAdjacency::Dict{String,Array{Int64}} = qccd.adjacency.nodes
-    graph::SimpleGraph{Int64} = SimpleGraph(length(nodesAdjacency))
-    for nodes in keys(nodesAdjacency) 
-        for node in nodesAdjacency[nodes]
-            add_edge!(graph, parse(Int64, nodes), node)
-        end
-    end
-    return QCCDevCtrl(qccd,:No,false,0,traps,junctions,shuttles, graph)
-end
+
+    return QCCDevCtrl(qccd,:No,false,0,gateZones,junctions,auxZones,loadZones)
+end 

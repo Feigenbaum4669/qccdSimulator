@@ -50,10 +50,12 @@ struct QCCDevCtrl
     t_now          ::Time_t
 # Descomment when load() function is done
 #    qubits      ::Dict{Int,Qubit}
-    traps          ::Dict{Symbol,Trap}
+    gateZones      ::Dict{Symbol,GateZone}
     junctions      ::Dict{Symbol,Junction}
-    shuttles       ::Dict{Symbol,Shuttle}
-    graph          ::SimpleGraph{Int64}
+    auxZones       ::Dict{Symbol,AuxZone}
+    loadingZones   ::Dict{Symbol,LoadingZone}
+
+    # graph          ::SimpleGraph{Int64}
 
     # Rest of struct contains description of current status of qdev
     # and its ions, such as the list of operations that are ongoing
@@ -101,20 +103,22 @@ function QCCDevCtrl(qdd             ::QCCDevDescription
 
     dev   = qdd
     t_now = 0
-    # Initializes devices componentes
-    junctions = _initJunctions(qdd.shuttle.shuttles, qdd.junction.junctions)
-    shuttles = _initShuttles(qdd.shuttle)
-    traps = _initTraps(qdd.trap)
-    graph = initGraph(qdd)
+    # Initializes devices components
+    gateZones = _initGateZone(qdd.gateZone)
+    junctions = _initJunctions(qdd.gateZone.gateZones, qdd.auxZone.auxZones, qdd.loadZone.loadZones, qdd.junction.junctions)
+    auxZones = _initAuxZones(qdd.auxZone)
+    loadingZones = _initLoadingZones(qdd.loadZone)
+
+    # graph = initGraph(qdd)
 
     # Check errors
-    _checkInitErrors(qdd.adjacency.nodes, traps, shuttles)
+    _checkInitErrors(junctions, auxZones, gateZones, loadingZones)
 
     # Initalizate QCCDevCtrl
     return QCCDevCtrl(qdd,
                       simulate, qnoise_estimate,
                       t_now,
-                      traps,junctions,shuttles, graph)
+                      gateZones,junctions,auxZones, loadingZones)
 end #^ QCCDevCtrl()
 
 ####################################################################################################
