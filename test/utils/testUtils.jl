@@ -123,6 +123,8 @@ function giveShuttlesAdjacency(;faultyEnd0 = false,faultyEnd1 = false)::
     return adj, shuttles
 end
 
+
+
 """
 Creates a struct GateZoneDesc with repeated Ids
 """
