@@ -1,7 +1,9 @@
 module QCCDevControl_Types
 export GateZone, Junction, AuxZone, Qubit, LoadingZone, QubitStatus, typesSizes, JunctionType
+export Time_t, QCCDevControl
 
 using LightGraphs
+using ..QCCDevDes_Types
 
 # Possible Qubits Status
 const QubitStatus = Set([:inLoadingZone, :inGateZone])
@@ -9,6 +11,14 @@ const QubitStatus = Set([:inLoadingZone, :inGateZone])
 # Supported junction types with corresponding sizes
 const JunctionType = Set([:T, :Y, :X ])
 const typesSizes = Dict(:T => 3, :Y => 3, :X => 4)
+
+
+"""
+Type for time inside the qdev, in [change if necessary]   10^{-10}
+seconds, i.e., ns/10.  All times are ≥0; negative value of expressions
+of this type are errors (and may carry local error information).
+"""
+const Time_t = Int64
 
 """
 Struct for junction.
@@ -106,6 +116,43 @@ struct GateZone
     GateZone(id, capacity, end0, end1) = end0 == end1 && (!isnothing(end0) || !isnothing(end1)) ? 
     throw(ArgumentError("In gate zone $id : \"end0\" and \"end1\" must be different")) : 
     new(id, capacity, end0, end1, [[]])
+end
+
+"""
+Type for time inside the qdev, in [change if necessary]   10^{-10}
+seconds, i.e., ns/10.  All times are ≥0; negative value of expressions
+of this type are errors (and may carry local error information).
+"""
+const Time_t = Int64
+
+mutable struct QCCDevControl
+    dev            ::QCCDevDescription
+
+    simulate       ::Symbol                   # one of `:No`, `:PureStates`, `:MixedStates`
+    qnoise_esimate ::Bool                     # whether estimation of noise takes place
+
+    t_now          ::Time_t
+# Descomment when load() function is done
+#    qubits      ::Dict{Int,Qubit}
+    gateZones      ::Dict{Symbol,GateZone}
+    junctions      ::Dict{Symbol,Junction}
+    auxZones       ::Dict{Symbol,AuxZone}
+    loadingZones   ::Dict{Symbol,LoadingZone}
+
+    # graph          ::SimpleGraph{Int64}
+
+    QCCDevControl(dev, simulate, qnoise_estimate,
+            gateZones, junctions, auxZones, loadingZones) = 
+            new(dev, simulate, qnoise_estimate, 0,
+                gateZones, junctions, auxZones, loadingZones)
+
+    """"
+    Use this when initQubits
+    QCCDevControl(dev, simulate, qnoise_estimate,
+    gateZones, junctions, auxZones, loadingZones) = 
+            new(dev, simulate, qnoise_estimate, 0,
+                Dict{String,Qubit}(), gateZones, junctions, auxZones, loadingZones)
+    """
 end
 
 end
