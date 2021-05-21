@@ -420,8 +420,6 @@ function checkInitErrorsTestEdgeCases()
     end
     _qdd = deepcopy(qdd)
 
-
-
     # Randomly pick gate zones (by keys) and change their end0 or end1 to be nonsense.
     # This should throw error too.
     for k ∈ rand(keys(_qdd.gateZones), min(length(keys(_qdd.gateZones)), rand(1:10)))

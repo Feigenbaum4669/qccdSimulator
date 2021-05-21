@@ -30,4 +30,5 @@ end
     @test initLoadingZoneTest()
     @test_throws ArgumentError("Repeated loading zone with ID: 1") initLoadingZoneRepeatedIdTest()
     @test checkInitErrorsTest()
+    @test checkInitErrorsTestEdgeCases()
 end

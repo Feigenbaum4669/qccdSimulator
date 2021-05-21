@@ -88,6 +88,7 @@ function _initGateZone(gateZoneDesc::GateZoneDesc)::Dict{Symbol,GateZone}
 end
 
 """
+Tests that the user input topology makes sense.
 Throws error when:
     - Zones are wrong connected
     - Zones don't exist
@@ -110,7 +111,7 @@ function __auxCheck(end0::Union{Symbol, Nothing}, end1::Union{Symbol, Nothing},
                     zone1::Dict{Symbol,T}, zone2::Dict{Symbol,N},
                      zone3::Dict{Symbol,Z}, id::Symbol) where {T, N, Z}
 
-    isWrong = (zone1,zone2,zone3,id) -> id != nothing &&
+    isWrong = (zone1,zone2,zone3,id) -> !isnothing(id) &&
                            !(haskey(zone1,id) || haskey(zone2,id) || haskey(zone3,id))
     
     if isnothing(end0) && isnothing(end1)
