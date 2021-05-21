@@ -110,7 +110,7 @@ function load(qdc           ::QCCDevControl,
   isallowed_load(qdc, loading_zone, t)
   # Create new qubit
   local qubit = initQubit(loading_zone)
-  qdc.qubits[qubit.id] = qubit
+  qdc.qubits[qubit.id] = deepcopy(qubit)
   qdc.loadingZones[loading_zone].hole = qubit.id
   # Compute time
   local t₀ = t + OperationTimes[:load]

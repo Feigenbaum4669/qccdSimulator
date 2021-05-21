@@ -505,6 +505,9 @@ function loadOKTest()
     tmp = qccdSimulator.QCCDDevControl.load(qccd,2,Symbol(8))
     @assert tmp.new_ion_idx == qccdSimulator.QCCDDevControl.NIONS
     @assert tmp.t₀ == 7
+    @assert haskey(qccd.qubits, tmp.new_ion_idx)
+    @assert qccd.qubits[tmp.new_ion_idx].position == Symbol(8)
+    @assert qccd.qubits[tmp.new_ion_idx].destination == nothing
     return true
 end
 # ========= END load functiong test =========
