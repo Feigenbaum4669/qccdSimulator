@@ -1,7 +1,7 @@
 using qccdSimulator.QCCDevControl_Types
 using qccdSimulator.QCCDevDes_Types
 using Random
-using qccdSimulator.QCCDevControl
+using qccdSimulator.QCCDDevControl
 
 """
 Generates n junctions connected to ZoneInfoDesc (auxZones or gateZones).
@@ -179,9 +179,9 @@ end
 
 
 """
-Creates a struct QCCDevCtrl based in the file giveQccDes()
+Creates a struct QCCDevControl based in the file giveQccDes()
 """
-function giveQccCtrl()::QCCDevCtrl
+function giveQccCtrl()::QCCDevControl
     qccd::QCCDevDescription = giveQccDes()
     gateZones = Dict{Symbol,GateZone}()
     endId = id -> id == "" ? nothing : Symbol(id)
@@ -214,5 +214,5 @@ function giveQccCtrl()::QCCDevCtrl
         junctions[tmpId] = Junction(tmpId, Symbol(j.type), ends)
     end
 
-    return QCCDevCtrl(qccd,:No,false,0,gateZones,junctions,auxZones,loadZones)
-end 
+    return QCCDevControl(qccd,:No,false,gateZones,junctions,auxZones,loadZones)
+end
