@@ -462,6 +462,12 @@ end
 
 # ========= END functions check tests =========
 
+# ========= _time_check functiong test =========
+time_check_timeFailsTest() = qccdSimulator.QCCDev_Feasible._time_check( 10, 9, :load)
+time_check_modelFailsTest() = qccdSimulator.QCCDev_Feasible._time_check( 10, 12, :test)
+time_checkOKTest() = qccdSimulator.QCCDev_Feasible._time_check( 10, 12, :load)
+# ========= _time_check functiong test =========
+
 # ========= load functiong test =========
 function initQubitTest()
     for i in 1:25
@@ -473,12 +479,6 @@ function initQubitTest()
         @assert qubit1.destination == qubit2.destination == nothing
     end
     return true
-end
-
-function isallowedLoad_timeFailsTest()
-    qccd = giveQccCtrl()
-    qccd.t_now = 10
-    isallowed_load(qccd, :test, 3)
 end
 
 function isallowedLoad_zoneNotExistTest()

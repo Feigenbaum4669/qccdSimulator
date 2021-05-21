@@ -33,12 +33,20 @@ end
     @test checkInitErrorsTestEdgeCases()
 end
 
+@testset "Time check" begin
+    @test_throws OperationNotAllowedException("Time must be higher than " *
+                        "10") time_check_timeFailsTest()
+    @test_throws OperationNotAllowedException("Time model for test not " *
+                        "defined.") time_check_modelFailsTest()
+    @test time_checkOKTest()
+end
+
 # TODO: TIMES!
 @testset "Load ions `load()` and `isallowed_load()`" begin
     @test initQubitTest()
-    # Check time is okay
-    @test_throws OperationNotAllowedException("Time must be higher than " *
-                                                     "10") isallowedLoad_timeFailsTest()
+    #Time Ok
+    #@test isallowedLoad_OK()
+    #
 
     @test_throws OperationNotAllowedException("Loading zone with id test doesn't" *
                                     " exist.") isallowedLoad_zoneNotExistTest()
