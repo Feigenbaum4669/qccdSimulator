@@ -474,5 +474,47 @@ function checkInitErrorsTestEdgeCases()
     end
     return true
 end
+# ========= END Init functions check tests =========
 
-# ========= END functions check tests =========
+
+# ========= linear_transport tests =========
+function linearTransportTest()
+    
+end
+# ========= END linear_transport tests =========
+
+# ========= isallowed functions tests =========
+function isallowedLinearTransportTest()
+    
+end
+
+# ========= END isallowed functions tests =========
+
+
+# ========= utils functions tests =========
+function giveZoneTest()
+    qdd::QCCDevControl = giveQccCtrl()
+    
+    zone = giveZone(qdd, :nonsense)
+    @assert isnothing(zone)
+
+    k = rand(keys(qdd.gateZones))
+    zone = giveZone(qdd, k)
+    @assert zone === qdd.gateZones[k]
+
+    k = rand(keys(qdd.junctions))
+    zone = giveZone(qdd, k)
+    @assert zone === qdd.junctions[k]
+
+    k = rand(keys(qdd.auxZones))
+    zone = giveZone(qdd, k)
+    @assert zone === qdd.auxZones[k]
+
+    k = rand(keys(qdd.loadingZones))
+    zone = giveZone(qdd, k)
+    @assert zone === qdd.loadingZones[k]
+
+    return true
+end
+
+# ========= END utils functions tests =========
