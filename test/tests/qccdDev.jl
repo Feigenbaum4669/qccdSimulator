@@ -493,4 +493,18 @@ function isallowedLoad_loadingHoleBusyTest()
     isallowed_load(qccd,Symbol(8),4)
     return true
 end
+
+function isallowedLoad_OK()
+    qccd = giveQccCtrl()
+    isallowed_load(qccd,Symbol(8),4)
+    return true
+end
+
+function loadOKTest()
+    qccd = giveQccCtrl()
+    tmp = qccdSimulator.QCCDDevControl.load(qccd,2,Symbol(8))
+    @assert tmp.new_ion_idx == qccdSimulator.QCCDDevControl.NIONS
+    @assert tmp.t₀ == 7
+    return true
+end
 # ========= END load functiong test =========

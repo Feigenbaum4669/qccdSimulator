@@ -42,15 +42,12 @@ end
 end
 
 # TODO: TIMES!
-@testset "Load ions `load()` and `isallowed_load()`" begin
+@testset "Load ions `load()` & `isallowed_load()` & `initQubit()`" begin
     @test initQubitTest()
-    #Time Ok
-    #@test isallowedLoad_OK()
-    #
-
+    @test isallowedLoad_OK()
     @test_throws OperationNotAllowedException("Loading zone with id test doesn't" *
                                     " exist.") isallowedLoad_zoneNotExistTest()
     @test_throws OperationNotAllowedException("Loading hole is " *
                                               "busy.") isallowedLoad_loadingHoleBusyTest()
-    # AddQubit works
+    @test loadOKTest()
 end 

@@ -111,9 +111,9 @@ function load(qdc           ::QCCDevControl,
   # Create new qubit
   local qubit = initQubit(loading_zone)
   qdc.qubits[qubit.id] = qubit
-  qccd.loadingZones[loading_zone].hole = qubit.id
+  qdc.loadingZones[loading_zone].hole = qubit.id
   # Compute time
-  local t₀ = t + OperationTime[:load]
+  local t₀ = t + OperationTimes[:load]
   t₀ > t  || throw(Error("Error while computing time"))
   qdc.t_now = t₀
 
