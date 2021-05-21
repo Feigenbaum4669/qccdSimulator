@@ -123,6 +123,8 @@ function giveShuttlesAdjacency(;faultyEnd0 = false,faultyEnd1 = false)::
     return adj, shuttles
 end
 
+
+
 """
 Creates a struct GateZoneDesc with repeated Ids
 """
@@ -213,4 +215,4 @@ function giveQccCtrl()::QCCDevCtrl
     end
 
     return QCCDevCtrl(qccd,:No,false,0,gateZones,junctions,auxZones,loadZones)
-end
+end 
