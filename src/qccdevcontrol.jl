@@ -147,37 +147,10 @@ Function `linear_transport()` — moves ions between zones/junctions.
 The function returns the time at which the operation will be completed.
 """
 
-function isallowed_linear_transport()
-
-  # _time_check()
-
-  symbol = :linear_transport
-
-  if symbol ∉ keys(OperationTimes)
-    throw(OperationNotAllowedException("Time model for loading hole transport not defined"))
-  end
-
-  if ion_idx ∉ keys(qdc.qubits)
-    throw(OperationNotAllowedException("Ion with ID $ion_idx is not in device"))
-  end
-
-  if destination_idx ∉ keys(qdc.gateZones) && destination_idx ∉ keys(qdc.junctions) &&
-    destination_idx ∉ keys(qdc.auxZones) && destination_idx ∉ keys(qdc.loadingZones)
-    throw(OperationNotAllowedException("Zone with ID $destination_idx is not in device"))
-  end
-
-  currentPosition = qdc.qubits[ion_idx].position
-  
-
-
-
-
-end
-
 function linear_transport(qdc           :: QCCDevControl,
                           t             :: Time_t,
                           ion_idx       :: Int,
-                          destination_idx      :: Int       ) ::Time_t
+                          destination_idx      :: Symbol) ::Time_t
     
 end
 
