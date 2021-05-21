@@ -7,6 +7,7 @@ module QCCDev_Feasible
 export load_checks, OperationNotAllowedException, isallowed_load
 
 using ..QCCDevControl_Types
+using ..QCCDevDes_Types
 
 """
 Default error message for QCCD operations.
@@ -28,9 +29,9 @@ Function `time_check()` — checks if given time is correct
 
 The function throws an error if time is not correct.
 """
-_time_check(t_qdc:: Time_t, t::Time_t) = 
+_time_check(t_qdc:: Time_t, t::Time_t, id::Symbol) = 
   0 ≤ t_qdc ≤ t  || opError("Time must be higher than $t_qdc")
-
+  haskey(OperationTime, id) || opError("Time model for $id not defined")
 """
 Function `isallowed_load()` — checks if load operation is posisble
 

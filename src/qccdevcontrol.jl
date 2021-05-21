@@ -105,12 +105,13 @@ The function returns a named tuple consisting of:
 function load(qdc           ::QCCDevControl,
               t             ::Time_t,
               loading_zone  ::Symbol       )  ::@NamedTuple{new_ion_idx::Int,t₀::Time_t}
-
+  # Checks
   isallowed_load(qdc, loading_zone, t)
-
-  qubit = initQubit(loading_zone)
+  # Create new qubit
+  local qubit = initQubit(loading_zone)
   qdc.qubits[qubit.id] = qubit
   qccd.loadingZones[loading_zone].hole = qubit.id
+  # Compute time
   # TODO: TIMES!!!
   # local t₀ =
   #     compute_end_time() ::Time_t            # todo
