@@ -30,11 +30,10 @@ Function `time_check()` — checks if given time is correct
 
 The function throws an error if time is not correct.
 """
-function _time_check(t_qdc:: Time_t, t::Time_t, id::Symbol)
+function _time_check(t_qdc:: Time_t, t::Time_t, id::Symbol) 
   0 ≤ t_qdc ≤ t  || opError("Time must be higher than $t_qdc")
-  haskey(OperationTimes, id) || opError("Time model for $id not defined")
+  haskey(OperationTimes, id) || opError("Time model for $id not defined.")
 end
-
 
 """
 Function `isallowed_load()` — checks if load operation is posisble
@@ -51,10 +50,9 @@ Function `isallowed_load()` — checks if load operation is posisble
 * Check hole is avialable — Checl loading hole is not busy.
 """
 function isallowed_load(qdc::QCCDevControl, loading_zone::Symbol, t::Time_t)
-    _time_check(qdc.t_now, t)
-    length(qdc.qubits) < qdc.max_capacity || opError("Device's maximum capacity ($(qdc.max_capacity)) already achieved.")
-    haskey(qdc.traps, loading_zone) || opError("Trap with given id $loading_zone doesn't exist.")
-    qdc.traps[loading_zone].getIonInLoadingHole() && opError("Loading hole is busy.")
+    _time_check(qdc.t_now, t, :load)
+    haskey(qdc.loadingZones, loading_zone) || opError("Loading zone with id $loading_zone doesn't exist.")
+    qdc.loadingZones[loading_zone].hole != nothing && opError("Loading hole is busy.")
 end
 
 """

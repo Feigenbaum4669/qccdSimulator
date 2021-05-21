@@ -32,11 +32,31 @@ end
     @test checkInitErrorsTest()
     @test checkInitErrorsTestEdgeCases()
 end
-@testset "Isallowed functions" begin
-    @test isallowedLinearTransportTestTime()
-    @test isallowedLinearTransportTest()
+
+@testset "CAMBIA EL NOMBRE ALEJANDRO" begin
+    #@test isallowedLinearTransportTestTime()
+    #@test isallowedLinearTransportTest()
 end
 
 @testset "Util functions" begin
     @test giveZoneTest() 
 end
+
+@testset "Time check" begin
+    @test_throws OperationNotAllowedException("Time must be higher than " *
+                        "10") time_check_timeFailsTest()
+    @test_throws OperationNotAllowedException("Time model for test not " *
+                        "defined.") time_check_modelFailsTest()
+    @test time_checkOKTest()
+end
+
+# TODO: TIMES!
+@testset "Load ions `load()` & `isallowed_load()` & `initQubit()`" begin
+    @test initQubitTest()
+    @test isallowedLoad_OK()
+    @test_throws OperationNotAllowedException("Loading zone with id test doesn't" *
+                                    " exist.") isallowedLoad_zoneNotExistTest()
+    @test_throws OperationNotAllowedException("Loading hole is " *
+                                              "busy.") isallowedLoad_loadingHoleBusyTest()
+    @test loadOKTest()
+end 
