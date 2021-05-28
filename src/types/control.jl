@@ -6,7 +6,7 @@ using LightGraphs
 using ..QCCDevDes_Types
 
 #Types of zones
-const zones = Set([:junction,:loadingZone, :auxZone, :gateZone])
+const zoneTypes = Set([:junction,:loadingZone, :auxZone, :gateZone])
 
 # Possible Qubits Status
 const QubitStatus = Set([:inLoadingZone, :inGateZone])
