@@ -5,6 +5,9 @@ export Time_t, QCCDevControl
 using LightGraphs
 using ..QCCDevDes_Types
 
+#Types of zones
+const zones = Set([:junction,:loadingZone, :auxZone, :gateZone])
+
 # Possible Qubits Status
 const QubitStatus = Set([:inLoadingZone, :inGateZone])
 
@@ -30,6 +33,7 @@ Throws ArgumentError if junction type doesn't match with number of ends.
 struct Junction
     id::Symbol 
     type::Symbol
+    zoneType::Symbol
     ends::Array{Symbol}
     function Junction(id::Symbol, type::Symbol, ends::Array{Symbol})
         type in JunctionType || throw(ArgumentError("Junction type $type not supported"))
@@ -37,7 +41,7 @@ struct Junction
             throw(ArgumentError("Junction with ID $id of type $type has $(length(ends)) ends." *
             " It should have $(typesSizes[type]) ends."))
         end
-        return new(id, type, ends)
+        return new(id, type, :junction, ends)
     end
 end
 
@@ -69,12 +73,13 @@ end0 & end1: Trap endings
 """
 mutable struct LoadingZone
     id::Symbol
+    zoneType::Symbol
     end0::Union{Symbol, Nothing}
     end1::Union{Symbol, Nothing}
     hole::Union{Int, Nothing}
     LoadingZone(id, end0, end1) = end0 == end1 && (!isnothing(end0) || !isnothing(end1)) ? 
     throw(ArgumentError("In loading zone $id : \"end0\" and \"end1\" must be different")) : 
-    new(id, end0, end1, nothing)
+    new(id, :loadingZone, end0, end1, nothing)
 end
 
 """  
@@ -86,13 +91,14 @@ end0 & end1: Trap endings
 """
 struct AuxZone
     id::Symbol
+    zoneType::Symbol
     capacity::Int64 
     end0::Union{Symbol, Nothing}
     end1::Union{Symbol, Nothing}
     chain::Array{Array{Int64,1},1}
     AuxZone(id, capacity, end0, end1) = end0 == end1 && (!isnothing(end0) || !isnothing(end1)) ? 
     throw(ArgumentError("In aux zone $id : \"end0\" and \"end1\" must be different")) : 
-    new(id, capacity, end0, end1, [[]])
+    new(id, :auxZone, capacity, end0, end1, [[]])
 end
 
 
@@ -105,13 +111,14 @@ end0 & end1: Trap endings
 """
 struct GateZone
     id::Symbol
+    zoneType::Symbol
     capacity::Int64 
     end0::Union{Symbol, Nothing}
     end1::Union{Symbol, Nothing}
     chain::Array{Array{Int64,1},1}
     GateZone(id, capacity, end0, end1) = end0 == end1 && (!isnothing(end0) || !isnothing(end1)) ? 
     throw(ArgumentError("In gate zone $id : \"end0\" and \"end1\" must be different")) : 
-    new(id, capacity, end0, end1, [[]])
+    new(id, :gateZone, capacity, end0, end1, [[]])
 end
 
 """
