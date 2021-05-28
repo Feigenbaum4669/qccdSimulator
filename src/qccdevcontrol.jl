@@ -179,6 +179,11 @@ function swap(qdc           :: QCCDevControl,
               t             :: Time_t,
               ion1_idx      :: Int,
               ion2_idx      :: Int       ) ::Time_t
+  # Checks
+  isallowed_load(qdc, ion1_idx, ion2_idx, t)
+  # Swap qubits
+  # Waiting for Alex's code ... -> zone
+  
     
 end
 
