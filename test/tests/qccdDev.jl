@@ -281,7 +281,7 @@ function initGateZoneTest()
         @assert length(aux) == 1
         aux = aux[1]
         @assert aux.capacity == value.capacity
-        @assert length(value.chain) == 1 && isempty(value.chain[1]) 
+        @assert isempty(value.chain) 
         tmp = aux.end0 == "" ? nothing : Symbol(aux.end0)
         @assert tmp == value.end0
         tmp = aux.end1 == "" ? nothing : Symbol(aux.end1)
@@ -538,9 +538,10 @@ function isallowedLinearTransportTestFull()
     qdd.loadingZones[Symbol(8)].hole = 1
 
     # "Fill up" destination
-    capacity = qdd.gateZones[dest].capacity
+    halvedCapacity = floor(Int64, qdd.gateZones[dest].capacity / 2)
         # Multiple chains to check if reduce works
-    qdd.gateZones[dest].chain = [rand(Int, capacity/2), rand(Int, capacity/2)]
+    push!(qdd.gateZones[dest].chain,
+        rand(Int64, halvedCapacity), rand(Int64, halvedCapacity))
 
     try
         isallowed_linear_transport(qdd, qdd.t_now+1, 1, dest) 
@@ -557,7 +558,10 @@ function isallowedLinearTransportTestBlockedEnd0()
     # "Load" ion
     qdd::QCCDevControl = giveQccCtrl(;alternateDesc=true)
     qdd.qubits[1] = Qubit(1,origin)
-    qdd.gateZones[origin].chain = [rand(2:100, capacity/2), [1], rand(2:100, capacity/2-1)]
+    halvedCapacity = floor(Int64, qdd.gateZones[origin].capacity / 2)
+    push!(qdd.gateZones[origin].chain, rand(2:100, halvedCapacity), [1])
+    halvedCapacity -= 1
+    push!(qdd.gateZones[origin].chain, rand(2:100, halvedCapacity))
 
     try
         isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(7)) 
@@ -574,7 +578,10 @@ function isallowedLinearTransportTestBlockedEnd1()
     # "Load" ion
     qdd::QCCDevControl = giveQccCtrl(;alternateDesc=true)
     qdd.qubits[1] = Qubit(1,origin)
-    qdd.gateZones[origin].chain = [rand(2:100, capacity/2), [1], rand(2:100, capacity/2-1)]
+    halvedCapacity = floor(Int64, qdd.gateZones[origin].capacity / 2)
+    push!(qdd.gateZones[origin].chain, rand(2:100, halvedCapacity), [1])
+    halvedCapacity -= 1
+    push!(qdd.gateZones[origin].chain, rand(2:100, halvedCapacity))
 
     try
         isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(8)) 
@@ -591,7 +598,10 @@ function isallowedLinearTransportTestNotBlockedEnd0()
     # "Load" ion
     qdd::QCCDevControl = giveQccCtrl(;alternateDesc=true)
     qdd.qubits[1] = Qubit(1,origin)
-    qdd.gateZones[origin].chain = [[1],rand(2:100, capacity/2), rand(2:100, capacity/2-1)]
+    halvedCapacity = floor(Int64, qdd.gateZones[origin].capacity / 2)
+    push!(qdd.gateZones[origin].chain,[1], rand(2:100, halvedCapacity))
+    halvedCapacity -= 1
+    push!(qdd.gateZones[origin].chain, rand(2:100, halvedCapacity))
     isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(7)) 
     return true
 end
@@ -602,7 +612,10 @@ function isallowedLinearTransportTestNotBlockedEnd1()
     # "Load" ion
     qdd::QCCDevControl = giveQccCtrl(;alternateDesc=true)
     qdd.qubits[1] = Qubit(1,origin)
-    qdd.gateZones[origin].chain = [rand(2:100, capacity/2), rand(2:100, capacity/2-1), [1]]
+    halvedCapacity = floor(Int64, qdd.gateZones[origin].capacity / 2)
+    push!(qdd.gateZones[origin].chain, rand(2:100, halvedCapacity))
+    halvedCapacity -= 1
+    push!(qdd.gateZones[origin].chain, rand(2:100, halvedCapacity), [1])
     isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(8))
     return true
 end

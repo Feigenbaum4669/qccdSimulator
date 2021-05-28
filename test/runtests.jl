@@ -39,11 +39,11 @@ end
     @test isallowedLinearTransportTestNoZone()
     @test isallowedLinearTransportTestNonAdjacent()
     @test isallowedLinearTransportTestAllGood()
-    #@test isallowedLinearTransportTestFull()
-    #@test isallowedLinearTransportTestBlockedEnd0()
-    #@test isallowedLinearTransportTestBlockedEnd1()
-    #@test isallowedLinearTransportTestNotBlockedEnd0()
-    #@test isallowedLinearTransportTestNotBlockedEnd1()
+    @test isallowedLinearTransportTestFull()
+    @test isallowedLinearTransportTestBlockedEnd0()
+    @test isallowedLinearTransportTestBlockedEnd1()
+    @test isallowedLinearTransportTestNotBlockedEnd0()
+    @test isallowedLinearTransportTestNotBlockedEnd1()
 end
 
 @testset "Utils" begin

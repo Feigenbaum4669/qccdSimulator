@@ -98,7 +98,7 @@ struct AuxZone
     chain::Array{Array{Int64,1},1}
     AuxZone(id, capacity, end0, end1) = end0 == end1 && (!isnothing(end0) || !isnothing(end1)) ? 
     throw(ArgumentError("In aux zone $id : \"end0\" and \"end1\" must be different")) : 
-    new(id, :auxZone, capacity, end0, end1, [[]])
+    new(id, :auxZone, capacity, end0, end1, [])
 end
 
 
@@ -118,7 +118,7 @@ struct GateZone
     chain::Array{Array{Int64,1},1}
     GateZone(id, capacity, end0, end1) = end0 == end1 && (!isnothing(end0) || !isnothing(end1)) ? 
     throw(ArgumentError("In gate zone $id : \"end0\" and \"end1\" must be different")) : 
-    new(id, :gateZone, capacity, end0, end1, [[]])
+    new(id, :gateZone, capacity, end0, end1, [])
 end
 
 mutable struct QCCDevControl

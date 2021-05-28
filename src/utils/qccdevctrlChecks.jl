@@ -111,7 +111,8 @@ function isallowed_linear_transport(qdc           :: QCCDevControl,
 
   destinationIsLoadingZone = destination.zoneType == :loadingZone
   if (destinationIsLoadingZone && !isnothing(destination.hole)) ||
-    (!destinationIsLoadingZone && sum(length, destination.chain) == destination.capacity)
+    (!destinationIsLoadingZone && !isempty(destination.chain) && 
+    sum(length, destination.chain) == destination.capacity)
     opError("Destination zone with ID $destination_idx cannot hold more ions.")
   end
 end
