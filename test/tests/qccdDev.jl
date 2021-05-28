@@ -493,11 +493,12 @@ end
 
 function isallowedLinearTransportTest2()
     qdd::QCCDevControl = giveQccCtrl()
-    #load(qdd,qdd8)
+    qdd.qubits[1] = Qubit(1,Symbol(8))
+    qdd.loadingZones[Symbol(8)].hole = 1
     try
-        isallowed_linear_transport(qdd, qdd.t_now+1, 1, :a) 
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(2)) 
     catch e
-        @assert startswith(e.msg,"Ion with ID 1 is not in device")
+        @assert startswith(e.msg,"Can't do linear transport to a non-adjacent zone.")
         return true
     end
     return false

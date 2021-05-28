@@ -33,16 +33,17 @@ end
     @test checkInitErrorsTestEdgeCases()
 end
 
-@testset "CAMBIA EL NOMBRE ALEJANDRO" begin
-    #@test isallowedLinearTransportTestTime()
-    #@test isallowedLinearTransportTest()
+@testset "Linear transport" begin
+    @test isallowedLinearTransportTestTime()
+    @test isallowedLinearTransportTest()
+    @test isallowedLinearTransportTest2()
 end
 
-@testset "Util functions" begin
+@testset "Utils" begin
     @test giveZoneTest() 
 end
 
-@testset "Time check" begin
+@testset "Time checks" begin
     @test_throws OperationNotAllowedException("Time must be higher than " *
                         "10") time_check_timeFailsTest()
     @test_throws OperationNotAllowedException("Time model for test not " *

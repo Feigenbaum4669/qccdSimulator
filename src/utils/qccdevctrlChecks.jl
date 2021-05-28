@@ -92,19 +92,24 @@ function isallowed_linear_transport(qdc           :: QCCDevControl,
     opError("Ion with ID $ion_idx is nowhere (?)")
   end
 
+  chain = nothing
   if currentPosition.end0 == destination
-    if first(currentPosition.chain) != [ion_idx]
-      opError("Ion $ion_idx can't leave the trap since it's not in the correct end position.")
-    end
+
+    chain = currentPosition.zoneType == :loadingZone ? 
+        currentPosition.hole : first(currentPosition.chain)
   elseif currentPosition.end1 == destination
-    if last(currentPosition.chain) != [ion_idx]
-      opError("Ion $ion_idx can't leave the trap since it's not in the correct end position.")
-    end
+
+    chain = currentPosition.zoneType == :loadingZone ? 
+      currentPosition.hole : last(currentPosition.chain)
   else
     opError("Can't do linear transport to a non-adjacent zone.")
   end
 
-  destinationIsLoadingZone = destination_idx ∈ keys(qdc.loadingZones)
+  if chain != ion_idx && chain != [ion_idx]
+    opError("Ion $ion_idx can't leave the trap since it's not in the correct end position.")
+  end
+
+  destinationIsLoadingZone = destination.zoneType == :loadingZone
   if (destinationIsLoadingZone && !isnothing(destination.hole)) ||
     (!destinationIsLoadingZone && sum(length, destination.chain) == destination.capacity)
     opError("Destination zone with ID $destination_idx cannot hold more ions.")
