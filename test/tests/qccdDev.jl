@@ -172,6 +172,7 @@ function initJunctionsTest()
         juncType = filter(x-> Symbol(x.id)==k,_junctions)[1].type #[1] : get first and only element
         juncType = Symbol(juncType)
         @assert junction.type == juncType
+        @assert junction.zoneType == :junction
         @assert length(junction.ends) == typesSizes[juncType]
         for zoneId in junction.ends
             zone = filter(x -> Symbol(x.id) == zoneId, zones)[1] #[1] : get first and only element
@@ -259,6 +260,7 @@ function initLoadingZoneTest()
         @assert tmp == value.end0
         tmp = aux.end1 == "" ? nothing : Symbol(aux.end1)
         @assert tmp == value.end1
+        @assert value.zoneType == :loadingZone
     end
     return true
 end
@@ -284,6 +286,7 @@ function initGateZoneTest()
         @assert tmp == value.end0
         tmp = aux.end1 == "" ? nothing : Symbol(aux.end1)
         @assert tmp == value.end1
+        @assert value.zoneType == :gateZone
     end
     return true
 end
@@ -347,6 +350,7 @@ function initAuxZonesTest()
         @assert _auxZone.end0 == string(auxZone.end0)
         @assert _auxZone.end1 == string(auxZone.end1)
         @assert _auxZone.capacity == auxZone.capacity
+        @assert auxZone.zoneType == :auxZone
     end
     return true
 end
