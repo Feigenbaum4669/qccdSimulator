@@ -35,8 +35,15 @@ end
 
 @testset "Linear transport" begin
     @test isallowedLinearTransportTestTime()
-    @test isallowedLinearTransportTest()
-    @test isallowedLinearTransportTest2()
+    @test isallowedLinearTransportTestNoIon()
+    @test isallowedLinearTransportTestNoZone()
+    @test isallowedLinearTransportTestNonAdjacent()
+    @test isallowedLinearTransportTestAllGood()
+    #@test isallowedLinearTransportTestFull()
+    #@test isallowedLinearTransportTestBlockedEnd0()
+    #@test isallowedLinearTransportTestBlockedEnd1()
+    #@test isallowedLinearTransportTestNotBlockedEnd0()
+    #@test isallowedLinearTransportTestNotBlockedEnd1()
 end
 
 @testset "Utils" begin

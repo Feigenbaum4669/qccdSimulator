@@ -480,7 +480,7 @@ function isallowedLinearTransportTestTime()
     return false
 end
 
-function isallowedLinearTransportTest()
+function isallowedLinearTransportTestNoIon()
     qdd::QCCDevControl = giveQccCtrl()
     try
         isallowed_linear_transport(qdd, qdd.t_now+1, 1, :a) 
@@ -491,7 +491,20 @@ function isallowedLinearTransportTest()
     return false
 end
 
-function isallowedLinearTransportTest2()
+function isallowedLinearTransportTestNoZone()
+    qdd::QCCDevControl = giveQccCtrl()
+    qdd.qubits[1] = Qubit(1,Symbol(8))
+    qdd.loadingZones[Symbol(8)].hole = 1
+    try
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, :nonsense) 
+    catch e
+        @assert startswith(e.msg,"Zone with ID nonsense is not in device")
+        return true
+    end
+    return false
+end
+
+function isallowedLinearTransportTestNonAdjacent()
     qdd::QCCDevControl = giveQccCtrl()
     qdd.qubits[1] = Qubit(1,Symbol(8))
     qdd.loadingZones[Symbol(8)].hole = 1
@@ -504,7 +517,91 @@ function isallowedLinearTransportTest2()
     return false
 end
 
+function isallowedLinearTransportTestAllGood()
+    qdd::QCCDevControl = giveQccCtrl()
+    qdd.qubits[1] = Qubit(1,Symbol(8))
+    qdd.loadingZones[Symbol(8)].hole = 1
+    isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(3)) 
+    return true
+end
 
+function isallowedLinearTransportTestFull()
+    dest = Symbol(3)
+        
+    # "Load" ion
+    qdd::QCCDevControl = giveQccCtrl(;alternateDesc=true)
+    qdd.qubits[1] = Qubit(1,Symbol(8))
+    qdd.loadingZones[Symbol(8)].hole = 1
+
+    # "Fill up" destination
+    capacity = qdd.gateZones[dest].capacity
+        # Multiple chains to check if reduce works
+    qdd.gateZones[dest].chain = [rand(Int, capacity/2), rand(Int, capacity/2)]
+
+    try
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, dest) 
+    catch e
+        @assert endswith(e.msg,"$dest cannot hold more ions.")
+        return true
+    end
+    return false
+end
+
+function isallowedLinearTransportTestBlockedEnd0()
+    origin = Symbol(3)
+        
+    # "Load" ion
+    qdd::QCCDevControl = giveQccCtrl(;alternateDesc=true)
+    qdd.qubits[1] = Qubit(1,origin)
+    qdd.gateZones[origin].chain = [rand(2:100, capacity/2), [1], rand(2:100, capacity/2-1)]
+
+    try
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(7)) 
+    catch e
+        @assert endswith(e.msg,"not in the correct end position.")
+        return true
+    end
+    return false
+end
+
+function isallowedLinearTransportTestBlockedEnd1()
+    origin = Symbol(3)
+        
+    # "Load" ion
+    qdd::QCCDevControl = giveQccCtrl(;alternateDesc=true)
+    qdd.qubits[1] = Qubit(1,origin)
+    qdd.gateZones[origin].chain = [rand(2:100, capacity/2), [1], rand(2:100, capacity/2-1)]
+
+    try
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(8)) 
+    catch e
+        @assert endswith(e.msg,"not in the correct end position.")
+        return true
+    end
+    return false
+end
+
+function isallowedLinearTransportTestNotBlockedEnd0()
+    origin = Symbol(3)
+        
+    # "Load" ion
+    qdd::QCCDevControl = giveQccCtrl(;alternateDesc=true)
+    qdd.qubits[1] = Qubit(1,origin)
+    qdd.gateZones[origin].chain = [[1],rand(2:100, capacity/2), rand(2:100, capacity/2-1)]
+    isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(7)) 
+    return true
+end
+
+function isallowedLinearTransportTestNotBlockedEnd1()
+    origin = Symbol(3)
+        
+    # "Load" ion
+    qdd::QCCDevControl = giveQccCtrl(;alternateDesc=true)
+    qdd.qubits[1] = Qubit(1,origin)
+    qdd.gateZones[origin].chain = [rand(2:100, capacity/2), rand(2:100, capacity/2-1), [1]]
+    isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(8))
+    return true
+end
 # ========= END isallowed functions tests =========
 
 

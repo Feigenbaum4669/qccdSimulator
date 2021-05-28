@@ -93,11 +93,11 @@ function isallowed_linear_transport(qdc           :: QCCDevControl,
   end
 
   chain = nothing
-  if currentPosition.end0 == destination
+  if currentPosition.end0 == destination.id
 
     chain = currentPosition.zoneType == :loadingZone ? 
         currentPosition.hole : first(currentPosition.chain)
-  elseif currentPosition.end1 == destination
+  elseif currentPosition.end1 == destination.id
 
     chain = currentPosition.zoneType == :loadingZone ? 
       currentPosition.hole : last(currentPosition.chain)

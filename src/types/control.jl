@@ -52,7 +52,7 @@ status: current qubit status
 position: current qubit position
 destination: qubit destination, it could not have any
 """
-struct Qubit
+mutable struct Qubit
     id::Int
     status::Symbol
     position::Symbol
