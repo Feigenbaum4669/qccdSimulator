@@ -9,6 +9,7 @@ export QCCDevCtrl
 
 using ..QCCDevDes_Types
 using ..QCCDevControl_Types
+using ..QCCDev_Utils
 using ..QCCDev_Feasible
 
 include("initFunctions.jl")
@@ -139,7 +140,40 @@ function linear_transport(qdc           :: QCCDevControl,
                           t             :: Time_t,
                           ion_idx       :: Int,
                           destination_idx      :: Symbol) ::Time_t
-    
+  # Checks  
+  isallowed_linear_transport(qdc, t, ion_idx, destination_idx)
+
+  ion = qdc.qubits[ion_idx]
+  origin = giveZone(qdc, ion.position)
+  destination = giveZone(qdc, destination_idx)
+
+  # Remove ion from origin
+  if origin.zoneType === :loadingZone
+    origin.hole = nothing
+  elseif origin.end0 === destination_idx
+    deleteat!(origin.chain, 1)
+  else
+    deleteat!(origin.chain, length(origin.chain))
+  end
+
+  # Add ion to destination
+  if destination.zoneType === :loadingZone
+    destination.hole = ion_idx
+  elseif destination.end0 === origin.id
+    pushfirst!(destination.chain, [ion_idx])
+  else
+    push!(destination.chain, [ion_idx])
+  end
+
+  #Remove destination to ion
+  ion.destination = nothing
+
+  # Compute time
+  local t₀ = t + OperationTimes[:linear_transport]
+  t₀ > t  || throw(Error("Error while computing time"))
+  qdc.t_now = t₀
+
+  return t₀
 end
 
 ####################################################################################################

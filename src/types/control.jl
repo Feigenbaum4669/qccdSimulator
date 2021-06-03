@@ -8,7 +8,7 @@ using ..QCCDevDes_Types
 #Types of zones
 const zoneTypes = Set([:junction,:loadingZone, :auxZone, :gateZone])
 
-# Possible Qubits Status
+# Possible Qubits Status (not used)
 const QubitStatus = Set([:inLoadingZone, :inGateZone])
 
 # Supported junction types with corresponding sizes
