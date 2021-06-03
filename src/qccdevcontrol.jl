@@ -13,7 +13,7 @@ using ..QCCDev_Utils
 using ..QCCDev_Feasible
 
 include("initFunctions.jl")
-
+include("devCtrlAux.jl")
 """
 This sub-module provides the type `QCCDevCtrl` and functions for controlling the operation of the
 simulated quantum device.
@@ -147,26 +147,9 @@ function linear_transport(qdc           :: QCCDevControl,
   origin = giveZone(qdc, ion.position)
   destination = giveZone(qdc, destination_idx)
 
-  # Remove ion from origin
-  if origin.zoneType === :loadingZone
-    origin.hole = nothing
-  elseif origin.end0 === destination_idx
-    deleteat!(origin.chain, 1)
-  else
-    deleteat!(origin.chain, length(origin.chain))
-  end
-
-  # Add ion to destination
-  if destination.zoneType === :loadingZone
-    destination.hole = ion_idx
-  elseif destination.end0 === origin.id
-    pushfirst!(destination.chain, [ion_idx])
-  else
-    push!(destination.chain, [ion_idx])
-  end
-
-  #Remove destination to ion
-  ion.destination = nothing
+  # Remove ion from origin, insert it to destination,
+  # and check if it has arrived to its destination
+  _move_ion(ion, origin, destination)
 
   # Compute time
   local t₀ = t + OperationTimes[:linear_transport]

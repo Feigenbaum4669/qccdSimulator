@@ -467,12 +467,70 @@ end
 
 
 # ========= linear_transport tests =========
-function linearTransportTest()
-    
-end
-# ========= END linear_transport tests =========
+function linearTransportTestOK()
+    qdd::QCCDevControl = giveQccCtrl()
+    qdd.qubits[1] = Qubit(1,Symbol(8))
+    qdd.loadingZones[Symbol(8)].hole = 1
 
-# ========= isallowed functions tests =========
+    t = qccdSimulator.QCCDDevControl.linear_transport(qdd, 10, 1, Symbol(3))
+    @assert OperationTimes[:linear_transport] == 78
+    @assert t == 88
+    @assert qdd.t_now == 88
+    @assert qdd.qubits[1].position === Symbol(3)
+    @assert isnothing(qdd.loadingZones[Symbol(8)].hole)
+    @assert qdd.gateZones[Symbol(3)].chain == [[1]]
+    return true
+end
+
+function linearTransportTest1()
+    qdd::QCCDevControl = giveQccCtrl()
+    qdd.qubits[1] = Qubit(1,Symbol(3))
+    qdd.qubits[1].status = :inGateZone
+    qdd.qubits[1].destination = Symbol(7)
+
+    append!(qdd.gateZones[Symbol(3)].chain, [[1],[2]])
+    append!(qdd.auxZones[Symbol(7)].chain, [[3]])
+    qccdSimulator.QCCDDevControl.linear_transport(qdd, 10, 1, Symbol(7))
+    @assert qdd.qubits[1].position === Symbol(7)
+    @assert qdd.gateZones[Symbol(3)].chain == [[2]]
+    @assert qdd.auxZones[Symbol(7)].chain == [[3],[1]]
+    @assert isnothing(qdd.qubits[1].destination)
+
+    return true
+end
+
+function linearTransportTest2()
+    qdd::QCCDevControl = giveQccCtrl()
+    qdd.qubits[1] = Qubit(1,Symbol(3))
+    qdd.qubits[1].status = :inGateZone
+    qdd.qubits[1].destination = Symbol(7)
+
+    append!(qdd.gateZones[Symbol(3)].chain, [[2],[1]])
+    qccdSimulator.QCCDDevControl.linear_transport(qdd, 10, 1, Symbol(8))
+    @assert qdd.qubits[1].position === Symbol(8)
+    @assert qdd.gateZones[Symbol(3)].chain == [[2]]
+    @assert qdd.loadingZones[Symbol(8)].hole == 1
+    @assert qdd.qubits[1].destination == Symbol(7)
+
+    return true
+end
+
+function linearTransportTest3()
+    qdd::QCCDevControl = giveQccCtrl()
+    qdd.qubits[1] = Qubit(1,Symbol(7))
+    qdd.qubits[1].status = :inGateZone
+
+    append!(qdd.gateZones[Symbol(3)].chain, [[2]])
+    append!(qdd.auxZones[Symbol(7)].chain, [[3],[1]])
+    qccdSimulator.QCCDDevControl.linear_transport(qdd, 10, 1, Symbol(3))
+    @assert qdd.qubits[1].position === Symbol(3)
+    @assert qdd.gateZones[Symbol(3)].chain == [[1],[2]]
+    @assert qdd.auxZones[Symbol(7)].chain == [[3]]
+    @assert isnothing(qdd.qubits[1].destination)
+
+    return true
+end
+
 function isallowedLinearTransportTestTime()
     qdd::QCCDevControl = giveQccCtrl()
     try
@@ -619,7 +677,7 @@ function isallowedLinearTransportTestNotBlockedEnd1()
     isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(8))
     return true
 end
-# ========= END isallowed functions tests =========
+# ========= END linear_transport tests =========
 
 
 # ========= utils functions tests =========

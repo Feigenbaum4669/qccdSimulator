@@ -44,6 +44,11 @@ end
     @test isallowedLinearTransportTestBlockedEnd1()
     @test isallowedLinearTransportTestNotBlockedEnd0()
     @test isallowedLinearTransportTestNotBlockedEnd1()
+    @test linearTransportTestOK()
+    @test linearTransportTest1()
+    @test linearTransportTest2()
+    @test linearTransportTest3()
+
 end
 
 @testset "Utils" begin
