@@ -121,13 +121,6 @@ struct GateZone
     new(id, :gateZone, capacity, end0, end1, [[]])
 end
 
-"""
-Type for time inside the qdev, in [change if necessary]   10^{-10}
-seconds, i.e., ns/10.  All times are ≥0; negative value of expressions
-of this type are errors (and may carry local error information).
-"""
-const Time_t = Int64
-
 mutable struct QCCDevControl
     dev            ::QCCDevDescription
 

@@ -134,10 +134,11 @@ Function `linear_transport()` — moves ions between zones/junctions.
 
 The function returns the time at which the operation will be completed.
 """
+
 function linear_transport(qdc           :: QCCDevControl,
                           t             :: Time_t,
                           ion_idx       :: Int,
-                          edge_idx      :: Int       ) ::Time_t
+                          destination_idx      :: Symbol) ::Time_t
     
 end
 

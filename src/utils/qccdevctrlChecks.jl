@@ -4,10 +4,15 @@
 # Sub-module QCCDevCtrl
 
 module QCCDev_Feasible
+<<<<<<< HEAD
 export load_checks, OperationNotAllowedException, isallowed_load, isallowed_swap
+=======
+export load_checks, OperationNotAllowedException, isallowed_load, isallowed_linear_transport
+>>>>>>> origin/linear_transport
 
-using ..QCCDevControl_Types
 using ..QCCDevDes_Types
+using ..QCCDevControl_Types
+using ..QCCDev_Utils
 
 """
 Default error message for QCCD operations.

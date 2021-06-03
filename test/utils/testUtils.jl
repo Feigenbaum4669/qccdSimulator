@@ -2,6 +2,7 @@ using qccdSimulator.QCCDevControl_Types
 using qccdSimulator.QCCDevDes_Types
 using Random
 using qccdSimulator.QCCDDevControl
+using qccdSimulator.QCCDev_Utils
 
 """
 Generates n junctions connected to ZoneInfoDesc (auxZones or gateZones).

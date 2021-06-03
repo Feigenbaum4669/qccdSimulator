@@ -3,6 +3,7 @@ export readJSON, readTimeJSON
 
 include("./types/description.jl")
 include("./types/control.jl")
+include("./utils/qccdevctrlUtils.jl")
 include("./utils/qccdevctrlChecks.jl")
 include("./qccdevcontrol.jl")
 

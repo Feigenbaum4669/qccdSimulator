@@ -463,8 +463,81 @@ function checkInitErrorsTestEdgeCases()
     end
     return true
 end
+# ========= END Init functions check tests =========
 
-# ========= END functions check tests =========
+
+# ========= linear_transport tests =========
+function linearTransportTest()
+    
+end
+# ========= END linear_transport tests =========
+
+# ========= isallowed functions tests =========
+function isallowedLinearTransportTestTime()
+    qdd::QCCDevControl = giveQccCtrl()
+    try
+        isallowed_linear_transport(qdd, qdd.t_now - 5, 1, :a) 
+    catch e
+        @assert startswith(e.msg,"Time must be higher than")
+        return true
+    end
+    return false
+end
+
+function isallowedLinearTransportTest()
+    qdd::QCCDevControl = giveQccCtrl()
+    try
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, :a) 
+    catch e
+        @assert startswith(e.msg,"Ion with ID 1 is not in device")
+        return true
+    end
+    return false
+end
+
+function isallowedLinearTransportTest2()
+    qdd::QCCDevControl = giveQccCtrl()
+    #load(qdd,qdd8)
+    try
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, :a) 
+    catch e
+        @assert startswith(e.msg,"Ion with ID 1 is not in device")
+        return true
+    end
+    return false
+end
+
+
+# ========= END isallowed functions tests =========
+
+
+# ========= utils functions tests =========
+function giveZoneTest()
+    qdd::QCCDevControl = giveQccCtrl()
+    
+    zone = giveZone(qdd, :nonsense)
+    @assert isnothing(zone)
+
+    k = rand(keys(qdd.gateZones))
+    zone = giveZone(qdd, k)
+    @assert zone === qdd.gateZones[k]
+
+    k = rand(keys(qdd.junctions))
+    zone = giveZone(qdd, k)
+    @assert zone === qdd.junctions[k]
+
+    k = rand(keys(qdd.auxZones))
+    zone = giveZone(qdd, k)
+    @assert zone === qdd.auxZones[k]
+
+    k = rand(keys(qdd.loadingZones))
+    zone = giveZone(qdd, k)
+    @assert zone === qdd.loadingZones[k]
+
+    return true
+end
+
+# ========= END utils functions tests =========
 
 # ========= _time_check functiong test =========
 time_check_timeFailsTest() = qccdSimulator.QCCDev_Feasible._time_check( 10, 9, :load)
