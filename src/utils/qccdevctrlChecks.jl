@@ -4,11 +4,7 @@
 # Sub-module QCCDevCtrl
 
 module QCCDev_Feasible
-<<<<<<< HEAD
 export load_checks, OperationNotAllowedException, isallowed_load, isallowed_swap
-=======
-export load_checks, OperationNotAllowedException, isallowed_load, isallowed_linear_transport
->>>>>>> origin/linear_transport
 
 using ..QCCDevDes_Types
 using ..QCCDevControl_Types
@@ -79,13 +75,12 @@ function isallowed_swap(qdc::QCCDevControl, ion1_idx:: Int, ion2_idx:: Int , t::
     haskey(qdc.qubits, ion2_idx) || opError("Qubit with id $ion2_idx doesn't exist.")
     qdc.qubits[ion1_idx].position == qdc.qubits[ion2_idx].position || 
                     opError("Qubits with ids $ion1_idx  and $ion2_idx are not in the same zone.")
-    # Pending Alex's code finding zone -> zone
-    position = qdc.qubits[ion1_idx].position
-    zone.typeZone == :gateZone || opError("Swap can only be done in Gate Zones.")
-    pos1 = findall(x->x==ion1_idx, zone.chain)
-    pos2 = findall(x->x==ion2_idx, zone.chain)
+    zone = giveZone(qdc, qdc.qubits[ion1_idx].position)
+    zone.zoneType == :gateZone || opError("Swap can only be done in Gate Zones.")
+    pos1 = collect(Iterators.flatten(map( y -> findall(x->x==ion1_idx, y), zone.chain)))[1]
+    pos2 = collect(Iterators.flatten(map( y -> findall(x->x==ion2_idx, y), zone.chain)))[1]
     pos1 == pos2 + 1 || pos1 == pos2 - 1 || 
-                    opError("Qubits with ids $ion1_idx  and $ion2_idx are not adjacents.")
+                    opError("Qubits with ids $ion1_idx and $ion2_idx are not adjacents.")
 end
 
 

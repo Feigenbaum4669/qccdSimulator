@@ -33,11 +33,6 @@ end
     @test checkInitErrorsTestEdgeCases()
 end
 
-@testset "CAMBIA EL NOMBRE ALEJANDRO" begin
-    #@test isallowedLinearTransportTestTime()
-    #@test isallowedLinearTransportTest()
-end
-
 @testset "Util functions" begin
     @test giveZoneTest() 
 end
@@ -67,7 +62,7 @@ end
                                     "and 2 are not in the same zone.") isallowedSwap_qubitNotSameZone()
     @test_throws OperationNotAllowedException("Swap can only be done " * 
                                              "in Gate Zones.") isallowedSwap_qubitNotGateZone()
-    @test_throws OperationNotAllowedException("Qubits with ids 1 and 2 are not" *
+    @test_throws OperationNotAllowedException("Qubits with ids 1 and 3 are not" *
                                              " adjacents.") isallowedSwap_qubitsNotAdjacents()
     @test isallowedSwap_OK()
     # Swap: Check swap is done correctly
