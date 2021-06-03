@@ -66,6 +66,7 @@ Function `isallowed_swap()` — checks if load operation is posisble
 # checks
 * Check time — Call _time_check function.
 * Check if two ions exists
+* Check if two ions are in the same zone
 * check if ions are in same chain and are adjacents
 * Check if chain is in a gate zone
 """
