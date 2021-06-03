@@ -515,3 +515,60 @@ function loadOKTest()
     return true
 end
 # ========= END load functiong test =========
+
+# ========= swap function test =========
+function isallowedSwap_qubitNotExist()
+    qccd = giveQccCtrl()
+    isallowed_swap(qccd, 99, 1, 10)
+end
+
+function isallowedSwap_qubitNotSameZone()
+    qccd = giveQccCtrl()
+    ion1 = giveQubit(Symbol(1),1)
+    ion2 = giveQubit(Symbol(2),2)
+    qccd.qubits[ion1.id] = deepcopy(ion1)
+    qccd.qubits[ion2.id] = deepcopy(ion2)
+    push!(qccd.gateZones[Symbol(1)].chain, [ion1.id])
+    push!(qccd.gateZones[Symbol(2)].chain, [ion2.id])
+    isallowed_swap(qccd, ion1.id, ion2.id, 10)
+end
+
+function isallowedSwap_qubitNotGateZone()
+    qccd = giveQccCtrl()
+    ion1 = giveQubit(Symbol(4),1)
+    ion2 = giveQubit(Symbol(4),2)
+    qccd.qubits[ion1.id] = deepcopy(ion1)
+    qccd.qubits[ion2.id] = deepcopy(ion2)
+    push!(qccd.auxZones[Symbol(4)].chain[1], ion1.id)
+    push!(qccd.auxZones[Symbol(4)].chain[1], ion2.id)
+    isallowed_swap(qccd, ion1.id, ion2.id, 10)
+end
+
+function isallowedSwap_qubitsNotAdjacents()
+    qccd = giveQccCtrl()
+    ion1 = giveQubit(Symbol(1),1)
+    ion2 = giveQubit(Symbol(1),2)
+    ion3 = giveQubit(Symbol(1),3)
+    qccd.qubits[ion1.id] = deepcopy(ion1)
+    qccd.qubits[ion2.id] = deepcopy(ion2)
+    qccd.qubits[ion3.id] = deepcopy(ion3)
+    push!(qccd.gateZones[Symbol(1)].chain[1], ion1.id)
+    push!(qccd.gateZones[Symbol(1)].chain[1], ion2.id)
+    push!(qccd.gateZones[Symbol(1)].chain[1], ion3.id)
+    isallowed_swap(qccd, ion1.id, ion3.id, 10)
+end
+
+function isallowedSwap_OK()
+    qccd = giveQccCtrl()
+    ion1 = giveQubit(Symbol(1),1)
+    ion2 = giveQubit(Symbol(1),2)
+    ion3 = giveQubit(Symbol(1),3)
+    qccd.qubits[ion1.id] = deepcopy(ion1)
+    qccd.qubits[ion2.id] = deepcopy(ion2)
+    qccd.qubits[ion3.id] = deepcopy(ion3)
+    push!(qccd.gateZones[Symbol(1)].chain[1], ion1.id)
+    push!(qccd.gateZones[Symbol(1)].chain[1], ion2.id)
+    push!(qccd.gateZones[Symbol(1)].chain[1], ion3.id)
+    isallowed_swap(qccd, ion2.id, ion3.id, 10)
+end
+# ========= END swap function test =========

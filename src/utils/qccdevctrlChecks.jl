@@ -4,7 +4,7 @@
 # Sub-module QCCDevCtrl
 
 module QCCDev_Feasible
-export load_checks, OperationNotAllowedException, isallowed_load
+export load_checks, OperationNotAllowedException, isallowed_load, isallowed_swap
 
 using ..QCCDevControl_Types
 using ..QCCDevDes_Types
@@ -55,7 +55,7 @@ function isallowed_load(qdc::QCCDevControl, loading_zone::Symbol, t::Time_t)
 end
 
 """
-Function `isallowed_load()` — checks if load operation is posisble
+Function `isallowed_swap()` — checks if load operation is posisble
 
 # Arguments
 * `qdc::QCCDevControl` — Actual device's status.
@@ -68,7 +68,7 @@ Function `isallowed_load()` — checks if load operation is posisble
 * check if ions are in same chain and are adjacents
 * Check if chain is in a gate zone
 """
-function isallowed_load(qdc::QCCDevControl, ion1_idx:: Int, ion2_id:: Int , t::Time_t)
+function isallowed_swap(qdc::QCCDevControl, ion1_idx:: Int, ion2_idx:: Int , t::Time_t)
     _time_check(qdc.t_now, t, :load)
     haskey(qdc.qubits, ion1_idx) || opError("Qubit with id $ion1_idx doesn't exist.")
     haskey(qdc.qubits, ion2_idx) || opError("Qubit with id $ion2_idx doesn't exist.")
