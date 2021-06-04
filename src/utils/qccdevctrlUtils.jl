@@ -13,7 +13,9 @@ using ..QCCDevControl_Types
 Given a zone ID, return the zone from the QCCDevControl object.
 Returns `nothing` if no zone with that ID is found.
 """
-function giveZone(qdc ::QCCDevControl, id ::Symbol)
+function giveZone(qdc ::QCCDevControl,
+    id ::Symbol)::Union{GateZone, AuxZone, LoadingZone, Junction, Nothing}
+    
     zone = get(qdc.gateZones, id, nothing)
     if isnothing(zone)
         zone = get(qdc.junctions, id, nothing)
