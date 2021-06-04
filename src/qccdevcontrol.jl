@@ -9,10 +9,11 @@ export QCCDevCtrl
 
 using ..QCCDevDes_Types
 using ..QCCDevControl_Types
+using ..QCCDev_Utils
 using ..QCCDev_Feasible
 
 include("initFunctions.jl")
-
+include("devCtrlAux.jl")
 """
 This sub-module provides the type `QCCDevCtrl` and functions for controlling the operation of the
 simulated quantum device.
@@ -134,11 +135,28 @@ Function `linear_transport()` — moves ions between zones/junctions.
 
 The function returns the time at which the operation will be completed.
 """
+
 function linear_transport(qdc           :: QCCDevControl,
                           t             :: Time_t,
                           ion_idx       :: Int,
-                          edge_idx      :: Int       ) ::Time_t
-    
+                          destination_idx      :: Symbol) ::Time_t
+  # Checks  
+  isallowed_linear_transport(qdc, t, ion_idx, destination_idx)
+
+  ion = qdc.qubits[ion_idx]
+  origin = giveZone(qdc, ion.position)
+  destination = giveZone(qdc, destination_idx)
+
+  # Remove ion from origin, insert it to destination,
+  # and check if it has arrived to its destination
+  _move_ion(ion, origin, destination)
+
+  # Compute time
+  local t₀ = t + OperationTimes[:linear_transport]
+  t₀ > t  || throw(Error("Error while computing time"))
+  qdc.t_now = t₀
+
+  return t₀
 end
 
 ####################################################################################################

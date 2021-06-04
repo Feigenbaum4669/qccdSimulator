@@ -8,7 +8,7 @@ using ..QCCDevDes_Types
 #Types of zones
 const zoneTypes = Set([:junction,:loadingZone, :auxZone, :gateZone])
 
-# Possible Qubits Status
+# Possible Qubits Status (not used)
 const QubitStatus = Set([:inLoadingZone, :inGateZone])
 
 # Supported junction types with corresponding sizes
@@ -56,7 +56,7 @@ status: current qubit status
 position: current qubit position
 destination: qubit destination, it could not have any
 """
-struct Qubit
+mutable struct Qubit
     id::Int
     status::Symbol
     position::Symbol
@@ -98,7 +98,7 @@ struct AuxZone
     chain::Array{Array{Int64,1},1}
     AuxZone(id, capacity, end0, end1) = end0 == end1 && (!isnothing(end0) || !isnothing(end1)) ? 
     throw(ArgumentError("In aux zone $id : \"end0\" and \"end1\" must be different")) : 
-    new(id, :auxZone, capacity, end0, end1, [[]])
+    new(id, :auxZone, capacity, end0, end1, [])
 end
 
 
@@ -118,15 +118,8 @@ struct GateZone
     chain::Array{Array{Int64,1},1}
     GateZone(id, capacity, end0, end1) = end0 == end1 && (!isnothing(end0) || !isnothing(end1)) ? 
     throw(ArgumentError("In gate zone $id : \"end0\" and \"end1\" must be different")) : 
-    new(id, :gateZone, capacity, end0, end1, [[]])
+    new(id, :gateZone, capacity, end0, end1, [])
 end
-
-"""
-Type for time inside the qdev, in [change if necessary]   10^{-10}
-seconds, i.e., ns/10.  All times are ≥0; negative value of expressions
-of this type are errors (and may carry local error information).
-"""
-const Time_t = Int64
 
 mutable struct QCCDevControl
     dev            ::QCCDevDescription

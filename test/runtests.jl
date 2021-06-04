@@ -33,7 +33,29 @@ end
     @test checkInitErrorsTestEdgeCases()
 end
 
-@testset "Time check" begin
+@testset "Linear transport" begin
+    @test isallowedLinearTransportTestTime()
+    @test isallowedLinearTransportTestNoIon()
+    @test isallowedLinearTransportTestNoZone()
+    @test isallowedLinearTransportTestNonAdjacent()
+    @test isallowedLinearTransportTestAllGood()
+    @test isallowedLinearTransportTestFull()
+    @test isallowedLinearTransportTestBlockedEnd0()
+    @test isallowedLinearTransportTestBlockedEnd1()
+    @test isallowedLinearTransportTestNotBlockedEnd0()
+    @test isallowedLinearTransportTestNotBlockedEnd1()
+    @test linearTransportTestOK()
+    @test linearTransportTest1()
+    @test linearTransportTest2()
+    @test linearTransportTest3()
+
+end
+
+@testset "Utils" begin
+    @test giveZoneTest() 
+end
+
+@testset "Time checks" begin
     @test_throws OperationNotAllowedException("Time must be higher than " *
                         "10") time_check_timeFailsTest()
     @test_throws OperationNotAllowedException("Time model for test not " *

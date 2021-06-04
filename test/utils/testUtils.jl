@@ -2,6 +2,7 @@ using qccdSimulator.QCCDevControl_Types
 using qccdSimulator.QCCDevDes_Types
 using Random
 using qccdSimulator.QCCDDevControl
+using qccdSimulator.QCCDev_Utils
 
 """
 Generates n junctions connected to ZoneInfoDesc (auxZones or gateZones).
@@ -69,6 +70,35 @@ function giveQccDes()::QCCDevDescription
             ZoneInfoDesc("1", "", "4", 2),
             ZoneInfoDesc("2", "4", "5", 2),
             ZoneInfoDesc( "3", "7", "8", 2)
+        ]
+    )
+    auxZone:: AuxZoneDesc = AuxZoneDesc(
+        [ 
+            ZoneInfoDesc( "4", "1", "2", 2),
+            ZoneInfoDesc( "5", "", "9", 2),
+            ZoneInfoDesc( "6", "9", "", 2),
+            ZoneInfoDesc( "7", "9", "3", 2)
+        ]
+    )
+    junction:: JunctionDesc = JunctionDesc(
+        [
+            JunctionInfoDesc( "9", "T")
+        ]
+    )
+    loadZone:: LoadZoneDesc = LoadZoneDesc(
+        [ 
+            LoadZoneInfoDesc( "8", "3", "")
+        ]
+    )
+    return  QCCDevDescription(gateZone,auxZone,junction,loadZone)
+end
+
+function giveQccDes2()::QCCDevDescription
+    gateZone:: GateZoneDesc = GateZoneDesc(
+        [ 
+            ZoneInfoDesc("1", "", "4", 2),
+            ZoneInfoDesc("2", "4", "5", 2),
+            ZoneInfoDesc( "3", "7", "8", 8)
         ]
     )
     auxZone:: AuxZoneDesc = AuxZoneDesc(
@@ -181,8 +211,8 @@ end
 """
 Creates a struct QCCDevControl based in the file giveQccDes()
 """
-function giveQccCtrl()::QCCDevControl
-    qccd::QCCDevDescription = giveQccDes()
+function giveQccCtrl(;alternateDesc = false)::QCCDevControl
+    qccd::QCCDevDescription = alternateDesc ?  giveQccDes2() : giveQccDes()
     gateZones = Dict{Symbol,GateZone}()
     endId = id -> id == "" ? nothing : Symbol(id)
     map(tr -> gateZones[Symbol(tr.id)] = GateZone(Symbol(tr.id), tr.capacity,

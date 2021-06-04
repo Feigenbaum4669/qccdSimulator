@@ -281,7 +281,7 @@ function initGateZoneTest()
         @assert length(aux) == 1
         aux = aux[1]
         @assert aux.capacity == value.capacity
-        @assert length(value.chain) == 1 && isempty(value.chain[1]) 
+        @assert isempty(value.chain) 
         tmp = aux.end0 == "" ? nothing : Symbol(aux.end0)
         @assert tmp == value.end0
         tmp = aux.end1 == "" ? nothing : Symbol(aux.end1)
@@ -463,8 +463,250 @@ function checkInitErrorsTestEdgeCases()
     end
     return true
 end
+# ========= END Init functions check tests =========
 
-# ========= END functions check tests =========
+
+# ========= linear_transport tests =========
+function linearTransportTestOK()
+    qdd::QCCDevControl = giveQccCtrl()
+    qdd.qubits[1] = Qubit(1,Symbol(8))
+    qdd.loadingZones[Symbol(8)].hole = 1
+
+    t = qccdSimulator.QCCDDevControl.linear_transport(qdd, 10, 1, Symbol(3))
+    @assert OperationTimes[:linear_transport] == 78
+    @assert t == 88
+    @assert qdd.t_now == 88
+    @assert qdd.qubits[1].position === Symbol(3)
+    @assert isnothing(qdd.loadingZones[Symbol(8)].hole)
+    @assert qdd.gateZones[Symbol(3)].chain == [[1]]
+    return true
+end
+
+function linearTransportTest1()
+    qdd::QCCDevControl = giveQccCtrl()
+    qdd.qubits[1] = Qubit(1,Symbol(3))
+    qdd.qubits[1].status = :inGateZone
+    qdd.qubits[1].destination = Symbol(7)
+
+    append!(qdd.gateZones[Symbol(3)].chain, [[1],[2]])
+    append!(qdd.auxZones[Symbol(7)].chain, [[3]])
+    qccdSimulator.QCCDDevControl.linear_transport(qdd, 10, 1, Symbol(7))
+    @assert qdd.qubits[1].position === Symbol(7)
+    @assert qdd.gateZones[Symbol(3)].chain == [[2]]
+    @assert qdd.auxZones[Symbol(7)].chain == [[3],[1]]
+    @assert isnothing(qdd.qubits[1].destination)
+
+    return true
+end
+
+function linearTransportTest2()
+    qdd::QCCDevControl = giveQccCtrl()
+    qdd.qubits[1] = Qubit(1,Symbol(3))
+    qdd.qubits[1].status = :inGateZone
+    qdd.qubits[1].destination = Symbol(7)
+
+    append!(qdd.gateZones[Symbol(3)].chain, [[2],[1]])
+    qccdSimulator.QCCDDevControl.linear_transport(qdd, 10, 1, Symbol(8))
+    @assert qdd.qubits[1].position === Symbol(8)
+    @assert qdd.gateZones[Symbol(3)].chain == [[2]]
+    @assert qdd.loadingZones[Symbol(8)].hole == 1
+    @assert qdd.qubits[1].destination == Symbol(7)
+
+    return true
+end
+
+function linearTransportTest3()
+    qdd::QCCDevControl = giveQccCtrl()
+    qdd.qubits[1] = Qubit(1,Symbol(7))
+    qdd.qubits[1].status = :inGateZone
+
+    append!(qdd.gateZones[Symbol(3)].chain, [[2]])
+    append!(qdd.auxZones[Symbol(7)].chain, [[3],[1]])
+    qccdSimulator.QCCDDevControl.linear_transport(qdd, 10, 1, Symbol(3))
+    @assert qdd.qubits[1].position === Symbol(3)
+    @assert qdd.gateZones[Symbol(3)].chain == [[1],[2]]
+    @assert qdd.auxZones[Symbol(7)].chain == [[3]]
+    @assert isnothing(qdd.qubits[1].destination)
+
+    return true
+end
+
+function isallowedLinearTransportTestTime()
+    qdd::QCCDevControl = giveQccCtrl()
+    try
+        isallowed_linear_transport(qdd, qdd.t_now - 5, 1, :a) 
+    catch e
+        @assert startswith(e.msg,"Time must be higher than")
+        return true
+    end
+    return false
+end
+
+function isallowedLinearTransportTestNoIon()
+    qdd::QCCDevControl = giveQccCtrl()
+    try
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, :a) 
+    catch e
+        @assert startswith(e.msg,"Ion with ID 1 is not in device")
+        return true
+    end
+    return false
+end
+
+function isallowedLinearTransportTestNoZone()
+    qdd::QCCDevControl = giveQccCtrl()
+    qdd.qubits[1] = Qubit(1,Symbol(8))
+    qdd.loadingZones[Symbol(8)].hole = 1
+    try
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, :nonsense) 
+    catch e
+        @assert startswith(e.msg,"Zone with ID nonsense is not in device")
+        return true
+    end
+    return false
+end
+
+function isallowedLinearTransportTestNonAdjacent()
+    qdd::QCCDevControl = giveQccCtrl()
+    qdd.qubits[1] = Qubit(1,Symbol(8))
+    qdd.loadingZones[Symbol(8)].hole = 1
+    try
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(2)) 
+    catch e
+        @assert startswith(e.msg,"Can't do linear transport to a non-adjacent zone.")
+        return true
+    end
+    return false
+end
+
+function isallowedLinearTransportTestAllGood()
+    qdd::QCCDevControl = giveQccCtrl()
+    qdd.qubits[1] = Qubit(1,Symbol(8))
+    qdd.loadingZones[Symbol(8)].hole = 1
+    isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(3)) 
+    return true
+end
+
+function isallowedLinearTransportTestFull()
+    dest = Symbol(3)
+        
+    # "Load" ion
+    qdd::QCCDevControl = giveQccCtrl(;alternateDesc=true)
+    qdd.qubits[1] = Qubit(1,Symbol(8))
+    qdd.loadingZones[Symbol(8)].hole = 1
+
+    # "Fill up" destination
+    halvedCapacity = floor(Int64, qdd.gateZones[dest].capacity / 2)
+        # Multiple chains to check if reduce works
+    push!(qdd.gateZones[dest].chain,
+        rand(Int64, halvedCapacity), rand(Int64, halvedCapacity))
+
+    try
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, dest) 
+    catch e
+        @assert endswith(e.msg,"$dest cannot hold more ions.")
+        return true
+    end
+    return false
+end
+
+function isallowedLinearTransportTestBlockedEnd0()
+    origin = Symbol(3)
+        
+    # "Load" ion
+    qdd::QCCDevControl = giveQccCtrl(;alternateDesc=true)
+    qdd.qubits[1] = Qubit(1,origin)
+    halvedCapacity = floor(Int64, qdd.gateZones[origin].capacity / 2)
+    push!(qdd.gateZones[origin].chain, rand(2:100, halvedCapacity), [1])
+    halvedCapacity -= 1
+    push!(qdd.gateZones[origin].chain, rand(2:100, halvedCapacity))
+
+    try
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(7)) 
+    catch e
+        @assert endswith(e.msg,"not in the correct end position.")
+        return true
+    end
+    return false
+end
+
+function isallowedLinearTransportTestBlockedEnd1()
+    origin = Symbol(3)
+        
+    # "Load" ion
+    qdd::QCCDevControl = giveQccCtrl(;alternateDesc=true)
+    qdd.qubits[1] = Qubit(1,origin)
+    halvedCapacity = floor(Int64, qdd.gateZones[origin].capacity / 2)
+    push!(qdd.gateZones[origin].chain, rand(2:100, halvedCapacity), [1])
+    halvedCapacity -= 1
+    push!(qdd.gateZones[origin].chain, rand(2:100, halvedCapacity))
+
+    try
+        isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(8)) 
+    catch e
+        @assert endswith(e.msg,"not in the correct end position.")
+        return true
+    end
+    return false
+end
+
+function isallowedLinearTransportTestNotBlockedEnd0()
+    origin = Symbol(3)
+        
+    # "Load" ion
+    qdd::QCCDevControl = giveQccCtrl(;alternateDesc=true)
+    qdd.qubits[1] = Qubit(1,origin)
+    halvedCapacity = floor(Int64, qdd.gateZones[origin].capacity / 2)
+    push!(qdd.gateZones[origin].chain,[1], rand(2:100, halvedCapacity))
+    halvedCapacity -= 1
+    push!(qdd.gateZones[origin].chain, rand(2:100, halvedCapacity))
+    isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(7)) 
+    return true
+end
+
+function isallowedLinearTransportTestNotBlockedEnd1()
+    origin = Symbol(3)
+        
+    # "Load" ion
+    qdd::QCCDevControl = giveQccCtrl(;alternateDesc=true)
+    qdd.qubits[1] = Qubit(1,origin)
+    halvedCapacity = floor(Int64, qdd.gateZones[origin].capacity / 2)
+    push!(qdd.gateZones[origin].chain, rand(2:100, halvedCapacity))
+    halvedCapacity -= 1
+    push!(qdd.gateZones[origin].chain, rand(2:100, halvedCapacity), [1])
+    isallowed_linear_transport(qdd, qdd.t_now+1, 1, Symbol(8))
+    return true
+end
+# ========= END linear_transport tests =========
+
+
+# ========= utils functions tests =========
+function giveZoneTest()
+    qdd::QCCDevControl = giveQccCtrl()
+    
+    zone = giveZone(qdd, :nonsense)
+    @assert isnothing(zone)
+
+    k = rand(keys(qdd.gateZones))
+    zone = giveZone(qdd, k)
+    @assert zone === qdd.gateZones[k]
+
+    k = rand(keys(qdd.junctions))
+    zone = giveZone(qdd, k)
+    @assert zone === qdd.junctions[k]
+
+    k = rand(keys(qdd.auxZones))
+    zone = giveZone(qdd, k)
+    @assert zone === qdd.auxZones[k]
+
+    k = rand(keys(qdd.loadingZones))
+    zone = giveZone(qdd, k)
+    @assert zone === qdd.loadingZones[k]
+
+    return true
+end
+
+# ========= END utils functions tests =========
 
 # ========= _time_check functiong test =========
 time_check_timeFailsTest() = qccdSimulator.QCCDev_Feasible._time_check( 10, 9, :load)
