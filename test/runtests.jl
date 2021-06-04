@@ -81,8 +81,10 @@ end
     @test_throws OperationNotAllowedException("Swap can only be done " * 
                                              "in Gate Zones.") isallowedSwap_qubitNotGateZone()
     @test_throws OperationNotAllowedException("Qubits with ids 1 and 3 are not" *
-                                             " adjacents.") isallowedSwap_qubitsNotAdjacents()
+                                             " adjacents.") isallowedSwap_qubitsNotAdjacents1()
+    @test_throws OperationNotAllowedException("Qubits with ids 3 and 4 are not" *
+                                             " adjacents.") isallowedSwap_qubitsNotAdjacents2()
     @test isallowedSwap_OK()
-    # Swap: Check swap is done correctly
-
+    @test swap_OK1()
+    @test swap_OK2()
 end

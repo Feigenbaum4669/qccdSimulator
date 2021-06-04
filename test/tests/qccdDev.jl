@@ -786,7 +786,7 @@ function isallowedSwap_qubitNotGateZone()
     isallowed_swap(qccd, ion1.id, ion2.id, 10)
 end
 
-function isallowedSwap_qubitsNotAdjacents()
+function isallowedSwap_qubitsNotAdjacents1()
     qccd = giveQccCtrl()
     ion1 = giveQubit(Symbol(1),1)
     ion2 = giveQubit(Symbol(1),2)
@@ -798,6 +798,32 @@ function isallowedSwap_qubitsNotAdjacents()
     push!(qccd.gateZones[Symbol(1)].chain[1], ion2.id)
     push!(qccd.gateZones[Symbol(1)].chain[1], ion3.id)
     isallowed_swap(qccd, ion1.id, ion3.id, 10)
+end
+
+function isallowedSwap_qubitsNotAdjacents2()
+    qccd = giveQccCtrl()
+    ion1 = giveQubit(Symbol(1),1)
+    ion2 = giveQubit(Symbol(1),2)
+    ion3 = giveQubit(Symbol(1),3)
+    ion4 = giveQubit(Symbol(1),4)
+    ion5 = giveQubit(Symbol(1),5)
+    ion6 = giveQubit(Symbol(1),6)
+    qccd.qubits[ion1.id] = deepcopy(ion1)
+    qccd.qubits[ion2.id] = deepcopy(ion2)
+    qccd.qubits[ion3.id] = deepcopy(ion3)
+    qccd.qubits[ion4.id] = deepcopy(ion4)
+    qccd.qubits[ion5.id] = deepcopy(ion5)
+    qccd.qubits[ion6.id] = deepcopy(ion6)
+    push!(qccd.gateZones[Symbol(1)].chain, [ion1.id])
+    push!(qccd.gateZones[Symbol(1)].chain[1], ion2.id)
+    push!(qccd.gateZones[Symbol(1)].chain[1], ion3.id)
+    push!(qccd.gateZones[Symbol(1)].chain, [ion4.id])
+    push!(qccd.gateZones[Symbol(1)].chain[2], ion5.id)
+    push!(qccd.gateZones[Symbol(1)].chain[2], ion6.id)
+    @assert qccd.gateZones[Symbol(1)].chain == [[1,2,3],[4,5,6]]
+    isallowed_swap(qccd, ion3.id, ion4.id, 10)
+    @assert qccd.gateZones[Symbol(1)].chain == [[1,2,3],[4,6,5]]
+    @assert qccd.t_now == 4
 end
 
 function isallowedSwap_OK()
@@ -812,5 +838,50 @@ function isallowedSwap_OK()
     push!(qccd.gateZones[Symbol(1)].chain[1], ion2.id)
     push!(qccd.gateZones[Symbol(1)].chain[1], ion3.id)
     isallowed_swap(qccd, ion2.id, ion3.id, 10)
+end
+
+function swap_OK1()
+    qccd = giveQccCtrl()
+    ion1 = giveQubit(Symbol(1),1)
+    ion2 = giveQubit(Symbol(1),2)
+    ion3 = giveQubit(Symbol(1),3)
+    qccd.qubits[ion1.id] = deepcopy(ion1)
+    qccd.qubits[ion2.id] = deepcopy(ion2)
+    qccd.qubits[ion3.id] = deepcopy(ion3)
+    push!(qccd.gateZones[Symbol(1)].chain, [ion1.id])
+    push!(qccd.gateZones[Symbol(1)].chain[1], ion2.id)
+    push!(qccd.gateZones[Symbol(1)].chain[1], ion3.id)
+    @assert qccd.gateZones[Symbol(1)].chain == [[1,2,3]]
+    qccdSimulator.QCCDDevControl.swap(qccd, 2, ion2.id,ion3.id)
+    @assert qccd.gateZones[Symbol(1)].chain == [[1,3,2]]
+    @assert qccd.t_now == 4
+    return true
+end
+
+function swap_OK2()
+    qccd = giveQccCtrl()
+    ion1 = giveQubit(Symbol(1),1)
+    ion2 = giveQubit(Symbol(1),2)
+    ion3 = giveQubit(Symbol(1),3)
+    ion4 = giveQubit(Symbol(1),4)
+    ion5 = giveQubit(Symbol(1),5)
+    ion6 = giveQubit(Symbol(1),6)
+    qccd.qubits[ion1.id] = deepcopy(ion1)
+    qccd.qubits[ion2.id] = deepcopy(ion2)
+    qccd.qubits[ion3.id] = deepcopy(ion3)
+    qccd.qubits[ion4.id] = deepcopy(ion4)
+    qccd.qubits[ion5.id] = deepcopy(ion5)
+    qccd.qubits[ion6.id] = deepcopy(ion6)
+    push!(qccd.gateZones[Symbol(1)].chain, [ion1.id])
+    push!(qccd.gateZones[Symbol(1)].chain[1], ion2.id)
+    push!(qccd.gateZones[Symbol(1)].chain[1], ion3.id)
+    push!(qccd.gateZones[Symbol(1)].chain, [ion4.id])
+    push!(qccd.gateZones[Symbol(1)].chain[2], ion5.id)
+    push!(qccd.gateZones[Symbol(1)].chain[2], ion6.id)
+    @assert qccd.gateZones[Symbol(1)].chain == [[1,2,3],[4,5,6]]
+    qccdSimulator.QCCDDevControl.swap(qccd, 2, ion5.id,ion6.id)
+    @assert qccd.gateZones[Symbol(1)].chain == [[1,2,3],[4,6,5]]
+    @assert qccd.t_now == 4
+    return true
 end
 # ========= END swap function test =========
