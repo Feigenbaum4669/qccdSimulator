@@ -77,13 +77,16 @@ function isallowed_swap(qdc::QCCDevControl, ion1_idx:: Int, ion2_idx:: Int , t::
     haskey(qdc.qubits, ion2_idx) || opError("Qubit with id $ion2_idx doesn't exist.")
     qdc.qubits[ion1_idx].position == qdc.qubits[ion2_idx].position || 
                     opError("Qubits with ids $ion1_idx  and $ion2_idx are not in the same zone.")
+                    
     zone = giveZone(qdc, qdc.qubits[ion1_idx].position)
     zone.zoneType == :gateZone || opError("Swap can only be done in Gate Zones.")
+
     pos1 = map( y -> findall(x->x==ion1_idx, y), zone.chain)
     pos2 = map( y -> findall(x->x==ion2_idx, y), zone.chain)
     check = x ->  isempty(pos1[x]) && isempty(pos2[x]) || !isempty(pos1[x]) && !isempty(pos2[x]) ||
                   opError("Qubits with ids $ion1_idx and $ion2_idx are not in the same chain.")
     map(x -> check(x) , 1:length(pos1))
+
     pos1 = collect(Iterators.flatten(pos1))[1]
     pos2 = collect(Iterators.flatten(pos2))[1]
     pos1 == pos2 + 1 || pos1 == pos2 - 1 || 
