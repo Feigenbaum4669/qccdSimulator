@@ -82,8 +82,13 @@ end
                                              "in Gate Zones.") isallowedSwap_qubitNotGateZone()
     @test_throws OperationNotAllowedException("Qubits with ids 1 and 3 are not" *
                                              " adjacents.") isallowedSwap_qubitsNotAdjacents1()
-    @test_throws OperationNotAllowedException("Qubits with ids 3 and 4 are not" *
+    @test_throws OperationNotAllowedException("Qubits with ids 4 and 6 are not" *
                                              " adjacents.") isallowedSwap_qubitsNotAdjacents2()
+    
+    @test_throws OperationNotAllowedException("Qubits with ids 3 and 5 are not in the same" *
+                                             " chain.") isallowedSwap_qubitsNotSameChain1()
+    @test_throws OperationNotAllowedException("Qubits with ids 3 and 4 are not in the same" *
+                                             " chain.") isallowedSwap_qubitsNotSameChain2()
     @test isallowedSwap_OK()
     @test swap_OK1()
     @test swap_OK2()

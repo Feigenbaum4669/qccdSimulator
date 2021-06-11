@@ -79,8 +79,13 @@ function isallowed_swap(qdc::QCCDevControl, ion1_idx:: Int, ion2_idx:: Int , t::
                     opError("Qubits with ids $ion1_idx  and $ion2_idx are not in the same zone.")
     zone = giveZone(qdc, qdc.qubits[ion1_idx].position)
     zone.zoneType == :gateZone || opError("Swap can only be done in Gate Zones.")
-    pos1 = collect(Iterators.flatten(map( y -> findall(x->x==ion1_idx, y), zone.chain)))[1]
-    pos2 = collect(Iterators.flatten(map( y -> findall(x->x==ion2_idx, y), zone.chain)))[1]
+    pos1 = map( y -> findall(x->x==ion1_idx, y), zone.chain)
+    pos2 = map( y -> findall(x->x==ion2_idx, y), zone.chain)
+    check = x ->  isempty(pos1[x]) && isempty(pos2[x]) || !isempty(pos1[x]) && !isempty(pos2[x]) ||
+                  opError("Qubits with ids $ion1_idx and $ion2_idx are not in the same chain.")
+    map(x -> check(x) ,length(pos1))
+    pos1 = collect(Iterators.flatten(pos1))[1]
+    pos2 = collect(Iterators.flatten(pos2))[1]
     pos1 == pos2 + 1 || pos1 == pos2 - 1 || 
                     opError("Qubits with ids $ion1_idx and $ion2_idx are not adjacents.")
 end
