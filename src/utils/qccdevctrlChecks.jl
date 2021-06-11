@@ -83,7 +83,7 @@ function isallowed_swap(qdc::QCCDevControl, ion1_idx:: Int, ion2_idx:: Int , t::
     pos2 = map( y -> findall(x->x==ion2_idx, y), zone.chain)
     check = x ->  isempty(pos1[x]) && isempty(pos2[x]) || !isempty(pos1[x]) && !isempty(pos2[x]) ||
                   opError("Qubits with ids $ion1_idx and $ion2_idx are not in the same chain.")
-    map(x -> check(x) ,length(pos1))
+    map(x -> check(x) , 1:length(pos1))
     pos1 = collect(Iterators.flatten(pos1))[1]
     pos2 = collect(Iterators.flatten(pos2))[1]
     pos1 == pos2 + 1 || pos1 == pos2 - 1 || 
