@@ -24,6 +24,7 @@ function readTimeJSONfail(paths ::Array{String})
    errormsg1 = "Time values can't be negative"
    errormsg2 = "invalid JSON"
    errorcount = 0
+   
    for path ∈ paths
         try
             readTimeJSON(path)
